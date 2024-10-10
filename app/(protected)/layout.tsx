@@ -7,7 +7,10 @@ import { ReactNode } from "react";
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const user = await currentUser();
 
-  const { authorized, message } = await isAuthorized(user?.id!);
+  if (!user) {
+    redirect("/plans");
+  }
+  const { authorized } = await isAuthorized(user.id);
 
   if (!authorized) {
     redirect("/plans");

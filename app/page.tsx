@@ -1,11 +1,10 @@
-import AnimatedBackground from "@/components/landing-page/animated-background";
+import Footer from "@/components/sections/footer";
 import Header from "@/components/sections/header";
 import Hero from "@/components/sections/hero";
+import HowItWorks from "@/components/sections/how-it-works";
 import Logos from "@/components/sections/logos";
 import Problem from "@/components/sections/problem";
-import { Button } from "@/components/ui/button";
-import { BarChart2, DollarSign, TrendingUp } from "lucide-react";
-import Image from "next/image";
+import Solution from "@/components/sections/solution";
 
 export default function Home() {
   return (
@@ -14,6 +13,9 @@ export default function Home() {
       <Hero />
       <Logos />
       <Problem />
+      <Solution />
+      <HowItWorks />
+      <Footer />
     </main>
   );
 }

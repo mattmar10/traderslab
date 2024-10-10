@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 
-import { Icons } from "@/components/icons";
 import HeroVideoDialog from "@/components/landing-page/hero-video";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -62,7 +61,9 @@ function HeroTitles() {
           "Elevate",
           "your trading",
           "with",
-          <span className="text-traderslabblue">TradersLab</span>,
+          <span className="text-traderslabblue" key={"tl"}>
+            TradersLab
+          </span>,
         ].map((text, index) => (
           <motion.span
             key={index}

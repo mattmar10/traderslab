@@ -1,19 +1,16 @@
 "use client";
 
-import Drawer from "@/components/nav/mobile-menu";
-
 import Menu from "@/components/menu";
 import { buttonVariants } from "@/components/ui/button";
 
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Icons } from "../icons";
-import { siteConfig } from "@/lib/config";
+
 import { useTheme } from "next-themes";
-import { Arrow } from "@radix-ui/react-dropdown-menu";
-import { ArrowBigRight, ArrowRight, ArrowRightCircle } from "lucide-react";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+
+import { ArrowRight } from "lucide-react";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { UserManagement } from "../nav/user-management";
 import MobileMenu from "@/components/nav/mobile-menu";
 

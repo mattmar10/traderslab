@@ -6,8 +6,8 @@ import { RiInstagramFill } from "react-icons/ri";
 export const BLUR_FADE_DELAY = 0.15;
 
 export const siteConfig = {
-  name: "acme.ai",
-  description: "Automate your workflow with AI",
+  name: "TraderLab",
+  description: "Elevate your trading with TradersLab.",
   url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
   keywords: ["SaaS", "Template", "Next.js", "React", "Tailwind CSS"],
   links: {

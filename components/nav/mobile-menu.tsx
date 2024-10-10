@@ -24,7 +24,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { ThemeToggleButton } from "../ui/theme-toggle-button";
 
 import { cn } from "@/lib/utils";
-import { DashboardIcon, DashIcon } from "@radix-ui/react-icons";
+import { DashboardIcon } from "@radix-ui/react-icons";
 import axios from "axios";
 
 export interface MobileMenuProps {

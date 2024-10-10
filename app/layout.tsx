@@ -1,22 +1,11 @@
-import {
-  ClerkProvider,
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
-import type { Metadata, Viewport } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
+import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { IoIosHelpCircleOutline } from "react-icons/io";
 import { ThemeProvider } from "next-themes";
 import ReactQueryProvider from "./providers/Providers";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { HeaderNav } from "@/components/nav/header-nav";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

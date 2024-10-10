@@ -1,7 +1,7 @@
 "use client";
 import axios from "axios";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   NavigationMenuItem,
   NavigationMenuTrigger,
@@ -18,8 +18,6 @@ import { redirect } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 import { LogOutIcon } from "lucide-react";
-import { loadStripe } from "@stripe/stripe-js";
-import { Button } from "../ui/button";
 
 export function UserManagement() {
   const { isLoaded, user } = useUser();
