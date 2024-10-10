@@ -63,7 +63,7 @@ export function HeaderNav() {
             </DropdownMenuContent>
           </DropdownMenu>
           <Link className="text-sm font-medium" href="#">
-            Solutions
+            Screener
           </Link>
           <Link className="text-sm font-medium" href="#">
             Resources

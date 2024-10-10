@@ -50,7 +50,6 @@
     --solarizedblue-foreground: 0 0% 100%;
     --traderslabblue: 210 100% 56%;
     --traderslabblue-foreground: 0 0% 100%;
-    --logo-src: url('/tl-light-theme-nav-logo.png');
   }
 
   .dark {
@@ -83,7 +82,6 @@
     --solarizedblue-foreground: 0 0% 100%;
     --traderslabblue: 210 100% 56%;
     --traderslabblue-foreground: 0 0% 100%;
-    --logo-src: url('/tl-dark-theme-nav-logo.png');
   }
 }
 

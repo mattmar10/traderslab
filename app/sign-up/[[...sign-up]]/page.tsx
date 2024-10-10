@@ -3,7 +3,7 @@ import { Sign } from "crypto";
 
 export default function Page() {
   return (
-    <main className="grid min-h-screen place-items-center px-6 lg:px-8 bg-foreground/10 no-scrollbar">
+    <main className="grid min-h-screen place-items-center px-6 lg:px-8 no-scrollbar">
       <SignUp />
     </main>
   );

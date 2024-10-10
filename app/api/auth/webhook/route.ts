@@ -1,8 +1,7 @@
 import {
   insertUser,
-  updateUser,
   updateUserByExternalId,
-} from "@/actions/data/user/userActions";
+} from "@/actions/data/user/user-actions";
 import { NewUser } from "@/drizzle/schema";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { headers } from "next/headers";

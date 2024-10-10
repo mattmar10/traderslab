@@ -6,7 +6,7 @@ import {
   SignedOut,
   UserButton,
 } from "@clerk/nextjs";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,7 @@ import ReactQueryProvider from "./providers/Providers";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { HeaderNav } from "@/components/nav/header-nav";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -81,6 +82,8 @@ const MaintenancePage = () => (
   </body>
 );
 
+//export const metadata: Metadata = constructMetadata({});
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -89,7 +92,7 @@ export default function RootLayout({
   const isMaintenanceMode = process.env.MAINTENANCE_MODE === "TRUE";
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <title>Traderslab</title>
         <meta charSet="utf-8" />
@@ -104,7 +107,7 @@ export default function RootLayout({
       ) : (
         <body
           className={cn(
-            "antialiased min-h-screen font-sans",
+            "min-h-screen bg-background antialiased w-full mx-auto scroll-smooth",
             geistSans.className
           )}
         >
@@ -113,10 +116,9 @@ export default function RootLayout({
               <ThemeProvider
                 attribute="class"
                 defaultTheme="light"
-                enableSystem
+                enableSystem={false}
                 disableTransitionOnChange
               >
-                <HeaderNav />
                 {children}
               </ThemeProvider>
             </ReactQueryProvider>
@@ -124,47 +126,5 @@ export default function RootLayout({
         </body>
       )}
     </html>
-  );
-
-  return (
-    <ClerkProvider>
-      <html lang="en">
-        <head>
-          <title>traderslab</title>
-          <meta charSet="utf-8" />
-          <meta
-            name="viewport"
-            content="initial-scale=1.0, width=device-width"
-          />
-          <meta
-            name="description"
-            content="Market research tool with comprehensive breadth model (PTMM) and sophisticated stock screener for swing traders"
-          />
-        </head>
-        <body
-          className={cn(
-            "antialiased min-h-screen font-sans",
-            geistSans.className
-          )}
-        >
-          <ReactQueryProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="light"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <SignedOut>
-                <SignInButton />
-              </SignedOut>
-              <SignedIn>
-                <UserButton />
-              </SignedIn>
-              {children}
-            </ThemeProvider>
-          </ReactQueryProvider>
-        </body>
-      </html>
-    </ClerkProvider>
   );
 }

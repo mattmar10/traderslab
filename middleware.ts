@@ -5,7 +5,9 @@ const publicRoutes = [
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/api/health",
-  "/api/auth/webhook", // Add your webhook route here
+  "/api/auth/webhook",
+  "/api/payments/webhook",
+  "/api/payments/create-checkout-session", // Add your webhook route here
 ];
 
 const isPublicRoute = createRouteMatcher(publicRoutes);

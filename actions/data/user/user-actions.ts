@@ -1,6 +1,11 @@
 "server only";
 
-import { NewUser, usersTable } from "@/drizzle/schema";
+import {
+  ExistingUser,
+  NewUser,
+  subscriptionsTable,
+  usersTable,
+} from "@/drizzle/schema";
 import { getDatabaseInstance } from "@/lib/db";
 import { eq } from "drizzle-orm";
 
@@ -41,6 +46,41 @@ export async function findOrCreateUser(user: NewUser): Promise<NewUser> {
     return existingUsers[0];
   }
 }
+
+export async function getUserByEmail(
+  email: string
+): Promise<ExistingUser | undefined> {
+  const db = await getDatabaseInstance();
+
+  const existingUsers = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.email, email))
+    .limit(1);
+
+  if (existingUsers.length === 0) {
+    return undefined;
+  } else {
+    return existingUsers[0];
+  }
+}
+
+export const getStripeUserIdByEmail = async (
+  email: string
+): Promise<string | undefined> => {
+  const db = await getDatabaseInstance();
+  const result = await db
+    .select({
+      email: usersTable.email,
+      stripeUserId: subscriptionsTable.stripeUserId,
+    })
+    .from(usersTable)
+    .innerJoin(subscriptionsTable, eq(usersTable.id, subscriptionsTable.userId))
+    .where(eq(usersTable.email, email))
+    .limit(1);
+
+  return result[0]?.stripeUserId || undefined;
+};
 
 type Condition = ReturnType<typeof eq>; // Define a type for the condition based on your query builder
 
