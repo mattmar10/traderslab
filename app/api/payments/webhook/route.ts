@@ -1,11 +1,10 @@
 import {
   cancelSubscription,
   insertSubscription,
-  updateSubscription,
   upsertSubscription,
 } from "@/actions/data/subscriptions/subscriptionActions";
 import { getUserByEmail } from "@/actions/data/user/user-actions";
-import { NewSubscription, usersTable } from "@/drizzle/schema";
+import { NewSubscription } from "@/drizzle/schema";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
@@ -126,6 +125,8 @@ async function handleInvoiceEvent(
     user_id: invoice.metadata?.userId,
     email: customerEmail,
   };
+
+  console.log(invoiceData);
 
   let error, data;
   if (error) {
