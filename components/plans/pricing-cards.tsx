@@ -110,6 +110,10 @@ export default function PricingCards() {
     }
   };
 
+  if (checkoutErrorMsg) {
+    console.log("Error checking out");
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <PricingHeader title="Choose the plan that's right for you" subtitle="" />
