@@ -3,10 +3,10 @@ import { notFound } from "next/navigation";
 
 const PTMMDashboard = ({
   params,
-  searchParams,
-}: {
+}: // searchParams,
+{
   params: { dataset: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
+  // searchParams?: { [key: string]: string | string[] | undefined };
 }) => {
   const dataset = decodeURIComponent(params.dataset.toUpperCase());
 
