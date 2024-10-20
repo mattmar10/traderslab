@@ -1,6 +1,3 @@
-import PricingCards from "@/components/plans/pricing-cards";
-import Footer from "@/components/sections/footer";
-import Header from "@/components/sections/header";
 import { SignIn } from "@clerk/nextjs";
 
 export default function Page() {

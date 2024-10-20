@@ -12,7 +12,6 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
-import { siteConfig } from "@/lib/config";
 import {
   CurrentDayMarketBreadthSnapshot,
   CurrentDayMarketBreadthSnapshotSchema,
@@ -21,7 +20,7 @@ import { useQuery } from "react-query";
 import BreadthCard from "./nav/breadth-card";
 import { AllPTTrendModels } from "@/lib/types/trend-model-types";
 import { Button } from "./ui/button";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { SignedIn } from "@clerk/nextjs";
 
 export default function NavigationMenuDemo() {
   const snapshotKey = `/api/breadth-snapshot`;
