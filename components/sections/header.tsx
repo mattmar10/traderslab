@@ -48,14 +48,11 @@ export default function Header() {
 
   return (
     <header
-      className={
-        "relative sticky top-0 z-50 py-2 bg-background/60 backdrop-blur"
-      }
+      className={" sticky top-0 z-50 py-3 bg-background/60 backdrop-blur"}
     >
       <div className="flex justify-between items-center container">
         <Link href="/">
-          <div className="flex items-center space-x-4">
-            {/* Render the logo based on the resolved theme */}
+          <div className="flex items-center space-x-4 cursor">
             <img
               src={logoSrc}
               alt="TradersLab Logo"
@@ -65,7 +62,7 @@ export default function Header() {
             />
           </div>
         </Link>
-        <div className="hidden lg:block">
+        <div className="hidden lg:block mr-24">
           <div className="flex items-center ">
             <nav className="mr-10">
               <Menu />

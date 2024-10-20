@@ -61,7 +61,7 @@ export default function PricingCards() {
         "API access",
       ],
     },
-    {
+    /* {
       name: "Pro Plan",
       description: "Everything you need to grow your business",
       monthlyPrice: 49,
@@ -75,7 +75,7 @@ export default function PricingCards() {
         "50GB storage",
         "Advanced security",
       ],
-    },
+    },*/
   ];
 
   const handleCheckout = async (priceId: string, subscription: boolean) => {
@@ -116,7 +116,7 @@ export default function PricingCards() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <PricingHeader title="Choose the plan that's right for you" subtitle="" />
+      <PricingHeader title="Sign up today to get started" subtitle="" />
       <div className="flex items-center justify-center mb-8">
         <span className="mr-2">Monthly</span>
         <Switch
@@ -126,7 +126,7 @@ export default function PricingCards() {
         />
         <span className="ml-2">Annual</span>
       </div>
-      <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      <div className="grid md:grid-cols-1 gap-8 max-w-2xl mx-auto">
         {plans.map((plan) => {
           const price = isAnnual ? plan.annualPrice : plan.monthlyPrice;
           const savings = isAnnual
@@ -172,14 +172,14 @@ export default function PricingCards() {
                     )
                   }
                 >
-                  Get Started
+                  Sign Up
                 </Button>
               </CardFooter>
             </Card>
           );
         })}
       </div>
-      <div className="flex flex-col w-[70%] lg:w-[50%] mx-auto  mt-12">
+      <div className="flex flex-col w-[70%] lg:w-[50%] mx-auto  mt-16">
         <h2
           className={` text-4xl mt-2 font-semibold text-center tracking-tight`}
         >
@@ -206,7 +206,7 @@ export default function PricingCards() {
           </AccordionItem>
         </Accordion>
       </div>
-      <div className="mt-12 text-foreground/50 text-sm">
+      <div className="mt-12 text-foreground/50 text-sm text-center">
         Still have questions? Email us at{" "}
         <span className="underline">support@traderslab.com</span>
       </div>

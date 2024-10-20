@@ -1,9 +1,9 @@
-const ScreenerPage: React.FC = () => {
+const SectorsThemesPage: React.FC = () => {
   return (
     <main className="flex min-w-screen flex-col items-center justify-between pt-12">
-      Screener Page
+      Sectors/Themes Page
     </main>
   );
 };
 
-export default ScreenerPage;
+export default SectorsThemesPage;
