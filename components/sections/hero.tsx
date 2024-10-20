@@ -10,6 +10,14 @@ import { ArrowRight } from "lucide-react";
 
 const ease = [0.16, 1, 0.3, 1];
 
+import { Raleway } from "next/font/google";
+import { BorderBeam } from "../magicui/border-beam";
+
+const raleway = Raleway({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
+});
+
 function HeroPill() {
   return (
     <div className="hidden lg:block">
@@ -46,7 +54,9 @@ function HeroPill() {
 
 function HeroTitles() {
   return (
-    <div className="flex w-full max-w-2xl flex-col space-y-4 overflow-hidden pt-8">
+    <div
+      className={`flex w-full max-w-2xl flex-col space-y-4 overflow-hidden pt-8 ${raleway.className}`}
+    >
       <motion.h1
         className="text-center text-4xl font-medium leading-tight text-foreground sm:text-5xl md:text-6xl"
         initial={{ filter: "blur(10px)", opacity: 0, y: 50 }}
@@ -131,7 +141,7 @@ function HeroImage() {
       <HeroVideoDialog
         animationStyle="from-center"
         videoSrc="https://www.youtube.com/embed/W7Q41hhABOI?si=95RAjnNeZ_zS-NpM"
-        thumbnailSrc="/dashboard.png"
+        thumbnailSrc="/home-hero.png"
         thumbnailAlt="Hero Video"
         className="border rounded-lg shadow-lg max-w-screen-lg mt-16"
       />
@@ -143,7 +153,7 @@ export default function Hero2() {
   return (
     <section id="hero">
       <div className="relative flex w-full flex-col items-center justify-start px-4  sm:px-6 pt-4 md:pt-32 lg:px-8">
-        <HeroPill />
+        {/*<HeroPill />*/}
         <HeroTitles />
         <HeroCTA />
         <HeroImage />

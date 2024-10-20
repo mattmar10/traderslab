@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Play, XIcon } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import { BorderBeam } from "../magicui/border-beam";
 
 type AnimationStyle =
   | "from-bottom"
@@ -83,6 +84,7 @@ export default function HeroVideoDialog({
         className="relative cursor-pointer group rounded-md p-2 ring-1 ring-slate-200/50 dark:bg-gray-900/70 dark:ring-white/10 backdrop-blur-md"
         onClick={() => setIsVideoOpen(true)}
       >
+        <BorderBeam />
         <Image
           src={thumbnailSrc}
           alt={thumbnailAlt}

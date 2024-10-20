@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import * as React from "react";
-
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,72 +11,170 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/lib/config";
+import {
+  CurrentDayMarketBreadthSnapshot,
+  CurrentDayMarketBreadthSnapshotSchema,
+} from "@/lib/types/market-breadth-types";
+import { useQuery } from "react-query";
+import BreadthCard from "./nav/breadth-card";
+import { AllPTTrendModels } from "@/lib/types/trend-model-types";
+import { Button } from "./ui/button";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
 export default function NavigationMenuDemo() {
+  const snapshotKey = `/api/breadth-snapshot`;
+  const getSnapshots = async (): Promise<
+    CurrentDayMarketBreadthSnapshot | undefined
+  > => {
+    const res = await fetch(snapshotKey);
+    const data = await res.json();
+    const parsed = CurrentDayMarketBreadthSnapshotSchema.safeParse(data);
+    if (!parsed.success) {
+      console.error("Failed to parse snapshot data:", parsed.error);
+      return undefined;
+    }
+    return parsed.data;
+  };
+
+  const { data: snapshotsData } = useQuery({
+    queryKey: [snapshotKey],
+    queryFn: getSnapshots,
+    refetchInterval: 60000,
+    staleTime: 10000,
+  });
+
+  const trendModelsKey = `/api/trend-models/all`;
+  const getTrendModels = async (): Promise<AllPTTrendModels | undefined> => {
+    const res = await fetch(trendModelsKey);
+    const data = await res.json();
+    const parsed = AllPTTrendModels.safeParse(data);
+    if (!parsed.success) {
+      console.error("Failed to parse trend models data:", parsed.error);
+      return undefined;
+    }
+    return parsed.data;
+  };
+
+  const { data: trendModelsData } = useQuery({
+    queryKey: [trendModelsKey],
+    queryFn: getTrendModels,
+    refetchInterval: 60000,
+    staleTime: 10000,
+  });
+
+  const renderBreadthCards = () => {
+    if (!snapshotsData || !trendModelsData) return null;
+
+    const cardData = [
+      {
+        key: "nyse",
+        ticker: "^NYA",
+        name: "NYSE",
+        description: "NYSE Composite Index",
+        data: snapshotsData.nyseOverview,
+        ptTrendModel: trendModelsData.nyseTrendModel,
+        href: "/ptmm/nyse",
+      },
+      {
+        key: "rsp",
+        ticker: "RSP",
+        name: "S&P 500",
+        description: "Equal Weighted S&P 500",
+        data: snapshotsData.rspTradingOverview,
+        ptTrendModel: trendModelsData.rspTrendModel,
+        href: "/ptmm/s&p500",
+      },
+      {
+        key: "ndx",
+        ticker: "QQQE",
+        name: "NDX100",
+        description: "Equal Weighted Nasdaq 100",
+        data: snapshotsData.qqqETradingOverview,
+        ptTrendModel: trendModelsData.qqqeTrendModel,
+        href: "/ptmm/ndx100",
+      },
+      {
+        key: "iwm",
+        ticker: "IWM",
+        name: "Russell 2000",
+        description: "Small Cap Index",
+        data: snapshotsData.iwmTradingOverview,
+        ptTrendModel: trendModelsData.iwmTrendModel,
+        href: "/ptmm/iwm",
+      },
+    ];
+
+    return cardData.map(
+      ({ key, ticker, name, description, data, ptTrendModel, href }) => (
+        <li key={key} className="py-2">
+          {data && ptTrendModel && (
+            <NavigationMenuLink asChild>
+              <Link href={href}>
+                <BreadthCard
+                  ticker={ticker}
+                  name={name}
+                  description={description}
+                  data={data}
+                  ptTrendModel={ptTrendModel}
+                />
+              </Link>
+            </NavigationMenuLink>
+          )}
+        </li>
+      )
+    );
+  };
+
   return (
     <NavigationMenu>
       <NavigationMenuList>
-        {siteConfig.header.map((item, index) => (
-          <NavigationMenuItem key={index}>
-            {item.trigger ? (
-              <>
-                <NavigationMenuTrigger>{item.trigger}</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul
-                    className={`grid gap-3 p-6 ${
-                      item.content.main
-                        ? "md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]"
-                        : "w-[400px] md:w-[500px] md:grid-cols-2 lg:w-[600px]"
-                    }`}
-                  >
-                    {item.content.main && (
-                      <li className="row-span-3">
-                        <NavigationMenuLink asChild>
-                          <Link
-                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-primary/10 from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                            href={item.content.main.href}
-                          >
-                            {item.content.main.icon}
-                            <div className="mb-2 mt-4 text-lg font-medium">
-                              {item.content.main.title}
-                            </div>
-                            <p className="text-sm leading-tight text-muted-foreground">
-                              {item.content.main.description}
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                    )}
-                    {item.content.items.map((subItem, subIndex) => (
-                      <ListItem
-                        key={subIndex}
-                        href={subItem.href}
-                        title={subItem.title}
-                        className="hover:bg-primary/10"
-                      >
-                        {subItem.description}
-                      </ListItem>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
-              </>
-            ) : (
-              <Link
-                href={item.href || ""}
-                target="_arya"
-                legacyBehavior
-                passHref
-              >
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  {item.label}
-                </NavigationMenuLink>
-              </Link>
-            )}
+        <SignedIn>
+          <NavigationMenuItem>
+            <NavigationMenuTrigger>Breadth</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="p-6  w-[500px] md:w-[500px] lg:w-[500px]">
+                {renderBreadthCards()}
+              </ul>
+
+              <div className="text-center pb-6">
+                <Button>Intraday GDB Chart</Button>
+              </div>
+            </NavigationMenuContent>
           </NavigationMenuItem>
-        ))}
+          <NavigationMenuItem>
+            <NavigationMenuTrigger>Screener</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className={`p-6  w-[300px]`}>
+                <ListItem
+                  key={"sectors-themes"}
+                  href={"/sectors-themes"}
+                  title={"Sectors & Themes"}
+                  className="hover:bg-primary/10"
+                >
+                  Sectors & Themes Description Here
+                </ListItem>
+                <ListItem
+                  key={"screener"}
+                  href={"/screener"}
+                  title={"Screener"}
+                  className="hover:bg-primary/10"
+                >
+                  Screener Description Here
+                </ListItem>
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        </SignedIn>
+
+        <NavigationMenuItem>
+          <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+            <Link href={"/blog"} target="_arya">
+              Blog
+            </Link>
+          </NavigationMenuLink>
+        </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
   );
@@ -93,7 +190,7 @@ const ListItem = React.forwardRef<
         <a
           ref={ref}
           className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground py-4",
             className
           )}
           {...props}
