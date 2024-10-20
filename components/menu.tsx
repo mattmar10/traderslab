@@ -21,6 +21,7 @@ import BreadthCard from "./nav/breadth-card";
 import { AllPTTrendModels } from "@/lib/types/trend-model-types";
 import { Button } from "./ui/button";
 import { SignedIn } from "@clerk/nextjs";
+import SearchContainer from "./nav/search-container";
 
 export default function NavigationMenuDemo() {
   const snapshotKey = `/api/breadth-snapshot`;
@@ -174,6 +175,11 @@ export default function NavigationMenuDemo() {
             </Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
+        <SignedIn>
+          <NavigationMenuItem>
+            <SearchContainer />
+          </NavigationMenuItem>
+        </SignedIn>
       </NavigationMenuList>
     </NavigationMenu>
   );
