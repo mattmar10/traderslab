@@ -11,14 +11,13 @@ import { ArrowRight } from "lucide-react";
 const ease = [0.16, 1, 0.3, 1];
 
 import { Raleway } from "next/font/google";
-import { BorderBeam } from "../magicui/border-beam";
 
 const raleway = Raleway({
   subsets: ["latin"],
   weight: ["300", "400", "500", "700"],
 });
 
-function HeroPill() {
+/*function HeroPill() {
   return (
     <div className="hidden lg:block">
       <motion.a
@@ -50,7 +49,7 @@ function HeroPill() {
       </motion.a>
     </div>
   );
-}
+}*/
 
 function HeroTitles() {
   return (
