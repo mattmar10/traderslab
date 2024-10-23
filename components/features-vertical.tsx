@@ -281,7 +281,7 @@ export default function Features({
                     transition={{ duration: 0.25, ease: "easeOut" }}
                   >
                     <Image
-                      src={data[currentIndex].image}
+                      src={data[currentIndex].image || ""}
                       alt="feature"
                       fill
                       className="rounded-xl border border-neutral-300/50 px-1 p-1 shadow-lg"
