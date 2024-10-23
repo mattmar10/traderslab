@@ -1,3 +1,4 @@
+import DashboardWrapper from "@/components/ptmm-dashboard/dashboard-wrapper";
 import { isDataset } from "@/lib/types/basic-types";
 import { notFound } from "next/navigation";
 
@@ -27,9 +28,7 @@ const PTMMDashboard = ({
   }
 
   return (
-    <main className="flex min-w-screen flex-col items-center justify-between pt-12">
-      PTMM {datasetDesc}
-    </main>
+    <DashboardWrapper dataset={dataset} datasetDescription={datasetDesc} />
   );
 };
 
