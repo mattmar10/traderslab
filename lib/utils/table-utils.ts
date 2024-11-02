@@ -1,3 +1,5 @@
+import { negativeRed, positiveBlue } from "./color-utils";
+
 export const calculateColorFromPercentage = (
   value: number,
   theme: "dark" | "light",
@@ -6,8 +8,8 @@ export const calculateColorFromPercentage = (
   max: number
 ): string => {
   // Define colors for light and dark themes
-  const positiveColor = theme === "dark" ? "#4CAF50" : "#228B22"; // Green
-  const negativeColor = theme === "dark" ? "#F44336" : "#FF6347"; // Red
+  const positiveColor = theme === "dark" ? positiveBlue : positiveBlue; // Green
+  const negativeColor = theme === "dark" ? negativeRed : negativeRed; // Red
 
   // Calculate opacity based on distance from neutral value
   let opacity;

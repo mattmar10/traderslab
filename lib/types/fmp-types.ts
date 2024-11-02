@@ -313,16 +313,16 @@ export interface SearchResponse {
   indexes: IndexSymbolResponse[];
 }
 
-const EarningsDateSchema = z.object({
+export const EarningsDateSchema = z.object({
   date: z.string(),
   symbol: z.string(),
   eps: z.nullable(z.number()),
   epsEstimated: z.nullable(z.number()),
-  time: z.enum(["bmo", "amc"]), // Assuming "bmo" or "amc" are the possible values for time
+  time: z.enum(["bmo", "amc"]),
   revenue: z.nullable(z.number()),
   revenueEstimated: z.nullable(z.number()),
-  updatedFromDate: z.string(), // You might want to change this to a Date type if you need strict date validation
-  fiscalDateEnding: z.string(), // You might want to change this to a Date type if you need strict date validation
+  updatedFromDate: z.string(),
+  fiscalDateEnding: z.string(),
 });
 
 export type FMPEarningsDate = z.infer<typeof EarningsDateSchema>;
@@ -361,3 +361,20 @@ export function isFMPEarningsCalendar(data: any): data is FMPEarningsCalendar {
 
   return true;
 }
+
+export const EconomicEventSchema = z.object({
+  date: z.string(), // Assuming the date is in string format
+  country: z.string().length(2), // Two-letter country code
+  event: z.string(),
+  currency: z.string().length(3), // Three-letter currency code
+  previous: z.number().nullable(), // Nullable number
+  estimate: z.number().nullable(), // Nullable number
+  actual: z.number().nullable(), // Nullable number
+  change: z.number().nullable(), // Nullable number
+  impact: z.enum(["Low", "Medium", "High", "None"]), // Enum for impact levels
+  changePercentage: z.number(),
+  unit: z.string(),
+});
+
+export type EconomicEvent = z.infer<typeof EconomicEventSchema>;
+export type EconomicEventArray = EconomicEvent[];

@@ -1,5 +1,5 @@
 import { isAuthorized } from "@/actions/data/user/is-authorized";
-import Header from "@/components/sections/header";
+import AppSidebar from "@/components/layout/app-sidebar";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
@@ -17,9 +17,8 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div>
-      <Header />
-      <main>{children}</main>
+    <div className="py-2">
+      <AppSidebar>{children}</AppSidebar>
     </div>
   );
 }

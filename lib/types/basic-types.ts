@@ -89,13 +89,6 @@ export const StockIndexConstituentSchema = z.object({
   subSector: z.string(),
 });
 
-export type FMPDataLoadingError = string;
-export function isFMPDataLoadingError(
-  error: any
-): error is FMPDataLoadingError {
-  return typeof error === "string";
-}
-
 export type StockIndexConstituent = z.infer<typeof StockIndexConstituentSchema>;
 
 export const StockIndexConstituentListSchema =

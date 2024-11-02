@@ -6,8 +6,11 @@ import {
   ChartSettings,
   defaultSettings,
 } from "@/components/settings/chart-settings";
-import { Candle, isFMPDataLoadingError } from "@/lib/types/basic-types";
-import { FMPHistoricalResultsSchema } from "@/lib/types/fmp-types";
+import { Candle } from "@/lib/types/basic-types";
+import {
+  FMPHistoricalResultsSchema,
+  isFMPDataLoadingError,
+} from "@/lib/types/fmp-types";
 import {
   calculateEMA,
   calculateSMA,

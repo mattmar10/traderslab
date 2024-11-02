@@ -1,11 +1,12 @@
 "use client";
 import { getDataSetMarketBreadthOverview } from "@/actions/breadth/breadth-actions";
 import useViewport from "@/hooks/useViewport";
-import { Dataset, isFMPDataLoadingError } from "@/lib/types/basic-types";
+import { Dataset } from "@/lib/types/basic-types";
 import { useQuery } from "react-query";
 import Loading from "../loading";
 import DesktopDashboard from "./desktop-dashboard";
 import { MarketBreadthResponse } from "@/lib/types/market-breadth-types";
+import { isFMPDataLoadingError } from "@/lib/types/fmp-types";
 
 export interface DashboardWrapperProps {
   dataset: Dataset;
@@ -50,7 +51,7 @@ const DashboardWrapper: React.FC<DashboardWrapperProps> = ({
   return (
     <main
       className="flex flex-col items-center justify-between pt-12"
-      style={{ width: "75%", margin: "0 auto" }}
+      style={{ width: "85%", margin: "0 auto" }}
     >
       <DesktopDashboard
         overview={data as MarketBreadthResponse}

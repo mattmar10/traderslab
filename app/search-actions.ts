@@ -1,6 +1,7 @@
 "use server";
 
-import { FMPDataLoadingError, SearchResponse } from "@/lib/types/basic-types";
+import { SearchResponse } from "@/lib/types/basic-types";
+import { FMPDataLoadingError } from "@/lib/types/fmp-types";
 
 export async function basicSearch(
   query: string
