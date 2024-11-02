@@ -13,7 +13,7 @@ export default async function SuccessPage() {
         Welcome to TradersLab.
       </h1>
       <p className="leading-7 text-center w-[60%]">Let&apos;s get cooking</p>
-      <Link href="/home" className="mt-4">
+      <Link href="/market-overview" className="mt-4">
         <Button>Access Dashboard</Button>
       </Link>
     </main>

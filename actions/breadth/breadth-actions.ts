@@ -1,10 +1,6 @@
 "use server";
 import { fetchWithRetries } from "@/app/api/utils";
-import {
-  Dataset,
-  FMPDataLoadingError,
-  getTickerForDataset,
-} from "@/lib/types/basic-types";
+import { Dataset, getTickerForDataset } from "@/lib/types/basic-types";
 import { MarketBreadthResponse } from "@/lib/types/market-breadth-types";
 
 export async function getDataSetMarketBreadthOverview(

@@ -164,10 +164,11 @@ const SearchContainer = () => {
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
-          className="px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-800"
+          size={"icon"}
+          className="relative hover:bg-gray-100 dark:hover:bg-gray-800"
           aria-label="Search symbols"
         >
-          <MagnifyingGlassIcon className="h-6 w-6 shrink-0" />
+          <MagnifyingGlassIcon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100  shrink-0" />
         </Button>
       </PopoverTrigger>
 
