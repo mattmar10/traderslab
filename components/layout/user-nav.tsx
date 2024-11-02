@@ -15,7 +15,7 @@ import { useClerk, useUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 export function UserNav() {
   const { signOut } = useClerk();
-  const { isLoaded, user } = useUser();
+  const { user } = useUser();
   const handleSignOut = () => {
     signOut();
 

@@ -138,7 +138,7 @@ export default function AppSidebar({
   const { isLoaded, user } = useUser();
   const [mounted, setMounted] = React.useState(false);
   const pathname = usePathname();
-  const { theme, resolvedTheme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   // Only render after first client-side mount
   React.useEffect(() => {

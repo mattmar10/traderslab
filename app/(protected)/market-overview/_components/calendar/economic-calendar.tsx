@@ -16,7 +16,7 @@ import {
 import { formatDateToEST } from "@/lib/utils/epoch-utils";
 import EconcomicCalenderCard from "./economic-calendar-card";
 import { CalendarIcon } from "lucide-react";
-import { z, ZodError } from "zod"; // Import Zod if not already
+import { z } from "zod"; // Import Zod if not already
 
 async function EconomicCalendar() {
   const events = await getEconomicCalendar();

@@ -10,7 +10,6 @@ import {
   RealtimeQuoteResponse,
 } from "@/lib/types/fmp-types";
 import { CurrentDayMarketBreadthSnapshot } from "@/lib/types/market-breadth-types";
-import { AllPTTrendModels } from "@/lib/types/trend-model-types";
 import {
   dateSringToMillisSinceEpochInET,
   formatDateToEST,
@@ -161,7 +160,7 @@ export async function getEarningsCalendar(): Promise<
     }
 
     // Sort valid data by date in ascending order
-    const sortedData = validEarnings.sort((a, b) => {
+    const sortedData = validEarnings.sort((a: { date: string | number | Date; }, b: { date: string | number | Date; }) => {
       const dateA = new Date(a.date);
       const dateB = new Date(b.date);
       return dateA.getTime() - dateB.getTime();

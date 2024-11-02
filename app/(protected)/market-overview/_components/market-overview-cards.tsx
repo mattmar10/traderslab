@@ -1,12 +1,5 @@
 "use client";
-import BreadthCard from "@/components/nav/breadth-card";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+
 import {
   CurrentDayMarketBreadthSnapshot,
   CurrentDayMarketBreadthSnapshotSchema,
@@ -102,7 +95,7 @@ const MarketOverViewCards: React.FC = () => {
     ];
 
     return cardData.map(
-      ({ key, ticker, name, description, data, ptTrendModel, href }) => (
+      ({ key, ticker, description, data, ptTrendModel, href }) => (
         <div key={key} className="py-2">
           {data && ptTrendModel && (
             <Link href={href}>

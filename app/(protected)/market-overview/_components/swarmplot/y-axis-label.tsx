@@ -15,15 +15,15 @@ const CustomYAxisLabel: React.FC<CustomYAxisLabelProps> = ({
 }) => {
   const sectorName = payload.value
     ? Array.from(sectorsOrderMap.entries()).find(
-        ([_, val]) => val === payload.value
-      )?.[0]
+      ([, val]) => val === payload.value
+    )?.[0]
     : "";
 
   const formattedSectorName = sectorName
     ? sectorName
-        .replace(/-/g, " ")
-        .replace("communication", "Comm") // Abbreviate "Communication" to "Comm"
-        .replace(/\b\w/g, (c) => c.toUpperCase()) // Capitalize each word
+      .replace(/-/g, " ")
+      .replace("communication", "Comm") // Abbreviate "Communication" to "Comm"
+      .replace(/\b\w/g, (c) => c.toUpperCase()) // Capitalize each word
     : "";
 
   return (

@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import { fetchWithRetries } from "../../utils";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { ticker: string } }
-) {
+export async function GET() {
   if (!process.env.TRADERS_LAB_API) {
     return NextResponse.json(
       { error: "TRADERS_LAB_API must be specified" },

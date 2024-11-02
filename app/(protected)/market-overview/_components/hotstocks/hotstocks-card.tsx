@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import { getMarketPerformers } from "@/actions/market-data/actions";
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
@@ -67,8 +67,8 @@ export default function HotStocksCard({ stocks }: HotStocksCardProps) {
       <CardHeader className="flex-none pb-0">
         <div className="flex items-center justify-between pb-2">
           <div>
-            <CardTitle>Today's Hot Stocks</CardTitle>
-            <CardDescription>Find stocks on the move today.</CardDescription>
+            <CardTitle>Today`&apos;`s Hot Stocks</CardTitle>
+            <CardDescription>Find stocks on the move today</CardDescription>
           </div>
           <Flame className="h-4 w-4 text-muted-foreground" />
         </div>
@@ -158,7 +158,7 @@ const ErrorState = ({ refetch }: ErrorStateProps) => (
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
       <div className="space-y-1">
         <CardTitle>Hot Stocks</CardTitle>
-        <CardDescription>What's Moving Today</CardDescription>
+        <CardDescription>What`&apos;`s Moving Today</CardDescription>
       </div>
       <Flame className="h-5 w-5 text-muted-foreground" />
     </CardHeader>

@@ -2,16 +2,10 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+
 import {
   TableBody,
   TableCell,
@@ -32,7 +26,8 @@ export interface SectorHeatmapCardProps {
 
 const SectorHeatmapCard: React.FC<SectorHeatmapCardProps> = ({ snapshot }) => {
   const { theme } = useTheme();
-  const resolvedTheme = "light";
+  const resolvedTheme = (theme as "light" | "dark") || "light";
+
   return (
     <Card className="w-full h-full min-h-[625px] max-h-[50vh]">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
