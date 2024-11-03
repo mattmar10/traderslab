@@ -8,6 +8,9 @@ import HotStocksServer from "./_components/hotstocks/hotstocks";
 import SectorHeatmapServer from "./_components/sector-heatmap/sector-heatmap";
 import { LeadingStocksServer } from "./_components/leading-stocks/leading-stocks";
 import { SettingUpStocksServer } from "./_components/setting-up-stocks/setting-up-stocks";
+import HeadlinesServer from "./_components/headlines/headlines";
+import EconomicCalendarServer from "./_components/calendar/economic-calendar";
+
 const lato = Lato({
   subsets: ["latin"],
   weight: ["400", "700", "900"],
@@ -42,6 +45,15 @@ const HomePage: React.FC = () => {
           <div className="col-span-1 3xl:col-span-3 ">
             <SettingUpStocksServer />
           </div>
+        </div>
+        <div className="grid grid-cols-1 gap-4 3xl:grid-cols-9">
+          <div className="col-span-1 3xl:col-span-6 ">
+            <HeadlinesServer />
+          </div>
+          <div className="col-span-1 3xl:col-span-3 ">
+            <EconomicCalendarServer />
+          </div>
+
         </div>
       </div>
     </PageContainer>

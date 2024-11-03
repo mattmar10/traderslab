@@ -130,7 +130,7 @@ const SectorSwarmplot: React.FC<SectorSwarmplotResponse> = ({
     <Card className="w-full h-full min-h-[625px] max-h-[50vh] flex flex-col">
       <CardHeader className="flex-none flex flex-row items-center justify-between pb-3">
         <div>
-          <CardTitle>Sector Performance Distribution</CardTitle>
+          <CardTitle className="text-xl">Sector Performance Distribution</CardTitle>
           <CardDescription>
             High level overview of returns across sectors
           </CardDescription>

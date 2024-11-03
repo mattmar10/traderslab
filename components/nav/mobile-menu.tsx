@@ -209,7 +209,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ theme }) => {
                 <ul className="space-y-4">
                   <motion.li key={"mobile-home"}>
                     <Link
-                      href={"/home"}
+                      href={"/market-overview"}
                       className="flex items-center space-x-2"
                       onClick={() => setIsOpen(false)}
                     >

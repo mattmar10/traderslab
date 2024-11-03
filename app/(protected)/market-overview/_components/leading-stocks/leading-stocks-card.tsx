@@ -55,17 +55,16 @@ const LeadingStocksCard: React.FC<LeadingStocksCardProps> = ({ stocks }) => {
 
 
     return (
-        <Card className="h-full min-h-[300px] max-h-[35vh] flex flex-col">
-            <CardHeader className="flex-none pb-0">
-                <div className="flex items-center justify-between pb-2">
-                    <div>
-                        <CardTitle>Leading Stocks</CardTitle>
-                        <CardDescription>TradersLab Market Leaders</CardDescription>
-                    </div>
-                    <Trophy className="h-4 w-4 text-muted-foreground" />
+        <Card className="h-full min-h-[300px] max-h-[30vh] flex flex-col">            <CardHeader className="flex-none pb-0">
+            <div className="flex items-center justify-between pb-2">
+                <div>
+                    <CardTitle className="text-xl">Leading Stocks</CardTitle>
+                    <CardDescription>TradersLab market leaders</CardDescription>
                 </div>
+                <Trophy className="h-4 w-4 text-muted-foreground" />
+            </div>
 
-            </CardHeader>
+        </CardHeader>
             <CardContent className="flex-1 overflow-hidden p-0">
                 <ScrollArea className="h-full w-full overflow-auto">
                     {data && data.stocks && data.stocks.length > 0 ? (
@@ -75,9 +74,9 @@ const LeadingStocksCard: React.FC<LeadingStocksCardProps> = ({ stocks }) => {
                                     <TableRow>
                                         <TableHead>Symbol</TableHead>
                                         <TableHead>Name</TableHead>
-                                        <TableHead className="text-right">Price</TableHead>
-                                        <TableHead className="text-right">Change</TableHead>
-                                        <TableHead className="text-right">Change %</TableHead>
+                                        <TableHead className="text-right w-[4rem]">Price</TableHead>
+                                        <TableHead className="text-right w-[4rem]">Change</TableHead>
+                                        <TableHead className="text-right w-[5.5rem]">Change %</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -86,7 +85,9 @@ const LeadingStocksCard: React.FC<LeadingStocksCardProps> = ({ stocks }) => {
                                             <TableCell className="font-medium">
                                                 {stock.profile.symbol}
                                             </TableCell>
-                                            <TableCell>{stock.profile.companyName}</TableCell>
+                                            <TableCell className="truncate max-w-[150px]">
+                                                <span title={stock.profile.companyName || ""}>{stock.profile.companyName}</span>
+                                            </TableCell>
                                             <TableCell className="text-right">
                                                 {stock.quote.price}
                                             </TableCell>
@@ -120,7 +121,7 @@ const loadingState = (
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 h-1/4">
             <div className="flex flex-col space-y-1">
                 <CardTitle>Leading Stocks</CardTitle>
-                <CardDescription>TradersLab Market Leaders</CardDescription>
+                <CardDescription>TradersLab market leaders</CardDescription>
             </div>
             <Trophy className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -140,7 +141,7 @@ const ErrorState = ({ refetch }: ErrorStateProps) => (
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <div className="space-y-1">
                 <CardTitle>Leading Stocks</CardTitle>
-                <CardDescription>TradersLab Market Leaders</CardDescription>
+                <CardDescription>TradersLab market leaders</CardDescription>
             </div>
             <Trophy className="h-5 w-5 text-muted-foreground" />
         </CardHeader>

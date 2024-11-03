@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 
 import Loading from "@/components/loading";
-import { AlertCircle, EyeIcon, Trophy } from "lucide-react";
+import { AlertCircle, EyeIcon } from "lucide-react";
 import { useQuery } from "react-query";
 import { ScreenerResults, SymbolWithStatsWithRank } from "@/lib/types/screener-types";
 import { Button } from "@/components/ui/button";
@@ -59,10 +59,10 @@ const SettingUpStocksCard: React.FC<SettingUpStocksCardProps> = ({ stocks }) => 
             <CardHeader className="flex-none pb-0">
                 <div className="flex items-center justify-between pb-2">
                     <div>
-                        <CardTitle>Stocks to Watch</CardTitle>
+                        <CardTitle className="text-xl">Stocks to Watch</CardTitle>
                         <CardDescription>Liquid stocks setting up</CardDescription>
                     </div>
-                    <Trophy className="h-4 w-4 text-muted-foreground" />
+                    <EyeIcon className="h-4 w-4 text-muted-foreground" />
                 </div>
 
             </CardHeader>
@@ -75,9 +75,9 @@ const SettingUpStocksCard: React.FC<SettingUpStocksCardProps> = ({ stocks }) => 
                                     <TableRow>
                                         <TableHead>Symbol</TableHead>
                                         <TableHead>Name</TableHead>
-                                        <TableHead className="text-right">Price</TableHead>
-                                        <TableHead className="text-right">Change</TableHead>
-                                        <TableHead className="text-right">Change %</TableHead>
+                                        <TableHead className="text-right w-[4rem]">Price</TableHead>
+                                        <TableHead className="text-right w-[4rem]">Change</TableHead>
+                                        <TableHead className="text-right w-[5.5rem]">Change %</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -86,7 +86,9 @@ const SettingUpStocksCard: React.FC<SettingUpStocksCardProps> = ({ stocks }) => 
                                             <TableCell className="font-medium">
                                                 {stock.profile.symbol}
                                             </TableCell>
-                                            <TableCell>{stock.profile.companyName}</TableCell>
+                                            <TableCell className="truncate max-w-[150px]">
+                                                <span title={stock.profile.companyName || ""}>{stock.profile.companyName}</span>
+                                            </TableCell>
                                             <TableCell className="text-right">
                                                 {stock.quote.price}
                                             </TableCell>
@@ -116,7 +118,7 @@ const loadingState = (
     <Card className="w-full h-[30vh] min-h-[300px] max-h-[500px]">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 h-1/4">
             <div className="flex flex-col space-y-1">
-                <CardTitle>Stocks to Watch</CardTitle>
+                <CardTitle className="text-xl">Stocks to Watch</CardTitle>
                 <CardDescription>Liquid stocks setting up</CardDescription>
             </div>
             <EyeIcon className="h-4 w-4 text-muted-foreground" />
@@ -136,7 +138,7 @@ const ErrorState = ({ refetch }: ErrorStateProps) => (
     <Card className="w-full min-h-[300px] max-h-[500px] h-[30vh] animate-in fade-in duration-500">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <div className="space-y-1">
-                <CardTitle>Stocks to watch</CardTitle>
+                <CardTitle className="text-xl">Stocks to watch</CardTitle>
                 <CardDescription>Liquid stocks setting up</CardDescription>
             </div>
             <EyeIcon className="h-5 w-5 text-muted-foreground" />

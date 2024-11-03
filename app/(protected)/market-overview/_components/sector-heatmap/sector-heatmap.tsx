@@ -28,7 +28,7 @@ function LoadingState() {
     <Card className="w-full h-full min-h-[625px] max-h-[40vh]">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex flex-col space-y-1">
-          <CardTitle>Sector Heatmap</CardTitle>
+          <CardTitle className="text-xl">Sector Heatmap</CardTitle>
           <CardDescription>Sector Comparison</CardDescription>
         </div>
         <TableIcon className="h-4 w-4 text-muted-foreground" />
