@@ -30,7 +30,7 @@ const EarningsCalendarCard: React.FC<EarningsCalendarProps> = ({
     <Card className="w-full h-[385px]">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex flex-col space-y-1">
-          <CardTitle>Earnings Calendar</CardTitle>
+          <CardTitle className="text-xl">Earnings Calendar</CardTitle>
           <CardDescription>Upcoming Earnings Reports</CardDescription>
         </div>
         <CalendarIcon className="h-4 w-4 text-muted-foreground" />

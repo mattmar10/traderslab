@@ -96,7 +96,7 @@ const MarketOverViewCards: React.FC = () => {
 
     return cardData.map(
       ({ key, ticker, description, data, ptTrendModel, href }) => (
-        <div key={key} className="py-2">
+        <div key={key} className="">
           {data && ptTrendModel && (
             <Link href={href}>
               <MarketOverviewCard

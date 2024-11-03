@@ -29,7 +29,7 @@ export interface EconomicCalendarProps {
 export default function EconomicCalendarCard({
   events = [],
 }: EconomicCalendarProps) {
-  const [showMedium, setShowMedium] = useState(false);
+  const [showMedium, setShowMedium] = useState(true);
   const [showHigh, setShowHigh] = useState(true);
 
   const filteredEvents = events.filter(
@@ -38,15 +38,15 @@ export default function EconomicCalendarCard({
   );
 
   return (
-    <Card className="w-full h-[400px]">
+    <Card className="h-full min-h-[300px] max-h-[30vh] flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex flex-col space-y-1">
-          <CardTitle>Economic Calendar</CardTitle>
+          <CardTitle className="text-xl">Economic Calendar</CardTitle>
           <CardDescription>Upcoming Market Events</CardDescription>
         </div>
         <CalendarIcon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1  overflow-hidden">
         <div className="flex space-x-4 mt-1 mb-2">
           <div className="flex items-center space-x-2">
             <Switch
@@ -65,7 +65,7 @@ export default function EconomicCalendarCard({
             <Label htmlFor="showMedium">Medium Impact</Label>
           </div>
         </div>
-        <ScrollArea className="h-[250px] w-full">
+        <ScrollArea className="h-full w-full overflow-auto">
           {filteredEvents.length > 0 ? (
             <Table>
               <TableHeader className="sticky top-0 bg-background z-10">

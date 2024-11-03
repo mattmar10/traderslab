@@ -63,11 +63,11 @@ export default function HotStocksCard({ stocks }: HotStocksCardProps) {
   }
 
   return (
-    <Card className="h-full min-h-[300px] max-h-[35vh] flex flex-col">
+    <Card className="h-full min-h-[300px] max-h-[30vh] flex flex-col">
       <CardHeader className="flex-none pb-0">
         <div className="flex items-center justify-between pb-2">
           <div>
-            <CardTitle>Today`&apos;`s Hot Stocks</CardTitle>
+            <CardTitle className="text-xl">Today&apos;s Hot Stocks</CardTitle>
             <CardDescription>Find stocks on the move today</CardDescription>
           </div>
           <Flame className="h-4 w-4 text-muted-foreground" />
@@ -95,9 +95,9 @@ export default function HotStocksCard({ stocks }: HotStocksCardProps) {
                   <TableRow>
                     <TableHead>Symbol</TableHead>
                     <TableHead>Name</TableHead>
-                    <TableHead className="text-right">Price</TableHead>
-                    <TableHead className="text-right">Change</TableHead>
-                    <TableHead className="text-right">Change %</TableHead>
+                    <TableHead className="text-right w-[4rem]">Price</TableHead>
+                    <TableHead className="text-right w-[4rem]">Change</TableHead>
+                    <TableHead className="text-right w-[5.5rem]">Change %</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -106,14 +106,16 @@ export default function HotStocksCard({ stocks }: HotStocksCardProps) {
                       <TableCell className="font-medium">
                         {stock.symbol}
                       </TableCell>
-                      <TableCell>{stock.name}</TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="truncate max-w-[150px]">
+                        <span title={stock.name || ""}>{stock.name}</span>
+                      </TableCell>
+                      <TableCell className="text-right w-[4rem]">
                         {stock.price}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right w-[4rem]">
                         {stock.change.toFixed(2)}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right w-[4rem]">
                         {stock.changesPercentage.toFixed(2)}%
                       </TableCell>
                     </TableRow>
@@ -158,7 +160,7 @@ const ErrorState = ({ refetch }: ErrorStateProps) => (
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
       <div className="space-y-1">
         <CardTitle>Hot Stocks</CardTitle>
-        <CardDescription>What`&apos;`s Moving Today</CardDescription>
+        <CardDescription>What&apos;s Moving Today</CardDescription>
       </div>
       <Flame className="h-5 w-5 text-muted-foreground" />
     </CardHeader>

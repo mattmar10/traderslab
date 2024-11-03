@@ -23,7 +23,7 @@ function LoadingState() {
         <Card className="w-full h-[30vh] min-h-[300px] max-h-[500px]">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 h-1/4">
                 <div className="flex flex-col space-y-1">
-                    <CardTitle>Stocks to Watch</CardTitle>
+                    <CardTitle className="text-xl">Stocks to Watch</CardTitle>
                     <CardDescription>Liquid stocks setting up</CardDescription>
                 </div>
                 <Eye className="h-4 w-4 text-muted-foreground" />
