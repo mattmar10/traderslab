@@ -55,7 +55,7 @@ const SettingUpStocksCard: React.FC<SettingUpStocksCardProps> = ({ stocks }) => 
 
 
     return (
-        <Card className="h-full min-h-[300px] max-h-[35vh] flex flex-col">
+        <Card className="h-full min-h-[300px] max-h-[30vh] flex flex-col">
             <CardHeader className="flex-none pb-0">
                 <div className="flex items-center justify-between pb-2">
                     <div>

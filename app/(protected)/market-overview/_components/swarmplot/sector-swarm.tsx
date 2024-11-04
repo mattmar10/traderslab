@@ -121,9 +121,16 @@ const SectorSwarmplot: React.FC<SectorSwarmplotResponse> = ({
   const maxReturn = Math.ceil(
     Math.max(...mapped.map((data) => data.return)) + 1
   );
+
+  const minMax = Math.max(Math.abs(minReturn), Math.abs(maxReturn));
+
+  // Set the interval to ensure we have 20 ticks in total (10 on each side)
+  const interval = Math.ceil(minMax / 10);
+
+  // Generate the ticks array from -minMax to +minMax, with the calculated interval
   const returnTicks = Array.from(
-    { length: maxReturn - minReturn + 1 },
-    (_, i) => minReturn + i
+    { length: Math.ceil((2 * minMax) / interval) + 1 },
+    (_, i) => -minMax + i * interval
   );
 
   return (
@@ -164,14 +171,15 @@ const SectorSwarmplot: React.FC<SectorSwarmplotResponse> = ({
           <ResponsiveContainer width="100%" height="100%">
             <ScatterChart margin={{ top: 20, right: 40, bottom: 20, left: 80 }}>
               <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" />
-              <ReferenceLine x={0} stroke="#ccc" strokeWidth={1.5} />
+              <ReferenceLine x={0} stroke="#999" strokeWidth={1.5} />
               <XAxis
                 type="number"
                 dataKey="return"
                 name="Return"
                 unit="%"
-                domain={[-10, "dataMax"]}
                 ticks={returnTicks}
+                interval={0} // Ensures all ticks in returnTicks are displayed
+                domain={[-minMax, minMax]} // Set domain directly to enforce min/max
                 stroke="#555"
                 tickFormatter={(value) => value.toFixed(0)}
               />
