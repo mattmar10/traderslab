@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { getMarketPerformers } from "@/actions/market-data/actions";
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
@@ -72,7 +72,7 @@ export default function HotStocksCard({ stocks }: HotStocksCardProps) {
           </div>
           <Flame className="h-4 w-4 text-muted-foreground" />
         </div>
-        <div className="flex gap-2">
+        <div className="flex  gap-2 w-64">
           {filterButtons.map((button) => (
             <Button
               key={button.value}
@@ -86,43 +86,43 @@ export default function HotStocksCard({ stocks }: HotStocksCardProps) {
           ))}
         </div>
       </CardHeader>
-      <CardContent className="flex-1 overflow-hidden p-0">
-        <ScrollArea className="h-full w-full overflow-auto">
+      <CardContent className="flex-1 overflow-hidden ">
+        <ScrollArea className="h-full w-full overflow-auto mt-2 pb-4">
           {data.length > 0 ? (
-            <div className="p-6">
-              <Table>
-                <TableHeader className="sticky top-0 bg-background z-10">
-                  <TableRow>
-                    <TableHead>Symbol</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead className="text-right w-[4rem]">Price</TableHead>
-                    <TableHead className="text-right w-[4rem]">Change</TableHead>
-                    <TableHead className="text-right w-[5.5rem]">Change %</TableHead>
+            <Table>
+              <TableHeader className="sticky top-0 bg-background z-10">
+                <TableRow>
+                  <TableHead>Symbol</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead className="text-right w-[4rem]">Price</TableHead>
+                  <TableHead className="text-right w-[4rem]">Change</TableHead>
+                  <TableHead className="text-right w-[5.5rem]">
+                    Change %
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data.map((stock: Quote) => (
+                  <TableRow key={`${stock.symbol}-${stock.timestamp}`}>
+                    <TableCell className="font-medium">
+                      {stock.symbol}
+                    </TableCell>
+                    <TableCell className="truncate max-w-[150px]">
+                      <span title={stock.name || ""}>{stock.name}</span>
+                    </TableCell>
+                    <TableCell className="text-right w-[4rem]">
+                      {stock.price}
+                    </TableCell>
+                    <TableCell className="text-right w-[4rem]">
+                      {stock.change.toFixed(2)}
+                    </TableCell>
+                    <TableCell className="text-right w-[4rem]">
+                      {stock.changesPercentage.toFixed(2)}%
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data.map((stock: Quote) => (
-                    <TableRow key={`${stock.symbol}-${stock.timestamp}`}>
-                      <TableCell className="font-medium">
-                        {stock.symbol}
-                      </TableCell>
-                      <TableCell className="truncate max-w-[150px]">
-                        <span title={stock.name || ""}>{stock.name}</span>
-                      </TableCell>
-                      <TableCell className="text-right w-[4rem]">
-                        {stock.price}
-                      </TableCell>
-                      <TableCell className="text-right w-[4rem]">
-                        {stock.change.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right w-[4rem]">
-                        {stock.changesPercentage.toFixed(2)}%
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                ))}
+              </TableBody>
+            </Table>
           ) : (
             <div className="flex items-center justify-center h-full">
               <p className="text-muted-foreground">No data</p>

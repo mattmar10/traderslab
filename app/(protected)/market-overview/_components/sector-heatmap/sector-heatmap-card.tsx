@@ -1,10 +1,5 @@
 "use client";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import {
   TableBody,
@@ -19,17 +14,34 @@ import { calculateColorFromPercentage } from "@/lib/utils/table-utils";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { TableIcon } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export interface SectorHeatmapCardProps {
   snapshot: CurrentDayMarketBreadthSnapshot;
 }
 
 const SectorHeatmapCard: React.FC<SectorHeatmapCardProps> = ({ snapshot }) => {
+  const [containerHeight, setContainerHeight] = useState("625px");
   const { theme } = useTheme();
   const resolvedTheme = (theme as "light" | "dark") || "light";
+  useEffect(() => {
+    const updateHeight = () => {
+      const vh = window.innerHeight;
+      // For smaller screens, use 80vh with a minimum height
+      if (vh < 800) {
+        setContainerHeight(`max(500px, ${Math.min(80, vh * 0.8)}px)`);
+      } else {
+        // For larger screens, cap at 800px
+        setContainerHeight("min(800px, 80vh)");
+      }
+    };
 
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, []);
   return (
-    <Card className="w-full h-full min-h-[625px] max-h-[50vh]">
+    <Card className="w-full relative" style={{ height: containerHeight }}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex flex-col space-y-1">
           <CardTitle className="text-xl">Sector Heatmap</CardTitle>

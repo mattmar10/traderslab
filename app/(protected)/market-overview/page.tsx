@@ -20,7 +20,7 @@ const lato = Lato({
 const HomePage: React.FC = () => {
   return (
     <PageContainer scrollable>
-      <div className="space-y-2 mt-2">
+      <div className="space-y-4 mt-2">
         <div className="flex items-center justify-between space-y-2">
           <h2 className={`text-2xl font-bold tracking-tight ${lato.className}`}>
             Hi, Welcome back 👋
@@ -53,7 +53,6 @@ const HomePage: React.FC = () => {
           <div className="col-span-1 3xl:col-span-3 ">
             <EconomicCalendarServer />
           </div>
-
         </div>
       </div>
     </PageContainer>

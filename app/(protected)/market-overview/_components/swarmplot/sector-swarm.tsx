@@ -35,7 +35,7 @@ import { sectorsOrderMap } from "./util";
 import CustomYAxisLabel from "./y-axis-label";
 import { getRealTimeQuotes } from "@/actions/market-data/actions";
 import { useQuery } from "react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface StockDataPoint {
   ticker: string;
@@ -69,13 +69,32 @@ const SectorSwarmplot: React.FC<SectorSwarmplotResponse> = ({
 }) => {
   const [selectedMarket, setSelectedMarket] =
     useState<MarketType>(initialMarket);
+  const [containerHeight, setContainerHeight] = useState("625px");
+
+  // Adjust container height based on viewport
+  useEffect(() => {
+    const updateHeight = () => {
+      const vh = window.innerHeight;
+      // For smaller screens, use 80vh with a minimum height
+      if (vh < 800) {
+        setContainerHeight(`max(500px, ${Math.min(80, vh * 0.8)}px)`);
+      } else {
+        // For larger screens, cap at 800px
+        setContainerHeight("min(800px, 80vh)");
+      }
+    };
+
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, []);
 
   const {
     data: quotes,
     error,
     refetch,
   } = useQuery({
-    queryKey: ["rea lTimeQuotes", selectedMarket],
+    queryKey: ["realTimeQuotes", selectedMarket],
     queryFn: () => getRealTimeQuotes(selectedMarket as MarketType),
     refetchInterval: 60000,
     initialData,
@@ -84,14 +103,14 @@ const SectorSwarmplot: React.FC<SectorSwarmplotResponse> = ({
 
   const handleMarketChange = async (value: MarketType) => {
     setSelectedMarket(value);
-    await getRealTimeQuotes(value); // Fetch data for the new market
-    refetch(); // Refetch to update the cache
+    await getRealTimeQuotes(value);
+    refetch();
   };
 
   if (!quotes || quotes.length === 0) {
     return (
-      <Card className="w-full">
-        <CardContent className="flex items-center justify-center h-[700px]">
+      <Card className="w-full h-full">
+        <CardContent className="flex items-center justify-center h-[500px]">
           <p className="text-muted-foreground">No market data available.</p>
         </CardContent>
       </Card>
@@ -100,8 +119,8 @@ const SectorSwarmplot: React.FC<SectorSwarmplotResponse> = ({
 
   if (isFMPDataLoadingError(quotes) || error) {
     return (
-      <Card className="w-full">
-        <CardContent className="flex items-center justify-center h-[700px]">
+      <Card className="w-full h-full">
+        <CardContent className="flex items-center justify-center h-[500px]">
           <p className="text-muted-foreground">Error loading market data</p>
         </CardContent>
       </Card>
@@ -134,18 +153,25 @@ const SectorSwarmplot: React.FC<SectorSwarmplotResponse> = ({
   );
 
   return (
-    <Card className="w-full h-full min-h-[625px] max-h-[50vh] flex flex-col">
-      <CardHeader className="flex-none flex flex-row items-center justify-between pb-3">
-        <div>
-          <CardTitle className="text-xl">Sector Performance Distribution</CardTitle>
-          <CardDescription>
+    <Card className="w-full relative" style={{ height: containerHeight }}>
+      <CardHeader className="flex-none flex flex-row items-center justify-between  px-4 lg:px-6">
+        <div className="flex-shrink">
+          <CardTitle className="text-lg lg:text-xl">
+            Sector Performance Distribution
+          </CardTitle>
+          <CardDescription className="text-sm">
             High level overview of returns across sectors
           </CardDescription>
         </div>
-        <div className="flex items-center space-x-1 mr-10">
-          <Label htmlFor="market-select">Market:</Label>
+        <div className="flex items-center space-x-1 flex-shrink-0">
+          <Label htmlFor="market-select" className="whitespace-nowrap">
+            Market:
+          </Label>
           <Select value={selectedMarket} onValueChange={handleMarketChange}>
-            <SelectTrigger id="market-select" className="w-[140px]">
+            <SelectTrigger
+              id="market-select"
+              className="w-[120px] lg:w-[140px]"
+            >
               <SelectValue placeholder="Select market" />
             </SelectTrigger>
             <SelectContent>
@@ -158,7 +184,7 @@ const SectorSwarmplot: React.FC<SectorSwarmplotResponse> = ({
           </Select>
         </div>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0">
+      <CardContent className="absolute inset-0 mt-[120px] mb-4 px-2 lg:px-4">
         <ChartContainer
           config={{
             stocks: {
@@ -169,7 +195,14 @@ const SectorSwarmplot: React.FC<SectorSwarmplotResponse> = ({
           className="h-full w-full"
         >
           <ResponsiveContainer width="100%" height="100%">
-            <ScatterChart margin={{ top: 20, right: 40, bottom: 20, left: 80 }}>
+            <ScatterChart
+              margin={{
+                top: 10,
+                right: 20,
+                bottom: 10,
+                left: window.innerWidth < 768 ? 60 : 80,
+              }}
+            >
               <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" />
               <ReferenceLine x={0} stroke="#999" strokeWidth={1.5} />
               <XAxis
@@ -182,6 +215,7 @@ const SectorSwarmplot: React.FC<SectorSwarmplotResponse> = ({
                 domain={[-minMax, minMax]} // Set domain directly to enforce min/max
                 stroke="#555"
                 tickFormatter={(value) => value.toFixed(0)}
+                fontSize={12}
               />
               <YAxis
                 type="number"
@@ -191,14 +225,19 @@ const SectorSwarmplot: React.FC<SectorSwarmplotResponse> = ({
                 domain={[0, 60]}
                 stroke="#555"
                 tick={({ x, y, payload }) => (
-                  <CustomYAxisLabel x={x} y={y} payload={payload} />
+                  <CustomYAxisLabel
+                    x={x}
+                    y={y}
+                    payload={payload}
+                    // fontSize={window.innerWidth < 768 ? 10 : 12}
+                  />
                 )}
-                tickMargin={20}
+                tickMargin={16}
               />
               <ZAxis
                 type="number"
                 dataKey="volume"
-                range={[100, 2000]}
+                range={[50, window.innerWidth < 768 ? 1000 : 2000]}
                 name="Volume"
                 unit="M"
               />

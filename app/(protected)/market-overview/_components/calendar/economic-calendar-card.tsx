@@ -65,7 +65,7 @@ export default function EconomicCalendarCard({
             <Label htmlFor="showMedium">Medium Impact</Label>
           </div>
         </div>
-        <ScrollArea className="h-full w-full overflow-auto">
+        <ScrollArea className="h-full w-full overflow-auto pb-4">
           {filteredEvents.length > 0 ? (
             <Table>
               <TableHeader className="sticky top-0 bg-background z-10">
