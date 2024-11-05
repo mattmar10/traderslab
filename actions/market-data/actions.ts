@@ -1,12 +1,14 @@
 "use server";
 
 import { fetchWithRetries } from "@/app/api/utils";
-import { Candle, Quote } from "@/lib/types/basic-types";
+import { Candle, Quote, QuoteArraySchema } from "@/lib/types/basic-types";
 import {
   EarningsDateSchema,
   FMPDataLoadingError,
   FMPEarningsDate,
   FMPHistoricalResultsSchema,
+  FMPIntradayChart,
+  FMPIntradayChartSchema,
   RealtimeQuoteResponse,
 } from "@/lib/types/fmp-types";
 import { CurrentDayMarketBreadthSnapshot } from "@/lib/types/market-breadth-types";
@@ -15,6 +17,7 @@ import {
   formatDateToEST,
 } from "@/lib/utils/epoch-utils";
 import { z } from "zod";
+
 export async function getPriceBars(
   ticker: string,
   fromDateString: string | undefined = undefined,
@@ -65,6 +68,35 @@ export async function getPriceBars(
   }
 }
 
+export async function getIntradayChart(
+  ticker: string,
+  period: "1min" | "5min" | "15min",
+  date: Date
+): Promise<FMPIntradayChart> {
+  if (!process.env.FINANCIAL_MODELING_PREP_API || !process.env.FMP_API_KEY) {
+    return Promise.reject("FMP URL and key must be specified");
+  }
+
+  const datePart = formatDateToEST(date)
+  let url = `${process.env.FINANCIAL_MODELING_PREP_API}/historical-chart/${period}/${ticker}?apikey=${process.env.FMP_API_KEY}&from=${datePart}&to=${datePart}`;
+  const response = await fetchWithRetries(
+    url,
+    { next: { revalidate: 0 } },
+    1
+  );
+
+  const parsed = FMPIntradayChartSchema.safeParse(response)
+
+  if (parsed.success) {
+    return parsed.data
+  }
+  else {
+    return Promise.reject("Unable to parse Intraday chart")
+  }
+
+}
+
+
 export async function getRealTimeQuotes(
   datasource: "sp500" | "ns100" | "iwm" | "nyse"
 ): Promise<RealtimeQuoteResponse[] | FMPDataLoadingError> {
@@ -91,6 +123,44 @@ export async function getRealTimeQuotes(
     return dataError;
   }
 }
+
+export async function getQuotesFromFMP(
+  tickers: string[]
+): Promise<Quote[]> {
+  if (!process.env.FINANCIAL_MODELING_PREP_API || !process.env.FMP_API_KEY) {
+    return Promise.reject("FMP URL and key must be specified");
+  }
+
+  const tickersPart = tickers.join(',')
+  const url = `${process.env.FINANCIAL_MODELING_PREP_API}/quote/${tickersPart}?apikey=${process.env.FMP_API_KEY}`;
+
+  try {
+    const response = await fetch(url, { next: { revalidate: 0 } });
+
+    if (!response.ok) {
+      const message = `Error fetching realtime quotes from FMP`;
+      console.error(message);
+      console.error(JSON.stringify(response));
+      return Promise.reject(message)
+    }
+
+    const data = await response.json();
+
+    const parsed = QuoteArraySchema.safeParse(data)
+
+    if (parsed.success) {
+      return parsed.data
+    }
+    else {
+      return Promise.reject("Unable to parse Intraday chart")
+    }
+
+  } catch (error) {
+    const dataError: FMPDataLoadingError = `Unable to fetch realtime quotes`;
+    return Promise.reject(dataError)
+  }
+}
+
 export async function getMarketPerformers(
   kind: "gainers" | "losers" | "actives"
 ): Promise<Quote[] | FMPDataLoadingError> {

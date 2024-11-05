@@ -130,7 +130,7 @@ export const QuoteElementSchema = z.object({
   exchange: z.string(),
   volume: z.number(),
   avgVolume: z.number(),
-  open: z.number(),
+  open: z.number().nullable(),
   previousClose: z.number(),
   eps: z.number().nullable(),
   pe: z.number().nullable(),

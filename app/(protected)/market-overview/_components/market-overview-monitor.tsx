@@ -10,15 +10,16 @@ import { getRealTimeQuotes } from "@/actions/market-data/actions";
 import SectorSwarmplot from "./swarmplot/sector-swarm";
 import { isFMPDataLoadingError } from "@/lib/types/fmp-types";
 import Loading from "@/components/loading";
+import OverviewMainContent from "./main-content/overview-main-content";
 
-async function QuotesDisplay() {
+async function MainContent() {
   const quotes = await getRealTimeQuotes("sp500");
 
   if (isFMPDataLoadingError(quotes)) {
     return <div>Unable to load data</div>;
   }
 
-  return <SectorSwarmplot quotes={quotes} market={"sp500"} />;
+  return <OverviewMainContent />;
 }
 
 function LoadingState() {
@@ -45,7 +46,7 @@ const MarketOverviewMonitor: React.FC = () => {
   return (
     <div className="col-span-6">
       <Suspense fallback={<LoadingState />}>
-        <QuotesDisplay />
+        <MainContent />
       </Suspense>
     </div>
   );
