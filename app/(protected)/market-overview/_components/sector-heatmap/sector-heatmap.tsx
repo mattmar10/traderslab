@@ -25,7 +25,7 @@ async function SectorHeatmap() {
 function LoadingState() {
   const skeletonRows = Array(11).fill(null);
   return (
-    <Card className="w-full h-full min-h-[625px] max-h-[40vh]">
+    <Card className="w-full  h-[60vh] ">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex flex-col space-y-1">
           <CardTitle className="text-xl">Sector Heatmap</CardTitle>
