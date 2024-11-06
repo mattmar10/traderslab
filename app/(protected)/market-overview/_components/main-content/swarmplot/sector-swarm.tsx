@@ -1,13 +1,8 @@
 "use client";
 
-import {
-  ChartContainer,
-  ChartTooltip,
-} from "@/components/ui/chart";
+import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { Label } from "@/components/ui/label";
-import {
-  isFMPDataLoadingError,
-} from "@/lib/types/fmp-types";
+import { isFMPDataLoadingError } from "@/lib/types/fmp-types";
 import {
   ScatterChart,
   Scatter,
@@ -75,19 +70,25 @@ const SectorSwarmplot: React.FC<SectorSwarmplotResponse> = ({
   };
 
   if (!quotes || quotes.length === 0) {
-    return <div className="place-items-center"><Loading /></div>;
+    return (
+      <div className="place-items-center">
+        <Loading />
+      </div>
+    );
   }
 
   if (isFMPDataLoadingError(quotes) || error) {
     return <p className="text-muted-foreground">Error loading market data</p>;
   }
 
-  const mapped: StockDataPoint[] = quotes.filter(q => q.volume > 10).map((q) => ({
-    ticker: q.ticker,
-    return: q.changesPercentage,
-    sector: getSectorNumber(q.sector),
-    volume: q.volume,
-  }));
+  const mapped: StockDataPoint[] = quotes
+    .filter((q) => q.volume > 10)
+    .map((q) => ({
+      ticker: q.ticker,
+      return: q.changesPercentage,
+      sector: getSectorNumber(q.sector),
+      volume: q.volume,
+    }));
 
   const minReturn = Math.floor(
     Math.min(...mapped.map((data) => data.return)) - 1
@@ -114,7 +115,7 @@ const SectorSwarmplot: React.FC<SectorSwarmplotResponse> = ({
             size={"sm"}
             key={option.value}
             onClick={() => handleMarketChange(option.value)}
-            variant={selectedMarket === option.value ? 'default' : 'secondary'}
+            variant={selectedMarket === option.value ? "default" : "secondary"}
           >
             {option.label}
           </Button>
@@ -127,7 +128,7 @@ const SectorSwarmplot: React.FC<SectorSwarmplotResponse> = ({
             color: "text-gray-700",
           },
         }}
-        className="h-full w-full"
+        className="h-[42vh] 4xl:h-[38vh] mt-2 w-full"
       >
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart
