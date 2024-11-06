@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import OverviewReturns from "./overview-returns";
 import SectorSwarmplot from "./swarmplot/sector-swarm";
 import OverviewIntradayGDB from "./overview-intraday-gdb";
