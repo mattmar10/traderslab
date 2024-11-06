@@ -14,7 +14,6 @@ import { calculateColorFromPercentage } from "@/lib/utils/table-utils";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { TableIcon } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
 
 export interface SectorHeatmapCardProps {
   snapshot: CurrentDayMarketBreadthSnapshot;
