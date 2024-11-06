@@ -3,7 +3,6 @@
 
 import {
     Card,
-    CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
@@ -11,10 +10,12 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import OverviewReturns from "./overview-returns";
+import SectorSwarmplot from "./swarmplot/sector-swarm";
+import OverviewIntradayGDB from "./overview-intraday-gdb";
 
 const OverviewMainContent: React.FC = () => {
 
-    const [activeTab, setActiveTab] = useState<"sectorPerformance" | "returns" | "intradayGDB">("sectorPerformance");
+    const [activeTab, setActiveTab] = useState<"sectorPerformance" | "returns" | "intradayGDB">("returns");
     const [containerHeight, setContainerHeight] = useState("625px");
 
     useEffect(() => {
@@ -34,10 +35,10 @@ const OverviewMainContent: React.FC = () => {
                     <CardTitle className="text-lg lg:text-xl">At A Glance</CardTitle>
                     <CardDescription className="text-sm">
                         {activeTab === "sectorPerformance"
-                            ? "High level overview of returns across sectors"
+                            ? "Compare the return distribution across sectors"
                             : activeTab === "returns"
-                                ? "Return statistics and insights"
-                                : "Intraday GDB analysis"}
+                                ? "Compare the returns across the major markets using representatitive ETFs/Indexes"
+                                : "Compare intraday global daily breadth across the major markets"}
                     </CardDescription>
                 </div>
             </CardHeader>
@@ -46,18 +47,18 @@ const OverviewMainContent: React.FC = () => {
                 <Tabs defaultValue={activeTab} onValueChange={(value) => setActiveTab(value as "sectorPerformance" | "returns" | "intradayGDB")}>
                     <TabsList className="flex space-x-2 max-w-fit">
                         <TabsTrigger value="returns">Returns</TabsTrigger>
-                        <TabsTrigger value="sectorPerformance">Sector Performance</TabsTrigger>
+                        <TabsTrigger value="sectorPerformance">Sector Distribution</TabsTrigger>
                         <TabsTrigger value="intradayGDB">Intraday GDB</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="sectorPerformance">
-                        {activeTab === "sectorPerformance" && <p>Sector Performance Content</p>}
+                        {activeTab === "sectorPerformance" && <SectorSwarmplot market={"sp500"} />}
                     </TabsContent>
                     <TabsContent value="returns">
                         {activeTab === "returns" && <OverviewReturns />}
                     </TabsContent>
                     <TabsContent value="intradayGDB">
-                        {activeTab === "intradayGDB" && <p>Intraday GDB Content</p>}
+                        {activeTab === "intradayGDB" && <OverviewIntradayGDB />}
                     </TabsContent>
                 </Tabs>
             </div>

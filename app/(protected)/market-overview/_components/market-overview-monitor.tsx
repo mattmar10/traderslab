@@ -7,7 +7,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getRealTimeQuotes } from "@/actions/market-data/actions";
-import SectorSwarmplot from "./swarmplot/sector-swarm";
 import { isFMPDataLoadingError } from "@/lib/types/fmp-types";
 import Loading from "@/components/loading";
 import OverviewMainContent from "./main-content/overview-main-content";
