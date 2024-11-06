@@ -119,6 +119,18 @@ export function isSectorPerformanceArray(
 }
 export const SectorPerformanceArraySchema = SectorPerformanceSchema.array();
 
+export const FMPIntradayChartCandleSchema = z.object({
+  date: z.string(),
+  open: z.number(),
+  high: z.number(),
+  low: z.number(),
+  close: z.number(),
+  volume: z.number(),
+})
+export type FMPIntradyChartCandle = z.infer<typeof FMPIntradayChartCandleSchema>;
+export const FMPIntradayChartSchema = z.array(FMPIntradayChartCandleSchema);
+export type FMPIntradayChart = z.infer<typeof FMPIntradayChartSchema>;
+
 export const FMPHistoricalSchema = z.object({
   date: z.string(),
   open: z.number(),
