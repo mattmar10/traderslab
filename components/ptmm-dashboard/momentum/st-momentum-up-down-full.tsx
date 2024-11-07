@@ -10,6 +10,7 @@ import {
 } from "lightweight-charts";
 import { useTheme } from "next-themes";
 import { MomentumRow } from "./momentum-types";
+import { negativeRed, positiveBlue } from "@/lib/utils/color-utils";
 
 export interface STMomentumUpDownChartFullTVProps {
   momentumRows: MomentumRow[];
@@ -31,8 +32,8 @@ const STMomentumUpDownChartFullTV: React.FC<
   const bgColor = theme === "light" ? "white" : "black";
   const gridColor = theme === "light" ? "#F0F0F0" : "#333";
 
-  const positiveColor = theme === "dark" ? "#4CAF50" : "#228B22"; // Green
-  const negativeColor = theme === "dark" ? "#F44336" : "#FF6347"; // Red
+  const positiveColor = positiveBlue
+  const negativeColor = negativeRed
   const ratioColor = "#268bd2";
   const tenDayColor = "#b58900";
 

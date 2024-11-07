@@ -1,3 +1,5 @@
+import { negativeRed, positiveBlue } from "@/lib/utils/color-utils";
+
 export interface ChartSettings {
   priceMovingAverages: MovingAverageSetting[];
   showPriceMovingAvgLegends: boolean;
@@ -35,13 +37,13 @@ export const defaultSettings: ChartSettings = {
     color: "#d33682",
   },
   seriesType: "candlestick",
-  useThinBars: false, // Default value, not relevant for candlestick
-  upColor: "#26a69a", // TradingView default green
-  downColor: "#ef5350", // TradingView default red
-  wickUpColor: "#26a69a", // TradingView default green
-  wickDownColor: "#ef5350", // TradingView default red
-  upBorderColor: "#26a69a", // Default green border for up candles
-  downBorderColor: "#ef5350", // Default red border for down candles
+  useThinBars: false,
+  upColor: positiveBlue,
+  downColor: negativeRed,
+  wickUpColor: positiveBlue,
+  wickDownColor: negativeRed,
+  upBorderColor: positiveBlue,
+  downBorderColor: negativeRed,
   screenerRefreshInterval: 30000,
   avwapSettings: {
     color: "#6c71c4",
