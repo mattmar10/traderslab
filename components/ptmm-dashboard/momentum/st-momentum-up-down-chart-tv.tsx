@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { AiOutlineZoomIn } from "react-icons/ai";
 import STMomentumUpDownChartFullTV from "./st-momentum-up-down-full";
+import { negativeRed, positiveBlue } from "@/lib/utils/color-utils";
 
 export interface STMomentumUpDownChartProps {
   momentumRows: MomentumRow[];
@@ -40,8 +41,8 @@ const STMomentumUpDownChartTV: React.FC<STMomentumUpDownChartProps> = ({
   const bgColor = theme === "light" ? "white" : "black";
   const gridColor = theme === "light" ? "#F0F0F0" : "#333";
 
-  const positiveColor = theme === "dark" ? "#4CAF50" : "#228B22"; // Green
-  const negativeColor = theme === "dark" ? "#F44336" : "#FF6347"; // Red
+  const positiveColor = positiveBlue
+  const negativeColor = negativeRed
   const ratioColor = "#268bd2";
   const tenDayColor = "#b58900";
 
