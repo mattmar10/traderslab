@@ -289,8 +289,8 @@ const PercentOfStocksAboveMAs: React.FC<PercentOfStocksAboveMATVLineProps> = ({
 
       <CardContent className=" px-4 pr-2">
         <div>
-          <div className="h-[28rem]">
-            <div ref={kmaChartContainerRef} className={`h-[28rem]`}></div>
+          <div className="h-[32rem]">
+            <div ref={kmaChartContainerRef} className={`h-[32rem]`}></div>
           </div>
         </div>
       </CardContent>

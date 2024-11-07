@@ -2,6 +2,7 @@ import {
   GlobalDailyBreadthDataPoint,
   GlobalDailyBreadthDataPointWithRank,
 } from "@/lib/types/market-breadth-types";
+import { negativeRed, positiveBlue } from "@/lib/utils/color-utils";
 
 export const calculateColorFromPercentage = (
   value: number,
@@ -11,8 +12,8 @@ export const calculateColorFromPercentage = (
   max: number
 ): string => {
   // Define colors for light and dark themes
-  const positiveColor = theme === "dark" ? "#4CAF50" : "#228B22"; // Green
-  const negativeColor = theme === "dark" ? "#F44336" : "#FF6347"; // Red
+  const positiveColor = positiveBlue
+  const negativeColor = negativeRed
 
   // Calculate opacity based on distance from neutral value
   let opacity;

@@ -24,6 +24,7 @@ import { atr } from "@/lib/indicators/atr";
 import { calculateSMAForChart } from "@/lib/indicators/moving-avg";
 import { match } from "@/lib/utils";
 import { calculateGreenOrRed } from "@/lib/utils/table-utils";
+import { negativeRed, positiveBlue } from "@/lib/utils/color-utils";
 export interface PriceChartProps {
   candles: Candle[];
   tenEMA: MovingAverageLine;
@@ -172,27 +173,27 @@ const PriceChart: React.FC<PriceChartProps> = ({
     const newPriceSeries =
       chartSettings.seriesType === "candlestick"
         ? chart.addCandlestickSeries({
-            upColor: chartSettings.upColor,
-            downColor: chartSettings.downColor,
-            wickUpColor: chartSettings.wickUpColor,
-            wickDownColor: chartSettings.wickDownColor,
-            borderUpColor: chartSettings.upBorderColor,
-            borderDownColor: chartSettings.downBorderColor,
-            borderVisible: true,
-            lastValueVisible: false,
-            priceLineVisible: false,
-            priceLineStyle: 2,
-            priceLineColor: "purple",
-          })
+          upColor: chartSettings.upColor,
+          downColor: chartSettings.downColor,
+          wickUpColor: chartSettings.wickUpColor,
+          wickDownColor: chartSettings.wickDownColor,
+          borderUpColor: chartSettings.upBorderColor,
+          borderDownColor: chartSettings.downBorderColor,
+          borderVisible: true,
+          lastValueVisible: false,
+          priceLineVisible: false,
+          priceLineStyle: 2,
+          priceLineColor: "purple",
+        })
         : chart.addBarSeries({
-            upColor: chartSettings.upColor,
-            downColor: chartSettings.downColor,
-            thinBars: chartSettings.useThinBars,
-            lastValueVisible: false,
-            priceLineVisible: false,
-            priceLineStyle: 2,
-            priceLineColor: "purple",
-          });
+          upColor: chartSettings.upColor,
+          downColor: chartSettings.downColor,
+          thinBars: chartSettings.useThinBars,
+          lastValueVisible: false,
+          priceLineVisible: false,
+          priceLineStyle: 2,
+          priceLineColor: "purple",
+        });
 
     setPriceSeries(newPriceSeries);
 
@@ -380,7 +381,7 @@ const PriceChart: React.FC<PriceChartProps> = ({
   const lastPrice = candles[candles.length - 1].close;
   const percentChange = Number(
     (100 * (lastPrice - candles[candles.length - 2].close)) /
-      candles[candles.length - 2].close
+    candles[candles.length - 2].close
   ).toFixed(2);
 
   const greaterThanFiftySMA =
@@ -401,7 +402,7 @@ const PriceChart: React.FC<PriceChartProps> = ({
   const greaterThanTwentyOneBG = calculateGreenOrRed(
     theme === "dark" ? "dark" : "light",
     lastPrice >
-      twentyOneEMA.timeseries[twentyOneEMA.timeseries.length - 1].value
+    twentyOneEMA.timeseries[twentyOneEMA.timeseries.length - 1].value
   );
 
   const greaterThanTenBG = calculateGreenOrRed(
@@ -436,10 +437,10 @@ const PriceChart: React.FC<PriceChartProps> = ({
     fiftyGreaterThanTwoHundredSMA
   );
 
-  const changeColor = Number(percentChange) >= 0 ? "green" : "red";
+  const changeColor = Number(percentChange) >= 0 ? positiveBlue : negativeRed;
 
   const ohlcBGColor = theme === "dark" ? "black" : "white";
-  const cursorChangeColor = cursorPercentChange >= 0 ? "green" : "red";
+  const cursorChangeColor = cursorPercentChange >= 0 ? positiveBlue : negativeRed;
   return (
     <>
       <div>

@@ -94,12 +94,12 @@ export const navItems: NavItem[] = [
       },
       {
         title: "S&P 500",
-        url: "/ptmm/RSP",
+        url: "/ptmm/s&p500",
         icon: "login",
       },
       {
         title: "Nasdaq 100",
-        url: "/ptmm/QQQE",
+        url: "/ptmm/ndx100",
         icon: "login",
       },
       {

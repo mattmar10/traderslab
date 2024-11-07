@@ -1,6 +1,5 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTheme } from "next-themes";
 import { AiOutlineZoomIn } from "react-icons/ai";
 import {
@@ -210,11 +209,11 @@ const FiftyTwoWeekHighsLowsLineTV: React.FC<HighsLowsLineProps> = ({
   ]);
 
   return (
-    <Card>
-      <CardHeader className="py-3 px-4">
-        <CardTitle className="text-lg">
+    <div>
+      <div className="py-1 px-4">
+        <div className="text-lg">
           <div className="flex justify-between items-center">
-            <div>Cumulative 52 Week Highs/Lows</div>
+            <div className="text-sm font-semibold">Cumulative 52 Week Highs/Lows</div>
             <div className="hidden md:block text-foreground/15 hover:text-foreground/70 cursor-pointer">
               <Dialog>
                 <DialogTrigger>
@@ -235,25 +234,28 @@ const FiftyTwoWeekHighsLowsLineTV: React.FC<HighsLowsLineProps> = ({
               </Dialog>
             </div>
           </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className=" border-b border-foreground/20 px-4 pr-2">
-        <div className="h-[17.5rem]">
+        </div>
+      </div>
+      <div className=" border-b border-foreground/20 pb-2 px-4 pr-2">
+        <div className="h-[16.25m]">
           <div
             ref={highLowLineChartContainerRef}
-            className={`h-[17.5rem]`}
+            className={`h-[16.25rem]`}
           ></div>
+
         </div>
-      </CardContent>
-      <CardContent className=" mt-8 w-full border-foreground/20 pb-4 px-4 pr-1">
-        <div className="h-[17.5rem]">
+      </div>
+      <div className=" mt-4 w-full pb-4 px-4 pr-1">
+        <div className="text-sm font-semibold">Net New Highs/Lows</div>
+
+        <div className="h-[16.25rem]">
           <div
             ref={highLowBarChartContainerRef}
-            className={`h-[17.5rem]`}
+            className={`h-[16.25rem]`}
           ></div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

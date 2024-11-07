@@ -83,8 +83,8 @@ export const calculateGreenOrRed = (
   condition: boolean
 ): string => {
   // Define colors for light and dark themes
-  const positiveColor = theme === "dark" ? "#4CAF50" : "#228B22"; // Green
-  const negativeColor = theme === "dark" ? "#F44336" : "#FF6347"; // Red
+  const positiveColor = positiveBlue
+  const negativeColor = negativeRed
 
   let color = condition ? positiveColor : negativeColor;
 

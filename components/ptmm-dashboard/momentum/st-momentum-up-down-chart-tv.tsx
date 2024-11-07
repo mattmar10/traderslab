@@ -231,8 +231,8 @@ const STMomentumUpDownChartTV: React.FC<STMomentumUpDownChartProps> = ({
       </CardHeader>
 
       <CardContent className="w-full pr-1">
-        <div className="h-[28rem]">
-          <div ref={stMomentumChartContainerRef} className="h-[28rem]"></div>
+        <div className="h-[32rem]">
+          <div ref={stMomentumChartContainerRef} className="h-[32rem]"></div>
         </div>
       </CardContent>
     </Card>
