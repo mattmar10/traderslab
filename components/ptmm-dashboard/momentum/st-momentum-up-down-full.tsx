@@ -128,7 +128,7 @@ const STMomentumUpDownChartFullTV: React.FC<
 
     const lower = {
       price: 0.3,
-      color: "#26a69a",
+      color: positiveBlue,
       lineWidth: lineWidth as LineWidth,
       lineStyle: LineStyle.Solid,
       axisLabelVisible: true,
@@ -137,7 +137,7 @@ const STMomentumUpDownChartFullTV: React.FC<
 
     const upper = {
       price: 5,
-      color: "#ef5350",
+      color: negativeRed,
       lineWidth: lineWidth as LineWidth,
       lineStyle: LineStyle.Solid,
       axisLabelVisible: true,
