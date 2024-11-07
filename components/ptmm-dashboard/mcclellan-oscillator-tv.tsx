@@ -205,7 +205,7 @@ const McclellanOscillatorTV: React.FC<McclellanOscillatorProps> = ({
           ></div>
         </div>
       </div>
-      <div className=" mt- w-full border-foreground/20 pb-4 px-4 pr-1">
+      <div className=" mt-4 w-full border-foreground/20 pb-4 px-4 pr-1">
         <div className="text-sm font-semibold">McClellan Oscillator</div>
         <div className={`h-[16.25rem]`}>
           <div
