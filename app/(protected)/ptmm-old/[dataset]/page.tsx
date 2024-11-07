@@ -1,14 +1,14 @@
+import DashboardWrapper from "@/components/ptmm-dashboard/dashboard-wrapper";
 import { isDataset } from "@/lib/types/basic-types";
 import { notFound } from "next/navigation";
-import DashboardWrapper from "../_components/dashboard-wrapper";
 
 const PTMMDashboard = ({
   params,
 }: // searchParams,
-  {
-    params: { dataset: string };
-    // searchParams?: { [key: string]: string | string[] | undefined };
-  }) => {
+{
+  params: { dataset: string };
+  // searchParams?: { [key: string]: string | string[] | undefined };
+}) => {
   const dataset = decodeURIComponent(params.dataset.toUpperCase());
 
   if (!isDataset(dataset)) {
@@ -26,7 +26,6 @@ const PTMMDashboard = ({
   } else if (dataset === "IWM") {
     datasetDesc = "Russell 2000";
   }
-
 
   return (
     <DashboardWrapper dataset={dataset} datasetDescription={datasetDesc} />

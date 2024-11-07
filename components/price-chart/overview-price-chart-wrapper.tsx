@@ -179,7 +179,7 @@ const OverviewPriceChartWrapper: React.FC<OverviewPriceChartWrapperProps> = ({
         <CardContent className="">
           <div className="mt-1">
             <PriceChart
-              className="h-96 mt-1"
+              className="h-[28rem] mt-1"
               candles={filteredCandles}
               tenEMA={{
                 period: 10,

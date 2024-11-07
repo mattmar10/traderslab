@@ -1,6 +1,5 @@
 "use client";
 import { McClellanOscillatorPoint } from "@/lib/types/market-breadth-types";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useRef, useState } from "react";
 import { ColorType, CrosshairMode, createChart } from "lightweight-charts";
 import { useTheme } from "next-themes";
@@ -167,18 +166,11 @@ const McclellanOscillatorTV: React.FC<McclellanOscillatorProps> = ({
   ]);
 
   return (
-    <Card>
-      <CardHeader className="py-3 px-4">
-        <CardTitle className="text-lg">
+    <div>
+      <div className="py-1 px-4">
+        <div className="text-lg">
           <div className="flex justify-between items-center">
-            <div>
-              <span className="block md:hidden">
-                McClellan Osc. & Summation Index
-              </span>
-              <span className="hidden md:block">
-                McClellan Oscillator & Summation Index
-              </span>
-            </div>
+            <div className="text-sm font-semibold">McClellan Summation Index</div>
             <div className="hidden md:block text-foreground/15 hover:text-foreground/70 cursor-pointer">
               <Dialog>
                 <DialogTrigger>
@@ -201,26 +193,27 @@ const McclellanOscillatorTV: React.FC<McclellanOscillatorProps> = ({
               </Dialog>
             </div>
           </div>
-        </CardTitle>
-      </CardHeader>
+        </div>
+      </div>
 
-      <CardContent className=" border-b border-foreground/20 px-4 pr-1">
-        <div className="h-[17.5rem]">
+      <div className=" border-b border-foreground/20 pb-2 px-4 pr-2">
+        <div className={`h-[16.25rem]`}>
           <div
             ref={mclellanLineChartContainerRef}
-            className={`h-[17.5rem]`}
+            className={`h-[16.25rem]`}
           ></div>
         </div>
-      </CardContent>
-      <CardContent className=" mt-8 w-full border-foreground/20 pb-4 px-4 pr-1">
-        <div className="h-[17.5rem]">
+      </div>
+      <div className=" mt-4 w-full border-foreground/20 pb-4 px-4 pr-1">
+        <div className="text-sm font-semibold">McClellan Oscillator</div>
+        <div className={`h-[16.25rem]`}>
           <div
             ref={mclellanBarChartContainerRef}
-            className={`h-[17.5rem]`}
+            className={`h-[16.25rem]`}
           ></div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
