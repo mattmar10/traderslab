@@ -17,12 +17,6 @@ import {
 } from "@/lib/types/fmp-types";
 
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@radix-ui/react-popover";
-
-import {
   AdvanceDeclineRow,
   GlobalDailyBreadthRow,
   GreaterThanSMARow,
@@ -35,6 +29,7 @@ import { addPercentileRankToData, calculateColorFromPercentage } from "./utils";
 import { Dataset, getTickerForDataset } from "@/lib/types/basic-types";
 import { formatDateToEST } from "@/lib/utils/epoch-utils";
 import MarketBreadthPopoverContainer from "../popover/market-breadth-popover-container";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const firaCode = Fira_Code({
   subsets: ["latin"],
@@ -660,13 +655,11 @@ const MarketBreadthTable: React.FC<MarketBreadthTableProps> = ({
                       </PopoverTrigger>
 
                       <PopoverContent
-                        side="top"
-                        sideOffset={15}
-                        style={{
-                          zIndex: 1000,
-                          outline: "none",
-                          width: "1024px",
-                        }}
+                        side="bottom" // Change to a position that better suits your layout, like "bottom" or "top"
+                        align="start" // Align to the start for a more flush position relative to the trigger
+                        sideOffset={10} // Adjust this offset to avoid overlap or ensure proper space
+                        className="w-[60rem] p-0" // Increase width or padding as needed
+                        style={{ zIndex: 1000, outline: "none" }} // Retain this for visibility
                       >
                         <MarketBreadthPopoverContainer
                           ticker={getTickerForDataset(dataset)}
@@ -678,7 +671,7 @@ const MarketBreadthTable: React.FC<MarketBreadthTableProps> = ({
                           }
                           fromDate={getOneYearAgo(
                             r?.advanceDeclineRow.dateStr ||
-                              formatDateToEST(new Date())
+                            formatDateToEST(new Date())
                           )}
                         />
                       </PopoverContent>

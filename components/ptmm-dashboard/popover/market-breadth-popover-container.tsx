@@ -2,6 +2,7 @@
 
 import ErrorCard from "@/components/error-card";
 import Loading from "@/components/loading";
+import PriceChart from "@/components/price-chart/price-chart";
 import {
   ChartSettings,
   defaultSettings,
@@ -59,6 +60,7 @@ const MarketBreadthPopoverContainer: React.FC<OffCanvasContainerPros> = ({
 
   console.log(chartSettings, isDataLoaded);
 
+  const startDate = new Date(fromDate)
   const key = `/api/bars/${ticker}?fromDateString=${fromDate}&toDateString=${endDate}`;
 
   const getBars = async () => {
@@ -94,7 +96,6 @@ const MarketBreadthPopoverContainer: React.FC<OffCanvasContainerPros> = ({
   if (status === "loading" || !theme || !mounted) {
     return (
       <div
-        style={{ width: "640px" }}
         className={`p-4 rounded shadow-lg border border-foreground/70 bg-${bgColor} h-96 `}
       >
         <div>
@@ -131,11 +132,11 @@ const MarketBreadthPopoverContainer: React.FC<OffCanvasContainerPros> = ({
   const dateHeader = `${sortedTickerData[0].dateStr!} - ${sortedTickerData[
     sortedTickerData.length - 1
   ].dateStr!}`;
+  const chartTheme = theme === "dark" ? "dark" : "light";
 
   return (
     <div
       style={{
-        width: "800px",
         zIndex: 1000,
         outline: "none",
       }}
@@ -150,7 +151,39 @@ const MarketBreadthPopoverContainer: React.FC<OffCanvasContainerPros> = ({
         </div>
         <div className="text-xs text-foreground/70">{dateHeader}</div>
       </div>
-      <div>price chart</div>
+      <PriceChart
+        className="h-[30rem] mt-1 "
+        candles={data}
+        tenEMA={{
+          period: 10,
+          timeseries: tenEMARes.timeseries.filter(
+            (t) => new Date(t.time).getTime() > startDate.getTime()
+          ),
+        }}
+        twentyOneEMA={{
+          period: 21,
+          timeseries: twentyOneEMARes.timeseries.filter(
+            (t) => new Date(t.time).getTime() > startDate.getTime()
+          ),
+        }}
+        fiftySMA={{
+          period: 50,
+          timeseries: fiftySMARes.timeseries.filter(
+            (t) => new Date(t.time).getTime() > startDate.getTime()
+          ),
+        }}
+        twoHundredSMA={{
+          period: 200,
+          timeseries: twoHundredSMARes.timeseries.filter(
+            (t) => new Date(t.time).getTime() > startDate.getTime()
+          ),
+        }}
+        showVolume={!ticker.includes("^")}
+        ticker={ticker}
+        earningsDates={[]}
+        chartSettings={chartSettings}
+        theme={chartTheme}
+      />
     </div>
   );
 };

@@ -51,7 +51,6 @@ import ThemeToggle from "./ThemeToggle/theme-toggle";
 import { UserNav } from "./user-nav";
 import { useUser } from "@clerk/nextjs";
 import SearchInput from "../search-input";
-import { Breadcrumbs } from "../breadcrumbs";
 import { useTheme } from "next-themes";
 
 export const company = {
@@ -318,7 +317,7 @@ export default function AppSidebar({
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumbs />
+
           </div>
           <div className=" hidden w-1/3 items-center gap-2 px-4 md:flex ">
             {<SearchInput />}
