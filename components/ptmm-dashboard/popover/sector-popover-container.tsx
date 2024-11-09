@@ -17,7 +17,7 @@ import {
 import { formatDateToEST } from "@/lib/utils/epoch-utils";
 import {
   ChartSettings,
-  defaultSettings,
+  defaultChartSettings,
 } from "@/components/settings/chart-settings";
 import Loading from "@/components/loading";
 import ErrorCard from "@/components/error-card";
@@ -37,7 +37,7 @@ const SectorPopoverContainer: React.FC<OffCanvasContainerPros> = ({
   const [mounted, setMounted] = useState(false);
   const chartTheme = theme === "dark" ? "dark" : "light";
   const [chartSettings, setChartSettings] =
-    useState<ChartSettings>(defaultSettings);
+    useState<ChartSettings>(defaultChartSettings);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   useEffect(() => {
     const loadData = () => {
@@ -45,7 +45,7 @@ const SectorPopoverContainer: React.FC<OffCanvasContainerPros> = ({
       if (savedSettings) {
         setChartSettings(JSON.parse(savedSettings));
       } else {
-        setChartSettings(defaultSettings);
+        setChartSettings(defaultChartSettings);
       }
       setIsDataLoaded(true);
     };

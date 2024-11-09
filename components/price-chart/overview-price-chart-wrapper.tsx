@@ -16,7 +16,7 @@ import { isWithinMarketHours } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import {
   ChartSettings,
-  defaultSettings,
+  defaultChartSettings,
 } from "@/components/settings/chart-settings";
 import { useTheme } from "next-themes";
 import { useQuery } from "react-query";
@@ -40,7 +40,7 @@ const OverviewPriceChartWrapper: React.FC<OverviewPriceChartWrapperProps> = ({
 
   const { theme } = useTheme();
   const [chartSettings, setChartSettings] =
-    useState<ChartSettings>(defaultSettings);
+    useState<ChartSettings>(defaultChartSettings);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   useEffect(() => {
     const loadData = () => {
@@ -48,7 +48,7 @@ const OverviewPriceChartWrapper: React.FC<OverviewPriceChartWrapperProps> = ({
       if (savedSettings) {
         setChartSettings(JSON.parse(savedSettings));
       } else {
-        setChartSettings(defaultSettings);
+        setChartSettings(defaultChartSettings);
       }
       setIsDataLoaded(true);
     };

@@ -12,7 +12,7 @@ import { isWithinMarketHours } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import {
   ChartSettings,
-  defaultSettings,
+  defaultChartSettings,
 } from "@/components/settings/chart-settings";
 import {
   calculateEMA,
@@ -31,7 +31,7 @@ const OverviewMobilePriceChartWrapper: React.FC<
   const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
   const [chartSettings, setChartSettings] =
-    useState<ChartSettings>(defaultSettings);
+    useState<ChartSettings>(defaultChartSettings);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   useEffect(() => {
     const loadData = () => {
@@ -39,7 +39,7 @@ const OverviewMobilePriceChartWrapper: React.FC<
       if (savedSettings) {
         setChartSettings(JSON.parse(savedSettings));
       } else {
-        setChartSettings(defaultSettings);
+        setChartSettings(defaultChartSettings);
       }
       setIsDataLoaded(true);
     };

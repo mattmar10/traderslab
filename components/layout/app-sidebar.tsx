@@ -8,13 +8,9 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
 import {
   Sidebar,
   SidebarContent,
@@ -34,11 +30,8 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import {
-  BadgeCheck,
-  Bell,
   ChevronRight,
   ChevronsUpDown,
-  CreditCard,
   GalleryVerticalEnd,
   LogOut,
 } from "lucide-react";
@@ -126,6 +119,12 @@ export const navItems: NavItem[] = [
         icon: "login",
       },
     ],
+  },
+  {
+    title: "Settings",
+    url: "/settings", // Placeholder as there is no direct link for the parent
+    icon: "userPen",
+    isActive: true,
   },
 ];
 
@@ -262,45 +261,7 @@ export default function AppSidebar({
                   align="end"
                   sideOffset={4}
                 >
-                  <DropdownMenuLabel className="p-0 font-normal">
-                    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                      <Avatar className="h-8 w-8 rounded-lg">
-                        <AvatarImage
-                          src={user.imageUrl || ""}
-                          alt={user.firstName || ""}
-                        />
-                        <AvatarFallback className="rounded-lg">
-                          {user.lastName}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold">
-                          {user.imageUrl || ""}
-                        </span>
-                        <span className="truncate text-xs">
-                          {" "}
-                          {user.emailAddresses?.[0]?.emailAddress || ""}
-                        </span>
-                      </div>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
 
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                      <BadgeCheck />
-                      Account
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <CreditCard />
-                      Billing
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Bell />
-                      Notifications
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <LogOut />
                     Log out
@@ -316,7 +277,7 @@ export default function AppSidebar({
         <header className="flex h-12  items-center justify-between gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 ">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
+
 
           </div>
           <div className=" hidden w-1/3 items-center gap-2 px-4 md:flex ">
