@@ -22,7 +22,7 @@ export interface ChartSettings {
   avwapSettings: AVWAPSetting;
 }
 
-export const defaultSettings: ChartSettings = {
+export const defaultChartSettings: ChartSettings = {
   priceMovingAverages: [
     { id: 1, type: "EMA", period: 10, color: "#888" },
     { id: 2, type: "EMA", period: 21, color: "#268bd2" },

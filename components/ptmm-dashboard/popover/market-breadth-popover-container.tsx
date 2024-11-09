@@ -5,7 +5,7 @@ import Loading from "@/components/loading";
 import PriceChart from "@/components/price-chart/price-chart";
 import {
   ChartSettings,
-  defaultSettings,
+  defaultChartSettings,
 } from "@/components/settings/chart-settings";
 import { Candle } from "@/lib/types/basic-types";
 import {
@@ -38,7 +38,7 @@ const MarketBreadthPopoverContainer: React.FC<OffCanvasContainerPros> = ({
 
   const { theme } = useTheme();
   const [chartSettings, setChartSettings] =
-    useState<ChartSettings>(defaultSettings);
+    useState<ChartSettings>(defaultChartSettings);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   useEffect(() => {
     const loadData = () => {
@@ -46,7 +46,7 @@ const MarketBreadthPopoverContainer: React.FC<OffCanvasContainerPros> = ({
       if (savedSettings) {
         setChartSettings(JSON.parse(savedSettings));
       } else {
-        setChartSettings(defaultSettings);
+        setChartSettings(defaultChartSettings);
       }
       setIsDataLoaded(true);
     };
