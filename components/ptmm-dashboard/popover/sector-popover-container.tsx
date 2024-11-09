@@ -22,6 +22,7 @@ import {
 import Loading from "@/components/loading";
 import ErrorCard from "@/components/error-card";
 import { useQuery } from "react-query";
+import PriceChart from "@/components/price-chart/price-chart";
 
 export interface OffCanvasContainerPros {
   etfSymbol: string;
@@ -34,7 +35,7 @@ const SectorPopoverContainer: React.FC<OffCanvasContainerPros> = ({
 }) => {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
-
+  const chartTheme = theme === "dark" ? "dark" : "light";
   const [chartSettings, setChartSettings] =
     useState<ChartSettings>(defaultSettings);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -55,7 +56,9 @@ const SectorPopoverContainer: React.FC<OffCanvasContainerPros> = ({
   useEffect(() => {
     setMounted(true);
   }, []);
-  console.log(chartSettings, isDataLoaded);
+
+
+  console.log(isDataLoaded)
 
   const currentDate = new Date();
   const startDate = new Date(
@@ -104,18 +107,10 @@ const SectorPopoverContainer: React.FC<OffCanvasContainerPros> = ({
 
   if (status === "loading" || !theme || !mounted) {
     return (
-      <div
-        style={{ width: "640px" }}
-        className={`p-4 rounded shadow-lg border border-foreground/70 bg-${bgColor} h-96`}
-      >
-        <div className={`mb-2 pb-2 border-b border-foreground`}>
-          <div>
-            <span className="font-semibold">{etfSymbol} </span>
-            {name}
-          </div>
-        </div>
+      <div className="h-[32rem] pt-4">
         <Loading />
       </div>
+
     );
   }
   if (error || !data || isFMPDataLoadingError(data)) {
@@ -144,11 +139,12 @@ const SectorPopoverContainer: React.FC<OffCanvasContainerPros> = ({
 
   return (
     <div
+
       style={{
         zIndex: 1000,
         outline: "none",
       }}
-      className={`p-4 rounded shadow-lg border border-foreground/70 bg-${bgColor} `}
+      className={`bg-${bgColor}  `}
     >
       <div className={`mb-2 pb-2 border-b border-foreground`}>
         <div>
@@ -156,7 +152,39 @@ const SectorPopoverContainer: React.FC<OffCanvasContainerPros> = ({
           &nbsp;{name}
         </div>
       </div>
-      <div className="h-96">price chart</div>
+      <PriceChart
+        className="h-[30rem] mt-1"
+        candles={data}
+        tenEMA={{
+          period: 10,
+          timeseries: tenEMARes.timeseries.filter(
+            (t) => new Date(t.time).getTime() > startDate.getTime()
+          ),
+        }}
+        twentyOneEMA={{
+          period: 21,
+          timeseries: twentyOneEMARes.timeseries.filter(
+            (t) => new Date(t.time).getTime() > startDate.getTime()
+          ),
+        }}
+        fiftySMA={{
+          period: 50,
+          timeseries: fiftySMARes.timeseries.filter(
+            (t) => new Date(t.time).getTime() > startDate.getTime()
+          ),
+        }}
+        twoHundredSMA={{
+          period: 200,
+          timeseries: twoHundredSMARes.timeseries.filter(
+            (t) => new Date(t.time).getTime() > startDate.getTime()
+          ),
+        }}
+        showVolume={!etfSymbol.includes("^")}
+        ticker={etfSymbol}
+        earningsDates={[]}
+        chartSettings={chartSettings}
+        theme={chartTheme}
+      />
     </div>
   );
 };

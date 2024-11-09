@@ -9,15 +9,12 @@ import {
   CurrentDayMarketBreadthSnapshotPoint,
   CurrentDayMarketBreadthSnapshotSchema,
 } from "@/lib/types/market-breadth-types";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@radix-ui/react-popover";
+
 import { calculateColorFromPercentage } from "./utils";
 import { useQuery } from "react-query";
 import Loading from "@/components/loading";
 import SectorPopoverContainer from "../popover/sector-popover-container";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const firaCode = Fira_Code({
   subsets: ["latin"],
@@ -467,7 +464,8 @@ const MarketBreadthSnapshotTable: React.FC = () => {
                   <Popover key={so.sector}>
                     <PopoverTrigger asChild>{row}</PopoverTrigger>
                     <PopoverContent
-                      side="left"
+                      side="bottom"
+                      className="w-[60rem]  border border-foreground/70"
                       sideOffset={15}
                       style={{ zIndex: 1000, outline: "none" }}
                     >

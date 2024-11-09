@@ -15,6 +15,7 @@ import STMomentumUpDownChartTV from "@/components/ptmm-dashboard/momentum/st-mom
 import ClientOverviewPriceChart from "@/components/price-chart/client-overview-price-chart";
 import CombinedHighsLowsMcClellan from "./combined-highs-lows-mcclellan";
 import PercentOfStocksAboveMAs from "@/components/ptmm-dashboard/percent-of-stocks-above-ma-tv";
+import DesktopTrendModelStatus from "./desktop-trend-model-status";
 
 const lato = Lato({
   subsets: ["latin"],
@@ -76,14 +77,27 @@ const DashboardWrapper: React.FC<DashboardWrapperProps> = ({
     currentDate.getMilliseconds()
   );
 
+
   return (
     <PageContainer scrollable>
       <div className="space-y-4 mt-2">
-        <div className="flex items-center justify-between space-y-2">
-          <h2 className={`text-2xl font-bold tracking-tight ${lato.className}`}>
-            PTMM Dashboard
-          </h2>
-        </div>
+        <div className="space-y-1">
+          <span className="text-foreground/60">{datasetDescription}</span>
+
+          <div className="flex space-x-3" >
+            <div>
+              <div className={`text-2xl font-bold tracking-tight ${lato.className}`}>
+                PTMM Dashboard {" "} <span className="text-2xl font-semibold"> ({getTickerForDataset(dataset)})</span>
+              </div>
+
+            </div>
+
+            <DesktopTrendModelStatus dataset={dataset} />
+
+          </div>
+        </div >
+
+
         <div className="grid grid-cols-1 gap-4 3xl:grid-cols-4">
           <div className="col-span-3">
             <MarketBreadthSnapshotTable />
@@ -126,8 +140,8 @@ const DashboardWrapper: React.FC<DashboardWrapperProps> = ({
 
         </div>
 
-      </div>
-    </PageContainer>
+      </div >
+    </PageContainer >
   );
 };
 
