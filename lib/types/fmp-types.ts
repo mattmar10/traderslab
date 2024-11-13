@@ -222,6 +222,51 @@ const FMPSymbolProfileArraySchema = z.array(FMPSymbolProfileDataSchema);
 export { FMPSymbolProfileDataSchema, FMPSymbolProfileArraySchema };
 export type FMPSymbolProfile = z.infer<typeof FMPSymbolProfileDataSchema>;
 
+
+
+export const FullFMPFullProfileSchema = z.object({
+  symbol: z.string(),
+  price: z.number(),
+  companyName: z.string(),
+  beta: z.number().nullable(),
+  volAvg: z.number().nullable(),
+  mktCap: z.number().nullable(),
+  lastDiv: z.number().nullable(),
+  range: z.string().nullable(),
+  changes: z.number().nullable(),
+  currency: z.string().nullable(),
+  cik: z.string().nullable(),
+  isin: z.string().nullable(),
+  cusip: z.string().nullable(),
+  exchange: z.string().nullable(),
+  exchangeShortName: z.string().nullable(),
+  industry: z.string().nullable(),
+  website: z.string().url().nullable(),
+  description: z.string().nullable(),
+  ceo: z.string().nullable(),
+  sector: z.string().nullable(),
+  country: z.string().nullable(),
+  fullTimeEmployees: z.string().nullable(),
+  phone: z.string().nullable(),
+  address: z.string().nullable(),
+  city: z.string().nullable(),
+  state: z.string().nullable(),
+  zip: z.string().nullable(),
+  dcfDiff: z.number().nullable(),
+  dcf: z.number().nullable(),
+  image: z.string().url().nullable(),
+  ipoDate: z.string().nullable(), // Consider z.string().datetime().nullable() if date format validation is needed
+  defaultImage: z.boolean().nullable(),
+  isEtf: z.boolean().nullable(),
+  isActivelyTrading: z.boolean().nullable(),
+  isAdr: z.boolean().nullable(),
+  isFund: z.boolean().nullable()
+});
+
+export const FullFMPFullProfileArraySchema = z.array(FullFMPFullProfileSchema);
+export type FullFMPProfile = z.infer<typeof FullFMPFullProfileSchema>
+
+
 export type RealtimeQuoteResponse = {
   ticker: string;
   name: string;

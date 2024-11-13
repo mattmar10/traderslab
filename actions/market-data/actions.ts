@@ -1,7 +1,7 @@
 "use server";
 
 import { fetchWithRetries } from "@/app/api/utils";
-import { Candle, Quote, QuoteArraySchema } from "@/lib/types/basic-types";
+import { Candle } from "@/lib/types/basic-types";
 import {
   EarningsDateSchema,
   FMPDataLoadingError,
@@ -9,7 +9,13 @@ import {
   FMPHistoricalResultsSchema,
   FMPIntradayChart,
   FMPIntradayChartSchema,
+  FullFMPFullProfileArraySchema,
+  FullFMPFullProfileSchema,
+  FullFMPProfile,
+  Quote,
+  QuoteArraySchema,
   RealtimeQuoteResponse,
+  SymbolProfile,
 } from "@/lib/types/fmp-types";
 import { CurrentDayMarketBreadthSnapshot } from "@/lib/types/market-breadth-types";
 import {
@@ -124,6 +130,64 @@ export async function getRealTimeQuotes(
   }
 }
 
+export async function getProfile(ticker: string): Promise<SymbolProfile> {
+  if (!process.env.TRADERS_LAB_API) {
+    return Promise.reject("TRADERS_LAB_API must be specified");
+  }
+  const url = `${process.env.TRADERS_LAB_API}/symbol/${ticker}/profile`;
+  console.log(url)
+  try {
+    const response = await fetch(url, { next: { revalidate: 0 } });
+
+    if (!response.ok) {
+      const message = `Error fetching profile`;
+      console.error(message);
+      console.error(JSON.stringify(response));
+      return Promise.reject("Error fetching profile")
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    const dataError: FMPDataLoadingError = `Unable to fetch profile`;
+    return Promise.reject(dataError);
+  }
+}
+
+export async function getFullProfile(ticker: string): Promise<FullFMPProfile[]> {
+  if (!process.env.FINANCIAL_MODELING_PREP_API || !process.env.FMP_API_KEY) {
+    return Promise.reject("FMP URL and key must be specified");
+  }
+  const url = `${process.env.FINANCIAL_MODELING_PREP_API}/profile/${ticker}?apikey=${process.env.FMP_API_KEY}`;
+  console.log(url)
+  try {
+    const response = await fetch(url, { next: { revalidate: 0 } });
+
+    if (!response.ok) {
+      const message = `Error fetching profile`;
+      console.error(message);
+      console.error(JSON.stringify(response));
+      return Promise.reject("Error fetching profile")
+    }
+
+    const data = await response.json();
+
+    const parsed = FullFMPFullProfileArraySchema.safeParse(data)
+    if (parsed.success) {
+      return parsed.data
+    }
+    else {
+      return Promise.reject("Unable to parse profiles")
+    }
+  } catch (error) {
+    const dataError: FMPDataLoadingError = `Unable to fetch profile`;
+    return Promise.reject(dataError);
+  }
+}
+
+
+
 export async function getQuotesFromFMP(
   tickers: string[]
 ): Promise<Quote[]> {
@@ -152,11 +216,11 @@ export async function getQuotesFromFMP(
       return parsed.data
     }
     else {
-      return Promise.reject("Unable to parse Intraday chart")
+      return Promise.reject("Unable to parse quotes")
     }
 
   } catch (error) {
-    const dataError: FMPDataLoadingError = `Unable to fetch realtime quotes`;
+    const dataError: FMPDataLoadingError = `Unable to fetch quotes`;
     return Promise.reject(dataError)
   }
 }

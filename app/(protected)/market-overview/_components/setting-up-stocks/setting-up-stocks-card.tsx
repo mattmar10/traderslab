@@ -26,6 +26,7 @@ import {
 } from "@/lib/types/screener-types";
 import { Button } from "@/components/ui/button";
 import { getSettingUpStocks } from "@/actions/screener/actions";
+import Link from "next/link";
 
 export interface SettingUpStocksCardProps {
   stocks: ScreenerResults;
@@ -86,23 +87,25 @@ const SettingUpStocksCard: React.FC<SettingUpStocksCardProps> = ({
               <TableBody>
                 {data.stocks.map((stock: SymbolWithStatsWithRank) => (
                   <TableRow key={`${stock.profile.symbol}-setting-up`}>
-                    <TableCell className="font-medium">
-                      {stock.profile.symbol}
-                    </TableCell>
-                    <TableCell className="truncate max-w-[150px]">
-                      <span title={stock.profile.companyName || ""}>
-                        {stock.profile.companyName}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {stock.quote.price}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {stock.quote.change.toFixed(2)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {stock.quote.changesPercentage.toFixed(2)}%
-                    </TableCell>
+                    <Link href={`/symbol/${stock.profile.symbol}`} className="contents">
+                      <TableCell className="font-medium">
+                        {stock.profile.symbol}
+                      </TableCell>
+                      <TableCell className="truncate max-w-[150px]">
+                        <span title={stock.profile.companyName || ""}>
+                          {stock.profile.companyName}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {stock.quote.price}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {stock.quote.change.toFixed(2)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {stock.quote.changesPercentage.toFixed(2)}%
+                      </TableCell>
+                    </Link>
                   </TableRow>
                 ))}
               </TableBody>

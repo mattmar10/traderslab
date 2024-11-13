@@ -20,13 +20,14 @@ async function LeadingStocks() {
 
 function LoadingState() {
   return (
-    <Card className="h-full min-h-[300px] max-h-[30vh] flex flex-col">      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 h-1/4">
-      <div className="flex flex-col space-y-1">
-        <CardTitle>Leading Stocks</CardTitle>
-        <CardDescription>TradersLab market leaders</CardDescription>
-      </div>
-      <Trophy className="h-4 w-4 text-muted-foreground" />
-    </CardHeader>
+    <Card className="h-full min-h-[300px] max-h-[30vh] flex flex-col">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 h-1/4">
+        <div className="flex flex-col space-y-1">
+          <CardTitle>Leading Stocks</CardTitle>
+          <CardDescription>TradersLab market leaders</CardDescription>
+        </div>
+        <Trophy className="h-4 w-4 text-muted-foreground" />
+      </CardHeader>
       <CardContent className="h-3/4">
         <div className="h-full flex items-center justify-center">
           <Loading />

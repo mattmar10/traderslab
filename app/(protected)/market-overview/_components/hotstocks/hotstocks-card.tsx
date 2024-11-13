@@ -18,11 +18,12 @@ import {
   TableRow,
   Table,
 } from "@/components/ui/table";
-import { Quote } from "@/lib/types/basic-types";
-import { isFMPDataLoadingError } from "@/lib/types/fmp-types";
+import { isFMPDataLoadingError, Quote } from "@/lib/types/fmp-types";
 import { AlertCircle, Flame, FlameIcon } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { useQuery } from "react-query";
+
 
 export interface HotStocksCardProps {
   stocks: Quote[];
@@ -104,21 +105,23 @@ export default function HotStocksCard({ stocks }: HotStocksCardProps) {
               <TableBody>
                 {data.map((stock: Quote) => (
                   <TableRow key={`${stock.symbol}-${stock.timestamp}`}>
-                    <TableCell className="font-medium">
-                      {stock.symbol}
-                    </TableCell>
-                    <TableCell className="truncate max-w-[150px]">
-                      <span title={stock.name || ""}>{stock.name}</span>
-                    </TableCell>
-                    <TableCell className="text-right w-[4rem]">
-                      {stock.price}
-                    </TableCell>
-                    <TableCell className="text-right w-[4rem]">
-                      {stock.change.toFixed(2)}
-                    </TableCell>
-                    <TableCell className="text-right w-[4rem]">
-                      {stock.changesPercentage.toFixed(2)}%
-                    </TableCell>
+                    <Link href={`/symbol/${stock.symbol}`} className="contents">
+                      <TableCell className="font-medium">
+                        {stock.symbol}
+                      </TableCell>
+                      <TableCell className="truncate max-w-[150px]">
+                        <span title={stock.name || ""}>{stock.name}</span>
+                      </TableCell>
+                      <TableCell className="text-right w-[4rem]">
+                        {stock.price}
+                      </TableCell>
+                      <TableCell className="text-right w-[4rem]">
+                        {stock.change.toFixed(2)}
+                      </TableCell>
+                      <TableCell className="text-right w-[4rem]">
+                        {stock.changesPercentage.toFixed(2)}%
+                      </TableCell>
+                    </Link>
                   </TableRow>
                 ))}
               </TableBody>
