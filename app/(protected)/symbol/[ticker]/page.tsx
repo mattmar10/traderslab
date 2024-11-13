@@ -1,21 +1,53 @@
+import { Suspense } from 'react';
+import Loading from '@/components/loading';
 import { notFound } from "next/navigation";
+import { getFullProfile, getPriceBars, getQuotesFromFMP } from '@/actions/market-data/actions';
+import SymbolPageWrapper from '../_components/symbol-page-wrapper';
+import { isFMPDataLoadingError, Quote } from '@/lib/types/fmp-types';
 
-const SymbolPage = ({
-  params,
-}: // searchParams,
-{
-  params: { ticker: string };
-  // searchParams?: { [key: string]: string | string[] | undefined };
-}) => {
+interface SymbolPageContentProps {
+  ticker: string;
+}
+
+async function SymbolPageContent({ ticker }: SymbolPageContentProps) {
+  const [quoteData, profile, bars] = await Promise.all([
+    getQuotesFromFMP([ticker]),
+    getFullProfile(ticker),
+    getPriceBars(ticker)
+  ]);
+
+  if (isFMPDataLoadingError(bars)) {
+    return (
+      <div>Error fetching price data</div>
+    )
+  }
+
+  const q: Quote = quoteData[0]
+
+  return (
+    <SymbolPageWrapper quote={q} profile={profile[0]} candles={bars} />
+  );
+}
+
+function SymbolPageServer({ ticker }: SymbolPageContentProps) {
+  return (
+    <Suspense fallback={<Loading />}>
+      <SymbolPageContent ticker={ticker} />
+    </Suspense>
+  );
+}
+
+
+interface PageProps {
+  params: {
+    ticker: string;
+  };
+}
+
+export default function SymbolPage({ params }: PageProps) {
   if (!params.ticker) {
     notFound();
   }
 
-  return (
-    <main className="flex min-w-screen flex-col items-center justify-between pt-12">
-      page for {params.ticker}
-    </main>
-  );
-};
-
-export default SymbolPage;
+  return <SymbolPageServer ticker={params.ticker} />;
+}
