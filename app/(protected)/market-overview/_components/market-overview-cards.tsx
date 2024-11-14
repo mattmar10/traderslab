@@ -6,7 +6,7 @@ import {
 } from "@/lib/types/market-breadth-types";
 import { AllPTTrendModels } from "@/lib/types/trend-model-types";
 import Link from "next/link";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import MarketOverviewCard from "./market-overview-card";
 import { PTTrendModel } from "@/lib/types/fmp-types";

@@ -22,8 +22,7 @@ import { isFMPDataLoadingError, Quote } from "@/lib/types/fmp-types";
 import { AlertCircle, Flame, FlameIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { useQuery } from "react-query";
-
+import { useQuery } from "@tanstack/react-query";
 
 export interface HotStocksCardProps {
   stocks: Quote[];

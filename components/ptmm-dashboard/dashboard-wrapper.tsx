@@ -2,7 +2,7 @@
 import { getDataSetMarketBreadthOverview } from "@/actions/breadth/breadth-actions";
 import useViewport from "@/hooks/useViewport";
 import { Dataset } from "@/lib/types/basic-types";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import Loading from "../loading";
 import DesktopDashboard from "./desktop-dashboard";
 import { MarketBreadthResponse } from "@/lib/types/market-breadth-types";

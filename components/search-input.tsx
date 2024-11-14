@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { ArrowRight, Search } from "lucide-react";
 import {
@@ -52,11 +52,12 @@ const SearchInput = () => {
 
   const debouncedSearch = useDebounce(searchTerm, 300);
 
-  const { data: searchResults, isLoading } = useQuery(
-    ["search", debouncedSearch],
-    () => basicSearch(debouncedSearch),
-    { enabled: debouncedSearch.length > 0, staleTime: 1000 * 60 * 5 }
-  );
+  const { data: searchResults, isLoading } = useQuery({
+    queryKey: ["search", debouncedSearch],
+    queryFn: () => basicSearch(debouncedSearch),
+    enabled: debouncedSearch.length > 0,
+    staleTime: 1000 * 60 * 5,
+  });
 
   const [currentIndex, setCurrentIndex] = useState(-1);
   const filteredResults = formatAndFilterSearchResults(

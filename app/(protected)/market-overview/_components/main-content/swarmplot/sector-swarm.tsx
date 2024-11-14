@@ -17,7 +17,7 @@ import {
 import { sectorsOrderMap } from "./util";
 import CustomYAxisLabel from "./y-axis-label";
 import { getRealTimeQuotes } from "@/actions/market-data/actions";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Loading from "@/components/loading";

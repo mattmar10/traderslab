@@ -2,7 +2,7 @@
 
 import { getPriceBars } from "@/actions/market-data/actions";
 import {} from "@/lib/types/basic-types";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import ErrorCard from "../error-card";
 import Loading from "../loading";
