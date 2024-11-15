@@ -5,7 +5,7 @@ import {
   SymbolWithStatsWithRank,
 } from "@/lib/types/screener-types";
 import { Column, mobileColumns } from "./screener-table-columns";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
   calculateColorFromPercentage,
@@ -15,6 +15,8 @@ import { Fira_Code } from "next/font/google";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Cross2Icon } from "@radix-ui/react-icons";
+import { ChartSettings } from "@/components/settings/chart-settings";
+import ScreenerPriceChart from "./screener-popup-price-chart";
 
 const firaCode = Fira_Code({
   subsets: ["latin"],
@@ -27,6 +29,7 @@ export interface ScreenerResultsTableProps {
   ranges: ScreenerRanges;
   columns: Column[];
   theme: "light" | "dark";
+  chartSettings: ChartSettings
 }
 
 const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
@@ -35,6 +38,7 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
   ranges,
   columns,
   theme,
+  chartSettings
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [selectedStock, setSelectedStock] =
@@ -375,7 +379,16 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
           onClose={closePopover}
         // selectedStock={selectedStock.profile.symbol}
         >
-          <div className="px-6 pt-2">{selectedStock.quote.symbol}</div>
+          <div className="px-2 ">
+            <ScreenerPriceChart
+              ticker={selectedStock.profile.symbol}
+              isMobile={isMobile}
+              name={selectedStock.profile.companyName}
+              sector={selectedStock.profile.sector || ""}
+              industry={selectedStock.profile.industry || ""}
+              chartSettings={chartSettings}
+              theme={theme}
+            /></div>
         </CenteredPopoverContent>
       )}
     </div>
@@ -387,12 +400,30 @@ const CenteredPopoverContent: React.FC<{
   onClose: () => void;
   children: React.ReactNode;
 }> = ({ isOpen, onClose, children }) => {
+
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    // Cleanup listener when component unmounts or isOpen changes
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-background rounded-none lg:rounded-lg shadow-lg w-full h-full sm:w-[66vw] sm:h-[52rem] flex flex-col">
-        <div className="flex justify-between items-start p-4 sm:p-2 border-b">
+        <div className="flex justify-between items-start  ">
           <div className="relative flex-grow mr-2"></div>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <Cross2Icon className="h-4 w-4" />

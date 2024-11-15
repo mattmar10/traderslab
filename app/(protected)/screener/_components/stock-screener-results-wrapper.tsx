@@ -331,7 +331,8 @@ const ScreenerResultsWrapper = ({
               theme={resolvedTheme}
               sortConfig={persistedState.sortConfig}
               ranges={initialData.ranges}
-              columns={persistedState.selectedColumns} // Use selectedColumns directly
+              columns={persistedState.selectedColumns}
+              chartSettings={persistedState.chartSettings}
             />
           ) : (
             <div className="pt-4 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:mt-4 px-2 lg:px-0">
@@ -445,7 +446,10 @@ const ScreenerResultsWrapper = ({
               filterGrp={persistedState.filterGroup}
             />
 
-            <Button onClick={() => updateState("isFiltersLibraryOpen", true)}><RiStackLine /> Library</Button>
+
+            <Button
+              onClick={() => updateState("isFiltersLibraryOpen", true)}><RiStackLine /> Library</Button>
+
 
             <div className="flex items-center space-x-2 pl-4 pb-2 sm:mt-0 pt-6">
               <div className="flex items-center space-x-4">
