@@ -19,7 +19,7 @@ import {
 } from "@/lib/utils/moving-average";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 export interface OffCanvasContainerPros {
   ticker: string;
@@ -60,7 +60,7 @@ const MarketBreadthPopoverContainer: React.FC<OffCanvasContainerPros> = ({
 
   console.log(chartSettings, isDataLoaded);
 
-  const startDate = new Date(fromDate)
+  const startDate = new Date(fromDate);
   const key = `/api/bars/${ticker}?fromDateString=${fromDate}&toDateString=${endDate}`;
 
   const getBars = async () => {
@@ -93,7 +93,7 @@ const MarketBreadthPopoverContainer: React.FC<OffCanvasContainerPros> = ({
 
   const bgColor = theme === "light" ? "white" : "black";
 
-  if (status === "loading" || !theme || !mounted) {
+  if (status === "pending" || !theme || !mounted) {
     return (
       <div
         className={`p-4 rounded shadow-lg border border-foreground/70 bg-${bgColor} h-96 `}

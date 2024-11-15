@@ -18,7 +18,7 @@ import {
   StockSymbolSearchResult,
 } from "@/lib/types/basic-types";
 import { useCallback, useRef, useState } from "react";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { basicSearch } from "@/app/search-actions";
 
 type SearchResultType = "stock" | "etf" | "index";

@@ -21,7 +21,7 @@ import {
 } from "@/components/settings/chart-settings";
 import Loading from "@/components/loading";
 import ErrorCard from "@/components/error-card";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import PriceChart from "@/components/price-chart/price-chart";
 
 export interface OffCanvasContainerPros {
@@ -57,8 +57,7 @@ const SectorPopoverContainer: React.FC<OffCanvasContainerPros> = ({
     setMounted(true);
   }, []);
 
-
-  console.log(isDataLoaded)
+  console.log(isDataLoaded);
 
   const currentDate = new Date();
   const startDate = new Date(
@@ -105,12 +104,11 @@ const SectorPopoverContainer: React.FC<OffCanvasContainerPros> = ({
 
   const bgColor = theme === "light" ? "white" : "black";
 
-  if (status === "loading" || !theme || !mounted) {
+  if (status === "pending" || !theme || !mounted) {
     return (
       <div className="h-[32rem] pt-4">
         <Loading />
       </div>
-
     );
   }
   if (error || !data || isFMPDataLoadingError(data)) {
@@ -139,7 +137,6 @@ const SectorPopoverContainer: React.FC<OffCanvasContainerPros> = ({
 
   return (
     <div
-
       style={{
         zIndex: 1000,
         outline: "none",

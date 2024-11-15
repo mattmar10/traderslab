@@ -16,7 +16,7 @@ import {
   CurrentDayMarketBreadthSnapshot,
   CurrentDayMarketBreadthSnapshotSchema,
 } from "@/lib/types/market-breadth-types";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import BreadthCard from "./nav/breadth-card";
 import { AllPTTrendModels } from "@/lib/types/trend-model-types";
 import { Button } from "./ui/button";

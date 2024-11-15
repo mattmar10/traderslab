@@ -19,7 +19,7 @@ import {
 
 import Loading from "@/components/loading";
 import { AlertCircle, Trophy } from "lucide-react";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   ScreenerResults,
   SymbolWithStatsWithRank,
@@ -86,7 +86,10 @@ const LeadingStocksCard: React.FC<LeadingStocksCardProps> = ({ stocks }) => {
               <TableBody>
                 {data.stocks.map((stock: SymbolWithStatsWithRank) => (
                   <TableRow key={`${stock.profile.symbol}-leading`}>
-                    <Link href={`/symbol/${stock.profile.symbol}`} className="contents">
+                    <Link
+                      href={`/symbol/${stock.profile.symbol}`}
+                      className="contents"
+                    >
                       <TableCell className="font-medium">
                         {stock.profile.symbol}
                       </TableCell>

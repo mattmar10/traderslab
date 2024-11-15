@@ -19,7 +19,7 @@ import {
   defaultChartSettings,
 } from "@/components/settings/chart-settings";
 import { useTheme } from "next-themes";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { formatDateToEST } from "@/lib/utils/epoch-utils";
 import {
   calculateEMA,
@@ -130,7 +130,7 @@ const OverviewPriceChartWrapper: React.FC<OverviewPriceChartWrapperProps> = ({
   }
 
   if (
-    (status === "loading" || barsStatus === "loading" || !isDataLoaded) &&
+    (status === "pending" || barsStatus === "pending" || !isDataLoaded) &&
     sortedTickerData.length === 0
   ) {
     return <Loading />;

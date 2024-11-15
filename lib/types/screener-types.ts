@@ -180,6 +180,8 @@ export const ScreenerRangesSchema = z.object({
   dailyRangeHistoricalVolatilityRange: z.tuple([z.number(), z.number()]),
 });
 
+export type ScreenerRanges = z.infer<typeof ScreenerRangesSchema>;
+
 export const ScreenerResultsSchema = z.object({
   stocks: z.array(SymbolWithStatsWithRankSchema),
   ranges: ScreenerRangesSchema,
@@ -190,3 +192,25 @@ export const ScreenerResultsSchema = z.object({
 });
 
 export type ScreenerResults = z.infer<typeof ScreenerResultsSchema>;
+
+export type ScreenerSortableKeys =
+  | "price"
+  | "rsRank"
+  | "rsScore"
+  | "oneDayReturnPercent"
+  | "oneWeekReturnPercent"
+  | "oneMonthReturnPercent"
+  | "threeMonthReturnPercent"
+  | "sixMonthReturnPercent"
+  | "oneYearReturnPercent"
+  | "percentFromFiftyTwoWeekHigh"
+  | "trendMomentum"
+  | "percentFromFiftyTwoWeekLow"
+  | "industry"
+  | "sector"
+  | "breakoutIntensityScore";
+
+export interface ScreenerSortConfig {
+  key: ScreenerSortableKeys;
+  direction: "asc" | "desc";
+}

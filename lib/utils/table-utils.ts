@@ -39,14 +39,13 @@ export const calculateColorFromPercentage = (
 
 export const calculateColorFromPercentageInverted = (
   value: number,
-  theme: "dark" | "light",
   min: number,
   neutral: number,
   max: number
 ): string => {
   // Define colors for light and dark themes
-  const greenColor = theme === "dark" ? "4CAF50" : "228B22"; // Green
-  const redColor = theme === "dark" ? "F44336" : "FF6347"; // Red
+  const positiveColor = positiveBlue;
+  const redColor = negativeRed;
 
   // Normalize the value to a 0-1 range
   const normalizedValue = (value - min) / (max - min);
@@ -68,7 +67,7 @@ export const calculateColorFromPercentageInverted = (
   intensity = Math.max(0, Math.min(1, intensity));
 
   // Determine color based on value
-  const color = normalizedValue <= neutralPoint ? greenColor : redColor;
+  const color = normalizedValue <= neutralPoint ? positiveColor : redColor;
 
   // Convert intensity to hex
   const opacityHex = Math.round(intensity * 255)
@@ -76,15 +75,15 @@ export const calculateColorFromPercentageInverted = (
     .padStart(2, "0");
 
   // Apply opacity
-  return `#${color}${opacityHex}`;
+  return `${color}${opacityHex}`;
 };
 export const calculateGreenOrRed = (
   theme: "dark" | "light",
   condition: boolean
 ): string => {
   // Define colors for light and dark themes
-  const positiveColor = positiveBlue
-  const negativeColor = negativeRed
+  const positiveColor = positiveBlue;
+  const negativeColor = negativeRed;
 
   let color = condition ? positiveColor : negativeColor;
 

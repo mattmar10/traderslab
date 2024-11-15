@@ -2,11 +2,16 @@
 import { getDataSetMarketBreadthOverview } from "@/actions/breadth/breadth-actions";
 import useViewport from "@/hooks/useViewport";
 import { Dataset, getTickerForDataset } from "@/lib/types/basic-types";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
-import { MarketBreadthResponse, MomentumRow, STMomentumRow, UpAndDown } from "@/lib/types/market-breadth-types";
+import {
+  MarketBreadthResponse,
+  MomentumRow,
+  STMomentumRow,
+  UpAndDown,
+} from "@/lib/types/market-breadth-types";
 import { isFMPDataLoadingError } from "@/lib/types/fmp-types";
-import PageContainer from "@/components/layout/page-container"
+import PageContainer from "@/components/layout/page-container";
 import { Lato } from "next/font/google";
 import Loading from "@/components/loading";
 import MarketBreadthSnapshotTable from "@/components/ptmm-dashboard/market-breadth-table/market-breadth-snapshot-table";
@@ -22,7 +27,6 @@ const lato = Lato({
   weight: ["400", "700", "900"],
   display: "swap",
 });
-
 
 export interface DashboardWrapperProps {
   dataset: Dataset;
@@ -64,7 +68,7 @@ const DashboardWrapper: React.FC<DashboardWrapperProps> = ({
     );
   }
 
-  const momentumRows = bulidMomentumRows(data)
+  const momentumRows = bulidMomentumRows(data);
   const currentDate = new Date();
 
   const oneYearAgo = new Date(
@@ -77,26 +81,28 @@ const DashboardWrapper: React.FC<DashboardWrapperProps> = ({
     currentDate.getMilliseconds()
   );
 
-
   return (
     <PageContainer scrollable>
       <div className="space-y-4 mt-2">
         <div className="space-y-1">
           <span className="text-foreground/60">{datasetDescription}</span>
 
-          <div className="flex space-x-3" >
+          <div className="flex space-x-3">
             <div>
-              <div className={`text-2xl font-bold tracking-tight ${lato.className}`}>
-                PTMM Dashboard {" "} <span className="text-2xl font-semibold"> ({getTickerForDataset(dataset)})</span>
+              <div
+                className={`text-2xl font-bold tracking-tight ${lato.className}`}
+              >
+                PTMM Dashboard{" "}
+                <span className="text-2xl font-semibold">
+                  {" "}
+                  ({getTickerForDataset(dataset)})
+                </span>
               </div>
-
             </div>
 
             <DesktopTrendModelStatus dataset={dataset} />
-
           </div>
-        </div >
-
+        </div>
 
         <div className="grid grid-cols-1 gap-4 3xl:grid-cols-4">
           <div className="col-span-3">
@@ -116,9 +122,7 @@ const DashboardWrapper: React.FC<DashboardWrapperProps> = ({
               percentAboveFiveSMA={
                 data.marketBreadthOverview.percentAboveFiveSMA
               }
-              percentAboveTenEMA={
-                data.marketBreadthOverview.percentAboveTenEMA
-              }
+              percentAboveTenEMA={data.marketBreadthOverview.percentAboveTenEMA}
               percentAboveTwentyOneEMA={
                 data.marketBreadthOverview.percentAboveTwentyOneEMA
               }
@@ -137,18 +141,15 @@ const DashboardWrapper: React.FC<DashboardWrapperProps> = ({
               datasetDescription={datasetDescription}
             />
           </div>
-
         </div>
-
-      </div >
-    </PageContainer >
+      </div>
+    </PageContainer>
   );
 };
 
 export default DashboardWrapper;
 
 const bulidMomentumRows = (overview: MarketBreadthResponse): MomentumRow[] => {
-
   const upFourPercentLine = overview.marketBreadthOverview.upFourPercentLine;
   const downFourPercentLine =
     overview.marketBreadthOverview.downFourPercentLine;
@@ -254,5 +255,5 @@ const bulidMomentumRows = (overview: MarketBreadthResponse): MomentumRow[] => {
     momentumRows.push(momentumRow);
   }
 
-  return momentumRows
-}
+  return momentumRows;
+};

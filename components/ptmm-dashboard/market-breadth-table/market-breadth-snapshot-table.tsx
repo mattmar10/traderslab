@@ -11,10 +11,14 @@ import {
 } from "@/lib/types/market-breadth-types";
 
 import { calculateColorFromPercentage } from "./utils";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import Loading from "@/components/loading";
 import SectorPopoverContainer from "../popover/sector-popover-container";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const firaCode = Fira_Code({
   subsets: ["latin"],
@@ -323,7 +327,7 @@ const MarketBreadthSnapshotTable: React.FC = () => {
     retry: 1,
   });
 
-  if (status === "loading" || !data || isFMPDataLoadingError(data)) {
+  if (status === "pending" || !data || isFMPDataLoadingError(data)) {
     if (error) {
       console.error(error);
     }

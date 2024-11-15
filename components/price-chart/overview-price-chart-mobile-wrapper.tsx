@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Candle } from "@/lib/types/basic-types";
 import { QuoteArraySchema, isFMPDataLoadingError } from "@/lib/types/fmp-types";
 
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import Loading from "@/components/loading";
 import MobilePriceChart from "./price-chart-mobile";
 import { isWithinMarketHours } from "@/lib/utils";
@@ -75,7 +75,7 @@ const OverviewMobilePriceChartWrapper: React.FC<
     refetchInterval: 45000,
   });
 
-  if (status === "loading") {
+  if (status === "pending") {
     return <Loading />;
   }
 

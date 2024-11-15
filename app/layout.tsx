@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { IoIosHelpCircleOutline } from "react-icons/io";
 import { ThemeProvider } from "next-themes";
 import ReactQueryProvider from "./providers/Providers";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -68,6 +69,7 @@ const MaintenancePage = () => (
         </p>
       </div>
     </main>
+    <Toaster />
   </body>
 );
 
@@ -81,7 +83,11 @@ export default function RootLayout({
   const isMaintenanceMode = process.env.MAINTENANCE_MODE === "TRUE";
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className="scrollbar-stable scrollbar-thin"
+    >
       <head>
         <title>Traderslab</title>
         <meta charSet="utf-8" />
