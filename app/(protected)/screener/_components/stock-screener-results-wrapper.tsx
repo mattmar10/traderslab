@@ -15,7 +15,7 @@ import {
   SymbolWithStatsWithRank,
 } from "@/lib/types/screener-types";
 import { useCallback, useEffect, useState } from "react";
-import { Column, defaultColumns } from "./screener-table-columns";
+import { allColumns, Column, defaultColumns } from "./screener-table-columns";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useInView } from "react-intersection-observer";
 import { adjustFilterGroupForSave } from "@/components/filters/utils";
@@ -26,6 +26,20 @@ import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import ScreenerResultsTable from "./screener-results-table";
 import { useTheme } from "next-themes";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { GearIcon } from "@radix-ui/react-icons";
+import TableColumnSelector from "./table-column-selector";
+import PulsatingDots from "@/components/pulsating-dots";
+import ExportComponent from "./export-component";
 // Define types for localStorage data
 interface LocalStorageData {
   sortConfig: ScreenerSortConfig;
@@ -282,6 +296,11 @@ const ScreenerResultsWrapper = ({
   });
 
   const resultCountFromQueryResult = data?.totalCount;
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (!state.isMounted) {
     return <Loading />;
@@ -304,17 +323,17 @@ const ScreenerResultsWrapper = ({
           {state.displayAs === "table" ? (
             <ScreenerResultsTable
               stocks={stocks}
+              theme={resolvedTheme}
               sortConfig={persistedState.sortConfig}
               ranges={initialData.ranges}
-              columns={persistedState.selectedColumns}
-              theme={resolvedTheme}
+              columns={persistedState.selectedColumns} // Use selectedColumns directly
             />
           ) : (
             <div className="pt-4 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:mt-4 px-2 lg:px-0">
               {stocks.map((item, index) => (
                 <Card key={index}>
                   <CardContent className="pl-3 pr-5">
-                    {item.profile.symbol}
+                    {item.quote.symbol}
                   </CardContent>
                 </Card>
               ))}
@@ -328,7 +347,168 @@ const ScreenerResultsWrapper = ({
     );
   };
 
-  return <div> {renderContent()}</div>;
+  return (
+    <div className="flex flex-col min-h-screen w-full">
+      <div className="flex items-center space-x-2  w-full pl-3 lg:pl-0">
+        <div className="relative">
+          <div className="text-sm text-foreground/60 pb-1">SORT BY</div>
+          <Select
+            onValueChange={handleSortKeyChange}
+            value={persistedState.sortConfig.key}
+          >
+            <SelectTrigger className="w-[185px]">
+              <SelectValue className="text-xs p-0" placeholder="SORT BY" />
+            </SelectTrigger>
+            <SelectContent className="text-xs w-[185px]" position="popper">
+              <SelectGroup>
+                <SelectLabel>GENERAL</SelectLabel>
+                <SelectItem value="price">PRICE</SelectItem>
+                <SelectItem value="rsRank">RS RANK</SelectItem>
+                <SelectItem value="oneDayAbsoluteChange">
+                  1 DAY CHANGE
+                </SelectItem>
+                <SelectItem value="sector">SECTOR</SelectItem>
+                <SelectItem value="industry">INDUSTRY</SelectItem>
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel>RETURN %</SelectLabel>
+                <SelectItem value="oneDayReturnPercent">
+                  1 DAY RETURN %
+                </SelectItem>
+                <SelectItem value="oneWeekReturnPercent">
+                  1 WK RETURN %
+                </SelectItem>
+                <SelectItem value="oneMonthReturnPercent">
+                  1 MO RETURN %
+                </SelectItem>
+                <SelectItem value="threeMonthReturnPercent">
+                  3 MO RETURN %
+                </SelectItem>
+                <SelectItem value="sixMonthReturnPercent">
+                  6 MO RETURN %
+                </SelectItem>
+                <SelectItem value="oneYearReturnPercent">
+                  1 YR RETURN %
+                </SelectItem>
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel>52 WEEK RANGE</SelectLabel>
+                <SelectItem value="percentFromFiftyTwoWeekHigh">
+                  % FROM 52 WK HIGH
+                </SelectItem>
+                <SelectItem value="percentFromFiftyTwoWeekLow">
+                  % FROM 52 WK LOW
+                </SelectItem>
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel>Volume</SelectLabel>
+                <SelectItem value="relativeVolume">RELATIVE VOLUME</SelectItem>
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel>Momentum</SelectLabel>
+                <SelectItem value="breakoutIntensityScore">BIS</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="relative">
+          <div className="text-sm text-foreground/60 pb-1">DIRECTION</div>
+          <Select
+            onValueChange={handleSortDirectionChange}
+            value={persistedState.sortConfig.direction}
+          >
+            <SelectTrigger className="w-[80px]">
+              <SelectValue className="text-xs" placeholder="DIR" />
+            </SelectTrigger>
+            <SelectContent className="text-sm">
+              <SelectItem value="asc">ASC</SelectItem>
+              <SelectItem value="desc">DESC</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        {isLargeScreen ? (
+          <>
+            <div className="flex flex-wrap items-center space-x-4 pl-2 pt-6">
+              Filter Group Selector
+            </div>
+            {/*<div className="flex flex-wrap items-center space-x-4 pl-2 pt-6">
+                      <EnhancedFilterComponent
+                        onApplyFilters={handleApplyFilters}
+                        onClearFilters={clearFilters}
+                        ranges={initialData.ranges}
+                        countryCodes={countryCodes}
+                      />
+                    </div>*/}
+            <div>Filter Group Editor</div>
+
+            <div className="flex items-center space-x-2 pl-4 mt-4 sm:mt-0 pt-6">
+              <div className="flex items-center space-x-4">
+                <span
+                  className={` ${
+                    state.displayAs === "charts"
+                      ? "text-foreground"
+                      : "text-foreground/50"
+                  }`}
+                >
+                  CHARTS
+                </span>
+                <Switch
+                  checked={state.displayAs === "table"}
+                  onCheckedChange={handleDisplayAsToggle}
+                  id="displayAs"
+                  className="transform scale-125" // Scale up the switch
+                />
+                <span
+                  className={` ${
+                    state.displayAs === "table"
+                      ? "text-foreground "
+                      : "text-foreground/50"
+                  }`}
+                >
+                  TABLE
+                </span>
+              </div>
+            </div>
+
+            {state.displayAs === "table" && (
+              <div className="pt-6">
+                <TableColumnSelector
+                  allColumns={allColumns}
+                  selectedColumns={persistedState.selectedColumns}
+                  onColumnChange={handleColumnChange}
+                >
+                  <GearIcon className=" h-5 w-5 text-foreground/50 cursor-pointer hover:text-foreground " />
+                </TableColumnSelector>
+              </div>
+            )}
+          </>
+        ) : (
+          <div>
+            <div className="flex flex-wrap items-center space-x-4 pt-6">
+              Mobile filter library
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-grow justify-end items-center space-x-4 mt-4 lg:mt-0 pt-6">
+          {isFetching || isFetchingNextPage ? (
+            <div className="flex items-center space-x-2">
+              <PulsatingDots />
+            </div>
+          ) : (
+            <div className="text-sm uppercase">
+              {resultCountFromQueryResult &&
+                `${resultCountFromQueryResult} Results`}
+            </div>
+          )}
+          <div className="hidden lg:block">
+            <ExportComponent getAllStocks={getAllStocks} />
+          </div>
+        </div>
+      </div>
+      {renderContent()}
+    </div>
+  );
 };
 
 export default ScreenerResultsWrapper;

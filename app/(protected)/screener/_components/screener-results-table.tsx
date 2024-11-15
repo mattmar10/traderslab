@@ -63,9 +63,9 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
     <div className="w-full pt-8 px-4 lg:px-0">
       <div className="relative overflow-x-auto overflow-y-auto ">
         <table className="w-full">
-          <thead className="sticky top-0 z-50 bg-accent">
+          <thead className="sticky top-0 z-50 ">
             <tr
-              className="text-sm bg-accent"
+              className="text-sm "
               style={{ boxShadow: "0 0px 0.5px 1px gray" }}
             >
               {columnsToUse.map((column) => (
@@ -114,7 +114,6 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
                       style = {
                         background: calculateColorFromPercentageInverted(
                           item.rsRank,
-                          theme,
                           ranges.rsRankRange[0],
                           ranges.rsRankRange[1] / 2,
                           ranges.rsRankRange[1]
