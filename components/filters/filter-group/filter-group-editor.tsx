@@ -196,14 +196,14 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
       <div className="relative inline-block">
         <Button
           variant="outline"
-          className="w-full mt-6 rounded-none "
+          className="w-full mt-6  "
           onClick={() => setIsDialogOpen(!isDialogOpen)}
         >
           <FilterIcon />
           <span className="ml-2">Filters</span>
         </Button>
         {filterCount > 0 && (
-          <span className="absolute -top-1 mt-4 -right-2 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 py-1 text-xs font-bold leading-none text-background bg-solarizedblue rounded-md z-50">
+          <span className="absolute -top-1 mt-4 -right-2 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 py-1 text-xs font-bold leading-none text-background bg-foreground rounded-md z-50">
             {filterCount}
           </span>
         )}

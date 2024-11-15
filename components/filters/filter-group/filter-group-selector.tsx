@@ -71,7 +71,7 @@ const FilterGroupSelector: React.FC<FilterGroupSelectorProps> = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="relative inline-block">
-          <Button variant="outline" className="justify-start rounded-none py-1">
+          <Button variant="outline" className="justify-start  py-1">
             <span className="">
               {filterGroup && filterGroup.filterGroupName ? (
                 <div className="">{filterGroup.filterGroupName}</div>
