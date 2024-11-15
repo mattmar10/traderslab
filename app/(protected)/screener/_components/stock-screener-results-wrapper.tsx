@@ -40,6 +40,8 @@ import { GearIcon } from "@radix-ui/react-icons";
 import TableColumnSelector from "./table-column-selector";
 import PulsatingDots from "@/components/pulsating-dots";
 import ExportComponent from "./export-component";
+import FilterGroupSelector from "@/components/filters/filter-group/filter-group-selector";
+import FilterGroupEditor from "@/components/filters/filter-group/filter-group-editor";
 // Define types for localStorage data
 interface LocalStorageData {
   sortConfig: ScreenerSortConfig;
@@ -349,7 +351,7 @@ const ScreenerResultsWrapper = ({
 
   return (
     <div className="flex flex-col min-h-screen w-full">
-      <div className="flex items-center space-x-2  w-full pl-3 lg:pl-0">
+      <div className="flex items-end space-x-2  w-full pl-3 lg:pl-0">
         <div className="relative">
           <div className="text-sm text-foreground/60 pb-1">SORT BY</div>
           <Select
@@ -428,27 +430,26 @@ const ScreenerResultsWrapper = ({
         </div>
         {isLargeScreen ? (
           <>
-            <div className="flex flex-wrap items-center space-x-4 pl-2 pt-6">
-              Filter Group Selector
-            </div>
-            {/*<div className="flex flex-wrap items-center space-x-4 pl-2 pt-6">
-                      <EnhancedFilterComponent
-                        onApplyFilters={handleApplyFilters}
-                        onClearFilters={clearFilters}
-                        ranges={initialData.ranges}
-                        countryCodes={countryCodes}
-                      />
-                    </div>*/}
-            <div>Filter Group Editor</div>
+            <FilterGroupSelector
+              onApplyFilters={handleApplyFilters}
+              appliedFilterGroup={persistedState.filterGroup}
+              openFilterLibrary={() => updateState("isFiltersLibraryOpen", true)}
+            />
+            <FilterGroupEditor
+              onApplyFilters={handleApplyFilters}
+              onClearFilters={clearFilters}
+              ranges={initialData.ranges}
+              countryCodes={countryCodes}
+              filterGrp={persistedState.filterGroup}
+            />
 
             <div className="flex items-center space-x-2 pl-4 mt-4 sm:mt-0 pt-6">
               <div className="flex items-center space-x-4">
                 <span
-                  className={` ${
-                    state.displayAs === "charts"
-                      ? "text-foreground"
-                      : "text-foreground/50"
-                  }`}
+                  className={` ${state.displayAs === "charts"
+                    ? "text-foreground"
+                    : "text-foreground/50"
+                    }`}
                 >
                   CHARTS
                 </span>
@@ -459,11 +460,10 @@ const ScreenerResultsWrapper = ({
                   className="transform scale-125" // Scale up the switch
                 />
                 <span
-                  className={` ${
-                    state.displayAs === "table"
-                      ? "text-foreground "
-                      : "text-foreground/50"
-                  }`}
+                  className={` ${state.displayAs === "table"
+                    ? "text-foreground "
+                    : "text-foreground/50"
+                    }`}
                 >
                   TABLE
                 </span>
