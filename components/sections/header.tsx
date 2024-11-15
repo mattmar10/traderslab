@@ -56,9 +56,8 @@ export default function Header() {
             <img
               src={logoSrc}
               alt="TradersLab Logo"
-              className={`w-auto h-8 transition-opacity duration-300 ${
-                !mounted ? "opacity-0" : "opacity-100"
-              }`}
+              className={`w-auto h-8 transition-opacity duration-300 ${!mounted ? "opacity-0" : "opacity-100"
+                }`}
             />
           </div>
         </Link>
