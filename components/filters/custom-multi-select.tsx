@@ -45,7 +45,7 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
     const mode = isIncludeMode ? "include" : "exclude";
     const isSelected = selectedOptions[mode].some((o) => o.id === option.id);
 
-    let updatedOptions = { ...selectedOptions };
+    const updatedOptions = { ...selectedOptions };
 
     if (isSelected) {
       updatedOptions[mode] = updatedOptions[mode].filter(
@@ -95,9 +95,8 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
     }, 300); // Match this duration with the CSS transition duration
   };
 
-  const dropdownClasses = `absolute z-50 w-full bg-background shadow-xl drop-shadow border border-foreground/30 mt-1 transition-opacity transition-transform duration-300 ease-in-out ${
-    isAnimatingOut ? "opacity-0 transform -translate-y-2" : "opacity-100"
-  }`;
+  const dropdownClasses = `absolute z-50 w-full bg-background shadow-xl drop-shadow border border-foreground/30 mt-1 transition-opacity transition-transform duration-300 ease-in-out ${isAnimatingOut ? "opacity-0 transform -translate-y-2" : "opacity-100"
+    }`;
 
   return (
     <div className="w-full">
@@ -148,11 +147,10 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
                   size={"sm"}
                   type="button"
                   onClick={handleModeChange}
-                  className={`transition-colors duration-200 ${
-                    isIncludeMode
+                  className={`transition-colors duration-200 ${isIncludeMode
                       ? "bg-primary text-background hover:bg-primary-dark"
                       : "bg-foreground/10 text-foreground hover:bg-foreground/20"
-                  }`}
+                    }`}
                 >
                   Include
                 </Button>
@@ -160,11 +158,10 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
                   size={"sm"}
                   type="button"
                   onClick={handleModeChange}
-                  className={`transition-colors duration-200 ${
-                    !isIncludeMode
+                  className={`transition-colors duration-200 ${!isIncludeMode
                       ? "bg-primary text-background hover:bg-primary-dark"
                       : "bg-foreground/10 text-foreground hover:bg-foreground/20"
-                  }`}
+                    }`}
                 >
                   Exclude
                 </Button>
@@ -191,9 +188,8 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
                 return (
                   <div
                     key={option.id}
-                    className={`cursor-pointer select-none relative py-2 pl-4 pr-4 ${
-                      isSelected ? "bg-foreground/5" : "text-foreground/70"
-                    } hover:bg-foreground/10`}
+                    className={`cursor-pointer select-none relative py-2 pl-4 pr-4 ${isSelected ? "bg-foreground/5" : "text-foreground/70"
+                      } hover:bg-foreground/10`}
                     onClick={() => handleOptionToggle(option)}
                   >
                     <div className="flex items-center">
@@ -204,9 +200,8 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
                         className="mr-3 accent-current"
                       />
                       <span
-                        className={`${
-                          isSelected ? "font-semibold" : "font-normal"
-                        } block truncate`}
+                        className={`${isSelected ? "font-semibold" : "font-normal"
+                          } block truncate`}
                       >
                         {option.displayName}
                       </span>

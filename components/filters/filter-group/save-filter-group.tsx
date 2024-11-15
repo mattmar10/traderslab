@@ -1,5 +1,5 @@
 "use client";
-import { startTransition, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -46,7 +46,7 @@ const SaveToLibrary: React.FC<SaveToLibraryProps> = ({
     useState<string>("");
 
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [failureMessage, setFailureMessage] = useState<string | null>(null);
+  const [, setFailureMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const handleSaveToLibrary = async (formData: FormData) => {

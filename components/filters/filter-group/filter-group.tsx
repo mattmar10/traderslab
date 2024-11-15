@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, MinusCircle, Search } from "lucide-react";
+import { PlusCircle, MinusCircle } from "lucide-react";
 import { FilterCriteria, FilterGroup } from "@/lib/types/screener-types";
 
 interface FilterGroupBuilderProps {

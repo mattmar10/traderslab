@@ -69,7 +69,20 @@ export class FiltersService {
       .orderBy(desc(filterGroups.updatedAt));
   }
 
-  async getUserFavoriteFilterGroupIds(userId: string) {
+  async getUserFavoriteFilterGroupIds(externalId: string) {
+
+    const user = await this.db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.externalId, externalId))
+      .limit(1);
+
+    if (!user.length) {
+      throw new Error("User not found");
+    }
+
+    const userId = user[0].id;
+
     const favorites = await this.db
       .select({ filterGroupId: userFavoriteFilterGroups.filterGroupId })
       .from(userFavoriteFilterGroups)
@@ -78,7 +91,20 @@ export class FiltersService {
     return favorites.map((fav) => fav.filterGroupId);
   }
 
-  async addFavoriteFilterGroup(userId: string, filterGroupId: string) {
+  async addFavoriteFilterGroup(externalId: string, filterGroupId: string) {
+
+    const user = await this.db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.externalId, externalId))
+      .limit(1);
+
+    if (!user.length) {
+      throw new Error("User not found");
+    }
+
+    const userId = user[0].id;
+
     return this.db
       .insert(userFavoriteFilterGroups)
       .values({ userId, filterGroupId })
@@ -86,7 +112,21 @@ export class FiltersService {
       .returning();
   }
 
-  async removeFavoriteFilterGroup(userId: string, filterGroupId: string) {
+  async removeFavoriteFilterGroup(externalId: string, filterGroupId: string) {
+
+
+    const user = await this.db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.externalId, externalId))
+      .limit(1);
+
+    if (!user.length) {
+      throw new Error("User not found");
+    }
+
+    const userId = user[0].id;
+
     return this.db
       .delete(userFavoriteFilterGroups)
       .where(
@@ -98,7 +138,21 @@ export class FiltersService {
       .returning();
   }
 
-  async getUserFavoriteFilterGroups(userId: string) {
+  async getUserFavoriteFilterGroups(externalId: string) {
+    // Resolve the `id` first
+    const user = await this.db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.externalId, externalId))
+      .limit(1);
+
+    if (!user.length) {
+      throw new Error("User not found");
+    }
+
+    const userId = user[0].id;
+
+    // Use the resolved `id` in the main query
     return this.db
       .select({
         filterGroup: filterGroups,

@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { IoAddCircleOutline, IoRemoveCircleOutline } from "react-icons/io5";
+import { IoAddCircleOutline } from "react-icons/io5";
 import { SliderRangeFilter } from "./slider-filter";
 import { Button } from "@/components/ui/button";
 import { MinusCircleIcon, PlusCircleIcon } from "lucide-react";

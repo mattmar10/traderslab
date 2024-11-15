@@ -9,7 +9,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 
 import { FilterIcon, Save, Upload } from "lucide-react";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 
 import SimpleFilterEditor from "./simple-filter-group-builder";
 import AdvancedFilterGroupEditor from "./advanced-filter-group-builder";
@@ -55,7 +55,7 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
 
   const [showUpdateSection, setShowUpdateSection] = useState<boolean>(false);
 
-  const { userId, sessionId } = useAuth()
+  const { userId } = useAuth()
 
   const fetchSectors = async () => {
     const response = await fetch("/api/sectors");
@@ -344,27 +344,6 @@ function isComplexFilterGroup(filterGroup: FilterGroup): boolean {
     filterGroup.filters.length > 1 ||
     filterGroup.filters.some((filter) => "operator" in filter)
   );
-}
-
-function sanitizeFilterGroup(group: FilterGroup): FilterGroup {
-  return {
-    name: group.name,
-    operator: group.operator,
-    filters: group.filters.map((filter) => {
-      return sanitizeFilterCriteria(filter as FilterCriteria);
-    }),
-  };
-}
-
-// Helper function to sanitize FilterCriteria
-function sanitizeFilterCriteria(criteria: FilterCriteria): FilterCriteria {
-  return {
-    ...criteria,
-  };
-}
-
-function deepClone<T>(obj: T): T {
-  return JSON.parse(JSON.stringify(obj));
 }
 
 function countActiveFilters(filters: FilterGroup): number {

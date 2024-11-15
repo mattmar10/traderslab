@@ -18,7 +18,7 @@ export interface MobileSliderRangeFilterProps {
 const MobileSliderRangeFilter = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> &
-    MobileSliderRangeFilterProps
+  MobileSliderRangeFilterProps
 >(
   (
     {
@@ -39,11 +39,11 @@ const MobileSliderRangeFilter = React.forwardRef<
       initialMinValue,
       initialMaxValue,
     ]);
-    const [inputValues, setInputValues] = React.useState<[string, string]>([
+    const [, setInputValues] = React.useState<[string, string]>([
       initialMinValue.toFixed(2),
       initialMaxValue.toFixed(2),
     ]);
-    const [isValid, setIsValid] = React.useState<[boolean, boolean]>([
+    const [, setIsValid] = React.useState<[boolean, boolean]>([
       true,
       true,
     ]);
@@ -52,7 +52,9 @@ const MobileSliderRangeFilter = React.forwardRef<
       setValues(newValues as [number, number]);
       setInputValues([newValues[0].toFixed(2), newValues[1].toFixed(2)]);
       setIsValid([true, true]);
-      onValueChange && onValueChange(newValues);
+      if (onValueChange) {
+        onValueChange(newValues);
+      }
     };
 
     return (

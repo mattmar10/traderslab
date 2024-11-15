@@ -56,7 +56,9 @@ const ExpandableDropDownList: React.FC<ExpandableDropDownListProps> = ({
                   <Label className="block text-sm leading-5 font-medium text-foreground/70">
                     {header}
                   </Label>
-                  <span className="inline-block w-full shadow-sm">
+                  <span
+                    className={`inline-block w-full shadow-sm ${open ? "bg-gray-200" : "bg-background"}`}
+                  >
                     <ListboxButton className="cursor-default relative w-full border border-foreground/30 bg-background pl-3 pr-10 py-2 text-left focus:outline-none focus:shadow-outline-blue focus:border-foreground/3 transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                       <span className="block truncate">{selectedText}</span>
                       <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">

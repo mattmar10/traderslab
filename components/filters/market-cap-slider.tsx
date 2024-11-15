@@ -17,7 +17,7 @@ export interface MarketCapSliderProps {
 const MarketCapSlider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> &
-    MarketCapSliderProps
+  MarketCapSliderProps
 >(
   (
     {
@@ -40,7 +40,9 @@ const MarketCapSlider = React.forwardRef<
 
     const handleSliderChange = (newValues: number[]) => {
       setValues(newValues as [number, number]);
-      onValueChange && onValueChange(newValues);
+      if (onValueChange) {
+        onValueChange(newValues);
+      }
     };
 
     function formatMarketCap(number: number): string {

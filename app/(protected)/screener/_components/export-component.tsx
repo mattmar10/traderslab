@@ -57,11 +57,10 @@ const ExportComponent: React.FC<ExportComponentProps> = ({ getAllStocks }) => {
       if (exportFormat !== "twitter") {
         toast({
           title: "Export Successful",
-          description: `Data exported to ${
-            exportFormat === "clipboard"
+          description: `Data exported to ${exportFormat === "clipboard"
               ? "clipboard"
               : exportFormat.toUpperCase()
-          }`,
+            }`,
         });
       }
     } catch (error) {
@@ -147,7 +146,6 @@ const ExportComponent: React.FC<ExportComponentProps> = ({ getAllStocks }) => {
       .join(", ");
     const tagline = "Check out these top performing stocks:";
     const tweetText = `${tagline}\n\n${symbols}\n\n`;
-    const url = "https://ptmmapp.com";
     const hashtags = "ptmm,stocks,investing";
 
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(

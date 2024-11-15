@@ -67,9 +67,14 @@ const SliderRangeFilter = React.forwardRef<
 
       // Check if the slider is at its minimum and maximum values
       if (newValues[0] === minValue && newValues[1] === maxValue) {
-        onValueChange && onValueChange(undefined); // Clear the filter
+        if (onValueChange) {
+          onValueChange(undefined); // Clear the filter
+        }
+
       } else {
-        onValueChange && onValueChange(newValues);
+        if (onValueChange) {
+          onValueChange(newValues);
+        }
       }
     };
 
@@ -107,7 +112,9 @@ const SliderRangeFilter = React.forwardRef<
             Number(newInputValues[1]),
           ] as [number, number];
           setValues(newValues);
-          onValueChange && onValueChange(newValues);
+          if (onValueChange) {
+            onValueChange(newValues);
+          }
         }
       };
 

@@ -71,22 +71,20 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
               {columnsToUse.map((column) => (
                 <th
                   key={column.key}
-                  className={`py-1 px-2 ${
-                    column.key === sortConfig.key ? "bg-accent" : ""
-                  }`}
+                  className={`py-1 px-2 ${column.key === sortConfig.key ? "bg-accent" : ""
+                    }`}
                   style={{
                     minWidth: column.minWidth, // Apply minWidth
                     maxWidth: column.maxWidth, // Apply maxWidth
                   }}
                 >
                   <div
-                    className={`pl-1 flex w-full items-center whitespace-nowrap py-2 ${
-                      column.alignment === "left"
-                        ? "justify-start"
-                        : column.alignment === "right"
+                    className={`pl-1 flex w-full items-center whitespace-nowrap py-2 ${column.alignment === "left"
+                      ? "justify-start"
+                      : column.alignment === "right"
                         ? "justify-end"
                         : "justify-center"
-                    }`}
+                      }`}
                   >
                     <span className={`text-${column.alignment}`}>
                       {column.label} {getHeaderClass(column.key)}
@@ -314,11 +312,10 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
                       );
                       break;
                     case "nextEarnings":
-                      value = `${
-                        item.quote.earningsAnnouncement
-                          ? formatEarnings(item.quote.earningsAnnouncement)
-                          : ""
-                      }`;
+                      value = `${item.quote.earningsAnnouncement
+                        ? formatEarnings(item.quote.earningsAnnouncement)
+                        : ""
+                        }`;
                       break;
 
                     case "relativeVolume":
@@ -355,9 +352,8 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
                   return (
                     <td
                       key={column.key}
-                      className={`${fontClassName} py-2 text-${
-                        column.alignment
-                      } px-2 ${isName ? "font-semibold" : ""}`} // Apply alignment from Column
+                      className={`${fontClassName} py-2 text-${column.alignment
+                        } px-2 ${isName ? "font-semibold" : ""}`} // Apply alignment from Column
                       style={{
                         ...style,
                         minWidth: column.minWidth, // Apply minWidth
@@ -377,7 +373,7 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
         <CenteredPopoverContent
           isOpen={isPopoverOpen}
           onClose={closePopover}
-          selectedStock={selectedStock.profile.symbol}
+        // selectedStock={selectedStock.profile.symbol}
         >
           <div className="px-6 pt-2">{selectedStock.quote.symbol}</div>
         </CenteredPopoverContent>
@@ -390,8 +386,7 @@ const CenteredPopoverContent: React.FC<{
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  selectedStock: string;
-}> = ({ isOpen, onClose, selectedStock, children }) => {
+}> = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
   return createPortal(

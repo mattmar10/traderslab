@@ -254,7 +254,7 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
 
     if (filterConfig.type === "dropdown") {
       let options = sectors;
-      let header = filterConfig.header;
+      const header = filterConfig.header;
 
       if (filterKey === "country") {
         options = countries;

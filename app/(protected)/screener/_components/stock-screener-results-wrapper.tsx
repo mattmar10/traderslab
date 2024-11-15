@@ -42,6 +42,10 @@ import PulsatingDots from "@/components/pulsating-dots";
 import ExportComponent from "./export-component";
 import FilterGroupSelector from "@/components/filters/filter-group/filter-group-selector";
 import FilterGroupEditor from "@/components/filters/filter-group/filter-group-editor";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import ScreenerLibrary from "./filter-library";
+import { Button } from "@/components/ui/button";
+import { RiStackLine } from "react-icons/ri";
 // Define types for localStorage data
 interface LocalStorageData {
   sortConfig: ScreenerSortConfig;
@@ -111,12 +115,12 @@ const ScreenerResultsWrapper = ({
         console.error("Error loading persisted data:", error);
       }
 
-      setPersistedState((prev) => ({
+      setPersistedState({
         sortConfig: data.sortConfig || defaultSortConfig,
         filterGroup: data.filterGroup,
         chartSettings: data.chartSettings || defaultChartSettings,
         selectedColumns: data.selectedColumns || defaultColumns,
-      }));
+      });
 
       setState((prev) => ({ ...prev, isMounted: true }));
     };
@@ -275,7 +279,6 @@ const ScreenerResultsWrapper = ({
     isFetchingNextPage,
     status,
     error,
-    refetch,
   } = useInfiniteQuery({
     queryKey: ["stocks", persistedState.sortConfig, persistedState.filterGroup],
     queryFn: fetchStocks,
@@ -433,7 +436,6 @@ const ScreenerResultsWrapper = ({
             <FilterGroupSelector
               onApplyFilters={handleApplyFilters}
               appliedFilterGroup={persistedState.filterGroup}
-              openFilterLibrary={() => updateState("isFiltersLibraryOpen", true)}
             />
             <FilterGroupEditor
               onApplyFilters={handleApplyFilters}
@@ -443,7 +445,9 @@ const ScreenerResultsWrapper = ({
               filterGrp={persistedState.filterGroup}
             />
 
-            <div className="flex items-center space-x-2 pl-4 mt-4 sm:mt-0 pt-6">
+            <Button onClick={() => updateState("isFiltersLibraryOpen", true)}><RiStackLine /> Library</Button>
+
+            <div className="flex items-center space-x-2 pl-4 pb-2 sm:mt-0 pt-6">
               <div className="flex items-center space-x-4">
                 <span
                   className={` ${state.displayAs === "charts"
@@ -471,7 +475,7 @@ const ScreenerResultsWrapper = ({
             </div>
 
             {state.displayAs === "table" && (
-              <div className="pt-6">
+              <div className="pb-3">
                 <TableColumnSelector
                   allColumns={allColumns}
                   selectedColumns={persistedState.selectedColumns}
@@ -506,6 +510,22 @@ const ScreenerResultsWrapper = ({
           </div>
         </div>
       </div>
+      <Dialog
+        open={state.isFiltersLibraryOpen}
+        onOpenChange={(isOpen) => updateState("isFiltersLibraryOpen", isOpen)}
+      >
+        <DialogContent className="w-[95%] max-w-[85vw] h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Screener Library</DialogTitle>
+          </DialogHeader>
+          <ScreenerLibrary
+            onApplyFilter={(filters: FilterGroupDTO | undefined) => {
+              handleApplyFilters(filters);
+              updateState("isFiltersLibraryOpen", false);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
       {renderContent()}
     </div>
   );

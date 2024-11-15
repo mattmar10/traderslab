@@ -21,19 +21,16 @@ import { ChevronDown, Star } from "lucide-react";
 
 
 import { useEffect, useState } from "react";
-import { RiStackLine } from "react-icons/ri";
 import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu";
 import { FilterGroup, FilterGroupDTO } from "@/lib/types/screener-types";
 
 interface FilterGroupSelectorProps {
   onApplyFilters: (filters: FilterGroupDTO) => void;
-  openFilterLibrary: () => void;
   appliedFilterGroup: FilterGroupDTO | undefined;
 }
 
 const FilterGroupSelector: React.FC<FilterGroupSelectorProps> = ({
   onApplyFilters,
-  openFilterLibrary,
   appliedFilterGroup,
 }) => {
   const [filterGroup, setFilterGroup] = useState<FilterGroupDTO | undefined>(
@@ -110,10 +107,6 @@ const FilterGroupSelector: React.FC<FilterGroupSelectorProps> = ({
           </DropdownMenuSubContent>
         </DropdownMenuSub>
 
-        <DropdownMenuItem onSelect={openFilterLibrary} className=" py-2">
-          <RiStackLine className="mr-2 h-5 w-5 " />
-          View Library
-        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuLabel className="p-2 font-semibold text-sm">
           My Screens
@@ -139,6 +132,7 @@ const FilterGroupSelector: React.FC<FilterGroupSelectorProps> = ({
 export default FilterGroupSelector;
 
 async function loadFilterGroups(): Promise<FilterGroupDTO[]> {
+
   const fromDB = await getFilterGroupsForUser();
 
   return fromDB.map((fg) => {
@@ -156,6 +150,7 @@ async function loadFilterGroups(): Promise<FilterGroupDTO[]> {
 }
 
 async function loadFavorites(): Promise<FilterGroupDTO[]> {
+
   const fromDB = await getUserFavoriteFilterGroups();
 
   return fromDB.map((fg) => {

@@ -21,7 +21,7 @@ export interface SliderRangeFilterLineProps {
 const SliderRangeFilterLine = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> &
-    SliderRangeFilterLineProps
+  SliderRangeFilterLineProps
 >(
   (
     {
@@ -62,9 +62,13 @@ const SliderRangeFilterLine = React.forwardRef<
       setIsValid([true, true]);
 
       if (newValues[0] === minValue && newValues[1] === maxValue) {
-        onValueChange && onValueChange(undefined); // Clear the filter
+        if (onValueChange) {
+          onValueChange(undefined); // Clear the filter
+        }
       } else {
-        onValueChange && onValueChange(newValues);
+        if (onValueChange) {
+          onValueChange(newValues);
+        }
       }
     };
 
@@ -102,7 +106,9 @@ const SliderRangeFilterLine = React.forwardRef<
             Number(newInputValues[1]),
           ] as [number, number];
           setValues(newValues);
-          onValueChange && onValueChange(newValues);
+          if (onValueChange) {
+            onValueChange(newValues);
+          }
         }
       };
 

@@ -8,13 +8,7 @@ import {
 } from "@/lib/types/screener-types";
 import { Either, isRight, Left, Right } from "@/lib/utils";
 
-import { Anek_Latin } from "next/font/google";
 import ScreenerResultsWrapper from "./stock-screener-results-wrapper";
-
-const anek = Anek_Latin({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
-});
 
 const ScreenerResultsContainter: React.FC = async () => {
   const [data, countryCodes] = await Promise.all([

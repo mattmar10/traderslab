@@ -2,7 +2,7 @@
 import { NewFilterGroup, usersTable } from "@/drizzle/schema";
 import { FilterGroup } from "@/lib/types/screener-types";
 import { eq } from "drizzle-orm";
-import { auth, currentUser } from '@clerk/nextjs/server'
+import { auth } from '@clerk/nextjs/server'
 import { FiltersService } from "@/services/filters-service";
 import { getDatabaseInstance } from "@/lib/db";
 export type FilterGroupPermissionType = "PRIVATE" | "SHARED" | "SYSTEM";
