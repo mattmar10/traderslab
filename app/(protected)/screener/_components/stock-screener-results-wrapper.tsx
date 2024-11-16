@@ -14,7 +14,7 @@ import {
   ScreenerSortConfig,
   SymbolWithStatsWithRank,
 } from "@/lib/types/screener-types";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { allColumns, Column, defaultColumns } from "./screener-table-columns";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useInView } from "react-intersection-observer";
@@ -46,6 +46,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import ScreenerLibrary from "./filter-library";
 import { Button } from "@/components/ui/button";
 import { RiStackLine } from "react-icons/ri";
+import ScreenerMiniChartWrapper from "./screener-result-minichart";
 // Define types for localStorage data
 interface LocalStorageData {
   sortConfig: ScreenerSortConfig;
@@ -94,6 +95,20 @@ const ScreenerResultsWrapper = ({
 
   const { theme } = useTheme();
   const resolvedTheme = (theme as "light" | "dark") || "light";
+
+
+  const startDate = useMemo(() => {
+    const currentDate = new Date();
+    return new Date(
+      currentDate.getFullYear() - 2,
+      currentDate.getMonth(),
+      currentDate.getDate(),
+      0, // Use fixed values for time to prevent unnecessary changes
+      0,
+      0,
+      0
+    );
+  }, []);
 
   useEffect(() => {
     const loadPersistedData = () => {
@@ -339,7 +354,13 @@ const ScreenerResultsWrapper = ({
               {stocks.map((item, index) => (
                 <Card key={index}>
                   <CardContent className="pl-3 pr-5">
-                    {item.quote.symbol}
+                    <ScreenerMiniChartWrapper
+                      ticker={item.profile.symbol}
+                      name={item.profile.companyName}
+                      sector={item.profile.sector || ""}
+                      industry={item.profile.industry || ""}
+                      chartSettings={persistedState.chartSettings}
+                      theme={resolvedTheme} startDate={startDate} />
                   </CardContent>
                 </Card>
               ))}
