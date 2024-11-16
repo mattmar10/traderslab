@@ -86,7 +86,8 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> = React.
 
     const {
         data: quoteData,
-        error: quoteError
+        error: quoteError,
+        isLoading: quoteIsLoading
     } = useQuery({
         queryKey: [quoteKey, ticker],
         queryFn: getQuoteApi,
@@ -104,7 +105,7 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> = React.
         return parsed.data;
     };
 
-    const { data: earningsData } = useQuery({
+    const { data: earningsData, isLoading: earningsLoading } = useQuery({
         queryKey: [earningsKey, ticker],
         queryFn: getEarningsApi,
         refetchOnWindowFocus: false,
@@ -139,7 +140,7 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> = React.
         return filteredSortedDates;
     };
 
-    if (barsIsLoading) {
+    if (barsIsLoading || quoteIsLoading || earningsLoading) {
         return <Loading />
     }
 

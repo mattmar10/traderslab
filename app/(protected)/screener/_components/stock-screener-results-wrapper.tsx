@@ -468,8 +468,16 @@ const ScreenerResultsWrapper = ({
             />
 
 
-            <Button
-              onClick={() => updateState("isFiltersLibraryOpen", true)}><RiStackLine /> Library</Button>
+            <div className="pl-2">
+              <Button
+                onClick={() => updateState("isFiltersLibraryOpen", true)}
+                className="flex items-center gap-2 h-[2.2rem] px-3"
+              >
+                <RiStackLine className="h-4 w-4" />
+                <span className="text-sm">Library</span>
+              </Button>
+            </div>
+
 
 
             <div className="flex items-center space-x-2 pl-4 pb-2 sm:mt-0 pt-6">

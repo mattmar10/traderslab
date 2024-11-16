@@ -193,13 +193,13 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
 
   return (
     <>
-      <div className="relative inline-block">
+      <div className="relative inline-block mr-2">
         <Button
           variant="outline"
           className="w-full mt-6  "
           onClick={() => setIsDialogOpen(!isDialogOpen)}
         >
-          <FilterIcon />
+          <FilterIcon className="h-5 w-5" />
           <span className="ml-2">Filters</span>
         </Button>
         {filterCount > 0 && (
