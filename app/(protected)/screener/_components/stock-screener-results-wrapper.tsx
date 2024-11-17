@@ -536,7 +536,10 @@ const ScreenerResultsWrapper = ({
             </div>
           )}
           <div className="hidden lg:block">
-            <ExportComponent getAllStocks={getAllStocks} />
+            <ExportComponent
+              getAllStocks={getAllStocks}
+              filterGroupName={persistedState.filterGroup?.filterGroupName || ""}
+              sortAttribute={persistedState.sortConfig.key} />
           </div>
         </div>
       </div>
