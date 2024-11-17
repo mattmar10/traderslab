@@ -238,6 +238,7 @@ const PercentOfStocksAboveMAs: React.FC<PercentOfStocksAboveMATVLineProps> = ({
     }
   }, [
     percentAboveFiveSMASeries,
+    percentAboveTenEMASeries,
     percentAboveFiftySMASeries,
     percentAboveTwentyOneEMASeies,
     percentAboveTwoHundredSMASeries,

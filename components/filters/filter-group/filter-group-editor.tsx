@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 
-import { FilterIcon, Save, Upload } from "lucide-react";
+import { Save, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import SimpleFilterEditor from "./simple-filter-group-builder";
@@ -19,6 +19,7 @@ import { isRangeKey, RangeKeys } from "../filters-types";
 import SaveToLibrary from "./save-filter-group";
 import { FilterCriteria, FilterGroup, FilterGroupDTO, InclusionExclusion, ScreenerRanges } from "@/lib/types/screener-types";
 import { useAuth } from "@clerk/nextjs";
+import { FilterIcon } from "./filter-icon"
 
 export interface FilterGroupEditorProps {
   onApplyFilters: (filters: FilterGroupDTO | undefined) => void;
@@ -199,7 +200,7 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
           className="w-full mt-6  "
           onClick={() => setIsDialogOpen(!isDialogOpen)}
         >
-          <FilterIcon className="h-5 w-5" />
+          <FilterIcon />
           <span className="ml-2">Filters</span>
         </Button>
         {filterCount > 0 && (

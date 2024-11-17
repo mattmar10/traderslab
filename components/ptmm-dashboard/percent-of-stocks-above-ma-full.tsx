@@ -239,6 +239,7 @@ const PercentOfStocksAboveMAsFull: React.FC<
         percentAboveTwoHundredSMASeries?.setData(twoHundredSMA);
       }
     }, [
+      percentAboveTenEMASeries,
       percentAboveFiveSMASeries,
       percentAboveFiftySMASeries,
       percentAboveTwentyOneEMASeies,
