@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 
 import { FaXTwitter } from "react-icons/fa6";
-import { SymbolWithStatsWithRank } from "@/lib/types/screener-types";
+import { ScreenerSortableKeys, SymbolWithStatsWithRank } from "@/lib/types/screener-types";
 import {
   Popover,
   PopoverContent,
@@ -21,11 +21,13 @@ import { useToast } from "@/hooks/use-toast";
 
 interface ExportComponentProps {
   getAllStocks: () => Promise<SymbolWithStatsWithRank[]>;
+  filterGroupName: string,
+  sortAttribute: ScreenerSortableKeys
 }
 
 type ExportFormat = "csv" | "tradingview" | "clipboard" | "twitter";
 
-const ExportComponent: React.FC<ExportComponentProps> = ({ getAllStocks }) => {
+const ExportComponent: React.FC<ExportComponentProps> = ({ getAllStocks, filterGroupName, sortAttribute }) => {
   const [isExporting, setIsExporting] = useState(false);
   const [exportFormat, setExportFormat] = useState<ExportFormat>("csv");
   const [isOpen, setIsOpen] = useState(false);
@@ -58,8 +60,8 @@ const ExportComponent: React.FC<ExportComponentProps> = ({ getAllStocks }) => {
         toast({
           title: "Export Successful",
           description: `Data exported to ${exportFormat === "clipboard"
-              ? "clipboard"
-              : exportFormat.toUpperCase()
+            ? "clipboard"
+            : exportFormat.toUpperCase()
             }`,
         });
       }
@@ -140,13 +142,36 @@ const ExportComponent: React.FC<ExportComponentProps> = ({ getAllStocks }) => {
     }
   };
 
+  const getSortName = (sortKey: ScreenerSortableKeys): string => {
+    const sortKeyMap: { [key in ScreenerSortableKeys]: string } = {
+      price: "Price",
+      rsRank: "RS Rank",
+      rsScore: "RS Score",
+      oneDayReturnPercent: "1-Day Return",
+      oneWeekReturnPercent: "1-Week Return",
+      oneMonthReturnPercent: "1-Month Return",
+      threeMonthReturnPercent: "3-Month Return",
+      sixMonthReturnPercent: "6-Month Return",
+      oneYearReturnPercent: "1-Year Return",
+      percentFromFiftyTwoWeekHigh: "% From 52-Week High",
+      trendMomentum: "Trend Momentum",
+      percentFromFiftyTwoWeekLow: "% From 52-Week Low",
+      industry: "Industry",
+      sector: "Sector",
+      breakoutIntensityScore: "Breakout Intensity Score",
+    };
+
+    return sortKeyMap[sortKey] || "Unknown Sort Key";
+  };
+
+
   const shareToTwitter = (stocks: SymbolWithStatsWithRank[]) => {
     const symbols = stocks
       .map((stock) => `$${stock.profile.symbol}`)
       .join(", ");
-    const tagline = "Check out these top performing stocks:";
-    const tweetText = `${tagline}\n\n${symbols}\n\n`;
-    const hashtags = "ptmm,stocks,investing";
+    const tagline = `${filterGroupName || "Check out these hot stocks"} sorted by ${getSortName(sortAttribute)}.`
+    const tweetText = `${tagline}\n\n${symbols}\n\n By @TradersLab_`;
+    const hashtags = "traderslab,stocks,investing";
 
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
       tweetText

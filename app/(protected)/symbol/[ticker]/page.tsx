@@ -14,6 +14,7 @@ async function SymbolPageContent({ ticker }: SymbolPageContentProps) {
     getQuotesFromFMP([ticker]),
     getFullProfile(ticker),
     getPriceBars(ticker)
+
   ]);
 
   if (isFMPDataLoadingError(bars)) {

@@ -1,11 +1,15 @@
 "use client"
 import { Candle } from "@/lib/types/basic-types"
-import { createChart, ColorType, IChartApi, ISeriesApi, CandlestickData, CrosshairMode } from 'lightweight-charts'
+import { createChart, ColorType, IChartApi, ISeriesApi, CandlestickData, CrosshairMode, LineData, Time, MouseEventParams } from 'lightweight-charts'
 import { useEffect, useRef, useState } from 'react'
-import { Card } from "@/components/ui/card"
 import { ChartSettings } from "@/components/settings/chart-settings"
 import { calculateEMA, calculateSMA, isMovingAverageError, MovingAverageLine } from "@/lib/utils/moving-average"
+import { CustomizableChartMALine } from "@/components/customizable-price-chart"
+import AVWAPMenu from "@/components/avwap-menu"
 
+interface StoredAVWAPData {
+    [ticker: string]: string[]; // Store array of start dates as strings
+}
 
 export interface MovingAverageLineWithColor extends MovingAverageLine {
     color: string;
@@ -15,23 +19,28 @@ export interface MovingAverageLineWithColor extends MovingAverageLine {
 export interface PriceChartProps {
     ticker: string
     dailyCandles: Candle[]
+    earningsDates: string[]
     theme: string,
     chartSettings: ChartSettings
 }
 
-const PriceChart: React.FC<PriceChartProps> = ({ ticker, dailyCandles, theme, chartSettings }) => {
-
-
+const PriceChart: React.FC<PriceChartProps> = ({ ticker, dailyCandles, earningsDates, theme, chartSettings }) => {
 
 
     const chartContainerRef = useRef<HTMLDivElement>(null)
     const chartRef = useRef<IChartApi | null>(null)
     const [, setPriceSeries] =
         useState<ISeriesApi<"Candlestick" | "Bar">>();
+    const [, setVolumeMASeries] =
+        useState<ISeriesApi<"Line"> | null>(null);
     const getChartHeight = () => {
         if (typeof window === 'undefined') return 400;
         return Math.max(400, window.innerHeight * 0.65); // 65% of viewport height, minimum 400px
     }
+    const [avwapSeries, setAvwapSeries] = useState<any[]>([]);
+    const [isDrawingMode, setIsDrawingMode] = useState(false);
+    const isDrawingModeRef = useRef(isDrawingMode); // Ref to track the current value of isDrawingMode
+
     const [, setVolumeSeries] =
         useState<ISeriesApi<"Histogram"> | null>(null);
 
@@ -64,11 +73,155 @@ const PriceChart: React.FC<PriceChartProps> = ({ ticker, dailyCandles, theme, ch
         },
     };
 
+    const handleAddAvwap = () => {
+        setIsDrawingMode(true);
+    };
+
+    const toggleDrawingMode = () => {
+        setIsDrawingMode(!isDrawingMode);
+    };
+
+    const handleClearAvwaps = (): void => {
+        avwapSeries.forEach((series) => {
+            chartRef.current?.removeSeries(series);
+        });
+
+        setAvwapSeries([]);
+        setIsDrawingMode(false);
+
+        const storedData: StoredAVWAPData = JSON.parse(
+            localStorage.getItem("avwapDataByTicker") || "{}"
+        );
+
+        if (storedData[ticker]) {
+            delete storedData[ticker]; // Remove the AVWAP data for this ticker
+            localStorage.setItem("avwapDataByTicker", JSON.stringify(storedData)); // Save back to localStorage
+        }
+    };
+
+    const saveAvwapStartDateToLocalStorage = (
+        ticker: string,
+        avwapStartDate: string
+    ): void => {
+        const storedData: StoredAVWAPData = JSON.parse(
+            localStorage.getItem("avwapDataByTicker") || "{}"
+        );
+
+        if (!storedData[ticker]) {
+            storedData[ticker] = [];
+        }
+
+        storedData[ticker].push(avwapStartDate); // Store the date, not the AVWAP data
+        localStorage.setItem("avwapDataByTicker", JSON.stringify(storedData));
+    };
+
+    const loadAvwapStartDatesFromLocalStorage = (ticker: string): string[] => {
+        const storedData: StoredAVWAPData = JSON.parse(
+            localStorage.getItem("avwapDataByTicker") || "{}"
+        );
+        return storedData[ticker] || [];
+    };
+
+    const calculateAVWAP = (startIndex: number): LineData<Time>[] => {
+        let cumulativeVolume = 0;
+        let cumulativeVolumePrice = 0;
+        const avwapData: LineData[] = [];
+
+        for (let i = startIndex; i < dailyCandles.length; i++) {
+            const candle = dailyCandles[i];
+            const volume = candle.volume;
+
+            const typicalPrice =
+                (candle.high + candle.low + candle.close + candle.open) / 4;
+
+            cumulativeVolume += volume;
+            cumulativeVolumePrice += typicalPrice * volume;
+
+            const avwap = Number(
+                (cumulativeVolumePrice / cumulativeVolume).toFixed(3)
+            );
+            avwapData.push({ time: candle.dateStr!, value: avwap });
+        }
+
+        return avwapData;
+    };
+
+    useEffect(() => {
+        isDrawingModeRef.current = isDrawingMode;
+    }, [isDrawingMode]);
+
+    const handleChartClick = (param: MouseEventParams<Time>) => {
+        const currentIsDrawingMode = isDrawingModeRef.current;
+
+        if (currentIsDrawingMode && param.time) {
+            const clickedDateStr = param.time.toString();
+            const startIndex = dailyCandles.findIndex(
+                (candle) => candle.dateStr === clickedDateStr
+            );
+
+            if (startIndex !== -1) {
+                const avwapData = calculateAVWAP(startIndex);
+
+                const newAvwapSeries = chartRef.current?.addLineSeries({
+                    color: chartSettings.avwapSettings?.color || "#6c71c4",
+                    lineWidth: 2,
+                    priceLineVisible: false,
+                    crosshairMarkerVisible: false,
+                    title: chartSettings.avwapSettings?.showLegend
+                        ? `AVWAP ${avwapData[0].time.toString()}`
+                        : "",
+                });
+
+                newAvwapSeries?.setData(avwapData);
+
+                setAvwapSeries((prevSeries) => [
+                    ...prevSeries,
+                    newAvwapSeries, // Save the AVWAP series
+                ]);
+
+                // Save the start date for recalculating later
+                saveAvwapStartDateToLocalStorage(ticker, clickedDateStr);
+
+                setIsDrawingMode(false);
+            }
+        } else {
+            console.log("Drawing mode is off or no date selected.");
+        }
+    };
+
     useEffect(() => {
         if (!chartContainerRef.current) return
 
         const chart = createChart(chartContainerRef.current, chartOptions)
         chartRef.current = chart;
+
+        chart.subscribeClick((param) => {
+            handleChartClick(param);
+        });
+
+        const avwapStartDates = loadAvwapStartDatesFromLocalStorage(ticker);
+
+        avwapStartDates.forEach((startDate) => {
+            const startIndex = dailyCandles.findIndex(
+                (candle) => candle.dateStr === startDate
+            );
+            if (startIndex !== -1) {
+                const avwapData = calculateAVWAP(startIndex);
+
+                const newAvwapSeries = chart.addLineSeries({
+                    color: chartSettings.avwapSettings?.color || "#6c71c4",
+                    lineWidth: 2,
+                    priceLineVisible: false,
+                    crosshairMarkerVisible: false,
+                    title: chartSettings.avwapSettings?.showLegend
+                        ? `AVWAP ${startDate}`
+                        : "",
+                });
+
+                newAvwapSeries.setData(avwapData);
+                setAvwapSeries((prevSeries) => [...prevSeries, newAvwapSeries]);
+            }
+        });
 
         const newPriceSeries =
             chartSettings.seriesType === "candlestick"
@@ -96,18 +249,13 @@ const PriceChart: React.FC<PriceChartProps> = ({ ticker, dailyCandles, theme, ch
                 });
         setPriceSeries(newPriceSeries);
 
-
-
-        const sortedCandles = [...dailyCandles].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-
-
         const priceMovingAverages: MovingAverageLineWithColor[] =
             chartSettings.priceMovingAverages
                 .map((ma) => {
                     const timeseries =
                         ma.type === "SMA"
-                            ? calculateSMA(sortedCandles, ma.period)
-                            : calculateEMA(sortedCandles, ma.period);
+                            ? calculateSMA(dailyCandles, ma.period)
+                            : calculateEMA(dailyCandles, ma.period);
 
                     if (isMovingAverageError(timeseries)) {
                         console.error(`Error calculating ${ma.type} ${ma.period}`);
@@ -147,7 +295,7 @@ const PriceChart: React.FC<PriceChartProps> = ({ ticker, dailyCandles, theme, ch
         setMaSeriesMap(new Map(maSeriesMap));
 
 
-        const formattedData: CandlestickData[] = sortedCandles.map(candle => ({
+        const formattedData: CandlestickData[] = dailyCandles.map(candle => ({
             time: candle.dateStr as string,
             open: candle.open,
             high: candle.high,
@@ -157,12 +305,14 @@ const PriceChart: React.FC<PriceChartProps> = ({ ticker, dailyCandles, theme, ch
 
         newPriceSeries.setData(formattedData)
 
+
+
         const newVolumeSeries = chartRef.current.addHistogramSeries({
             priceFormat: { type: "volume" },
             priceScaleId: "volume",
         });
         setVolumeSeries(newVolumeSeries);
-        const volumeData = sortedCandles.map((c) => ({
+        const volumeData = dailyCandles.map((c) => ({
             time: c.dateStr!,
             value: c.volume,
             color: "rgba(136,136,136, .4)"
@@ -171,6 +321,75 @@ const PriceChart: React.FC<PriceChartProps> = ({ ticker, dailyCandles, theme, ch
             //    : "rgba(136,136,136, .4)",
         }));
         newVolumeSeries.setData(volumeData);
+
+        const markers: any[] = [];
+
+        earningsDates.forEach(e => {
+            markers.push({
+                time: e,
+                position: "aboveBar",
+                color: "#b58900",
+                text: "E"
+            });
+        })
+        newVolumeSeries.setMarkers(markers);
+
+        let volumeMovingAverage: CustomizableChartMALine | undefined;
+        if (chartSettings.volumeMA.enabled) {
+            const volumeMA =
+                chartSettings.volumeMA.type === "SMA"
+                    ? calculateSMA(
+                        dailyCandles,
+                        chartSettings.volumeMA.period,
+                        (c) => c.volume
+                    )
+                    : calculateEMA(
+                        dailyCandles,
+                        chartSettings.volumeMA.period,
+                        (c) => c.volume
+                    );
+
+            if (!isMovingAverageError(volumeMA)) {
+                volumeMovingAverage = {
+                    period: chartSettings.volumeMA.period,
+                    type: chartSettings.volumeMA.type,
+                    color: chartSettings.volumeMA.color,
+                    timeseries: volumeMA.timeseries
+                };
+
+
+                const volumeMASeries = chartRef.current.addLineSeries({
+                    lineWidth: 1,
+                    title: chartSettings.showVolumeMovingAvgLegends
+                        ? `Volume ${volumeMovingAverage.period} ${volumeMovingAverage.type}`
+                        : "",
+                    color: "#d33682",
+                    priceLineVisible: false,
+                    priceScaleId: "volume",
+                    crosshairMarkerVisible: false,
+                });
+
+                volumeMASeries.setData(volumeMovingAverage.timeseries);
+                setVolumeMASeries(volumeMASeries);
+            }
+        }
+
+
+        const waterMarkColor =
+            theme === "light"
+                ? "rgba(128, 128, 128, 0.1)"
+                : "rgba(128, 128, 128, 0.25)";
+
+        chartRef.current.applyOptions({
+            watermark: {
+                visible: true,
+                fontSize: 100,
+                horzAlign: "center",
+                vertAlign: "center",
+                color: waterMarkColor,
+                text: ticker,
+            },
+        })
 
         newVolumeSeries.priceScale().applyOptions({
             scaleMargins: {
@@ -214,16 +433,20 @@ const PriceChart: React.FC<PriceChartProps> = ({ ticker, dailyCandles, theme, ch
     }, [])
 
     return (
-        <Card className="w-full p-4 ">
-            <div className="mb-4">
-                <h2 className="text-xl font-bold text-foreground/70">{ticker}</h2>
-            </div>
+        <div className="relative w-full p-4 border rounded-lg ">
+
             <div
                 ref={chartContainerRef}
                 className="w-full"
                 style={{ height: `${getChartHeight()}px` }}
             />
-        </Card>
+            <AVWAPMenu
+                isDrawingMode={isDrawingMode}
+                setDrawingMode={toggleDrawingMode}
+                handleAddAvwap={handleAddAvwap}
+                handleClearAvwaps={handleClearAvwaps}
+            />
+        </div>
     )
 }
 
