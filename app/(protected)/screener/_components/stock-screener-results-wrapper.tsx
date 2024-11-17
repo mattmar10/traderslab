@@ -351,14 +351,11 @@ const ScreenerResultsWrapper = ({
             />
           ) : (
             <div className="pt-4 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:mt-4 px-2 lg:px-0">
-              {stocks.map((item, index) => (
-                <Card key={index}>
+              {stocks.map((item) => (
+                <Card key={item.profile.symbol}>
                   <CardContent className="pl-3 pr-5">
                     <ScreenerMiniChartWrapper
-                      ticker={item.profile.symbol}
-                      name={item.profile.companyName}
-                      sector={item.profile.sector || ""}
-                      industry={item.profile.industry || ""}
+                      item={item}
                       chartSettings={persistedState.chartSettings}
                       theme={resolvedTheme} startDate={startDate} />
                   </CardContent>

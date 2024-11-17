@@ -10,28 +10,24 @@ import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { useMemo } from "react";
 import ScreenerMiniChart from "./screener-minichart";
+import { SymbolWithStatsWithRank } from "@/lib/types/screener-types";
+import CompactStrengthIndicator from "./compact-rs-indicator";
 
 export interface ScreenerMiniChartWrapperProps {
-    ticker: string,
-    name: string;
-    sector?: string;
-    industry?: string;
+    item: SymbolWithStatsWithRank
     chartSettings: ChartSettings,
     theme: "light" | "dark",
     startDate: Date
 }
 
 const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> = React.memo(({
-    ticker,
-    name,
-    sector,
-    industry,
+    item,
     chartSettings,
     theme,
     startDate
 }) => {
 
-
+    const ticker = item.quote.symbol
     const barsKey = useMemo(() =>
         `/api/bars/${ticker}?fromDateString=${formatDateToEST(startDate)}`
         , [ticker, startDate]);
@@ -264,18 +260,36 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> = React.
         }
     }
 
+    const rsScores = [
+        item.relativeStrength.relativeStrengthStats.oneMonth,
+        item.relativeStrength.relativeStrengthStats.threeMonth,
+        item.relativeStrength.relativeStrengthStats.sixMonth]
+
+    const volAdjustedScores = [
+        item.relativeStrength.volAdjustedRelativeStrengthStats.oneMonth,
+        item.relativeStrength.volAdjustedRelativeStrengthStats.threeMonth,
+        item.relativeStrength.volAdjustedRelativeStrengthStats.sixMonth]
+
     return (
         <div>
-            <div className=" pt-2 pb-2">
+            <div className="flex items-center justify-between pt-2 pb-2">
+
                 <div>
-                    <span className="font-semibold">{ticker} </span>{name}
+                    <span className="font-semibold">{ticker} </span>{item.profile.companyName}
                     <div className="flex space-x-1 text-sm text-foreground/50">
-                        <div>{sector}</div>
+                        <div>{item.profile.sector}</div>
                         <div>•</div>
-                        <div>{industry}</div>
+                        <div>{item.profile.industry}</div>
                     </div>
                 </div>
 
+
+
+                <div className="flex space-x-1">
+                    <CompactStrengthIndicator scores={rsScores} theme={theme} />
+                    <div className="text-lg">•</div>
+                    <CompactStrengthIndicator scores={volAdjustedScores} theme={theme} />
+                </div>
             </div>
             <ScreenerMiniChart
                 className="h-[28rem]"
