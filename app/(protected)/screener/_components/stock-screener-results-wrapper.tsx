@@ -12,7 +12,6 @@ import {
   ScreenerResultsSchema,
   ScreenerSortableKeys,
   ScreenerSortConfig,
-  SymbolWithStatsWithRank,
 } from "@/lib/types/screener-types";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { allColumns, Column, defaultColumns } from "./screener-table-columns";
@@ -42,7 +41,12 @@ import PulsatingDots from "@/components/pulsating-dots";
 import ExportComponent from "./export-component";
 import FilterGroupSelector from "@/components/filters/filter-group/filter-group-selector";
 import FilterGroupEditor from "@/components/filters/filter-group/filter-group-editor";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import ScreenerLibrary from "./filter-library";
 import { Button } from "@/components/ui/button";
 import { RiStackLine } from "react-icons/ri";
@@ -95,7 +99,6 @@ const ScreenerResultsWrapper = ({
 
   const { theme } = useTheme();
   const resolvedTheme = (theme as "light" | "dark") || "light";
-
 
   const startDate = useMemo(() => {
     const currentDate = new Date();
@@ -272,20 +275,6 @@ const ScreenerResultsWrapper = ({
     }
   };
 
-  const getAllStocks = async (): Promise<SymbolWithStatsWithRank[]> => {
-    let allStocks: SymbolWithStatsWithRank[] = [];
-    let pageParam = 1;
-
-    while (true) {
-      const page = await fetchStocks({ pageParam });
-      allStocks = [...allStocks, ...page.stocks];
-      if (page.pages <= pageParam) break;
-      pageParam++;
-    }
-
-    return allStocks;
-  };
-
   const {
     data,
     fetchNextPage,
@@ -357,7 +346,9 @@ const ScreenerResultsWrapper = ({
                     <ScreenerMiniChartWrapper
                       item={item}
                       chartSettings={persistedState.chartSettings}
-                      theme={resolvedTheme} startDate={startDate} />
+                      theme={resolvedTheme}
+                      startDate={startDate}
+                    />
                   </CardContent>
                 </Card>
               ))}
@@ -464,7 +455,6 @@ const ScreenerResultsWrapper = ({
               filterGrp={persistedState.filterGroup}
             />
 
-
             <div className="pl-2">
               <Button
                 onClick={() => updateState("isFiltersLibraryOpen", true)}
@@ -475,15 +465,14 @@ const ScreenerResultsWrapper = ({
               </Button>
             </div>
 
-
-
             <div className="flex items-center space-x-2 pl-4 pb-2 sm:mt-0 pt-6">
               <div className="flex items-center space-x-4">
                 <span
-                  className={` ${state.displayAs === "charts"
-                    ? "text-foreground"
-                    : "text-foreground/50"
-                    }`}
+                  className={` ${
+                    state.displayAs === "charts"
+                      ? "text-foreground"
+                      : "text-foreground/50"
+                  }`}
                 >
                   CHARTS
                 </span>
@@ -494,10 +483,11 @@ const ScreenerResultsWrapper = ({
                   className="transform scale-125" // Scale up the switch
                 />
                 <span
-                  className={` ${state.displayAs === "table"
-                    ? "text-foreground "
-                    : "text-foreground/50"
-                    }`}
+                  className={` ${
+                    state.displayAs === "table"
+                      ? "text-foreground "
+                      : "text-foreground/50"
+                  }`}
                 >
                   TABLE
                 </span>
@@ -537,9 +527,12 @@ const ScreenerResultsWrapper = ({
           )}
           <div className="hidden lg:block">
             <ExportComponent
-              getAllStocks={getAllStocks}
-              filterGroupName={persistedState.filterGroup?.filterGroupName || ""}
-              sortAttribute={persistedState.sortConfig.key} />
+              toExport={data?.pages.flatMap((page) => page.stocks) || []}
+              filterGroupName={
+                persistedState.filterGroup?.filterGroupName || ""
+              }
+              sortAttribute={persistedState.sortConfig.key}
+            />
           </div>
         </div>
       </div>
