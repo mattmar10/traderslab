@@ -92,7 +92,7 @@ const ScreenerMiniChart: React.FC<ScreenerMiniChartProps> = ({
     };
 
     const handleAddAvwap = () => {
-        setIsDrawingMode(true); // Enable drawing mode when the add button is clicked
+        setIsDrawingMode(true);
     };
 
     const toggleDrawingMode = () => {

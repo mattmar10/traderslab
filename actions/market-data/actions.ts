@@ -307,6 +307,62 @@ export async function getEarningsCalendar(): Promise<
   }
 }
 
+export async function getEarningsCalendarForSymbol(ticker: string): Promise<
+  FMPEarningsDate[] | FMPDataLoadingError
+> {
+  "use server";
+  if (!process.env.FINANCIAL_MODELING_PREP_API || !process.env.FMP_API_KEY) {
+    return "FMP URL and key must be specified";
+  }
+
+  const today = new Date();
+  const oneWeekLater = new Date();
+  oneWeekLater.setDate(today.getDate() + 7);
+
+  const fromDate = formatDateToEST(today);
+  const toDate = formatDateToEST(oneWeekLater);
+
+  const url = `${process.env.TRADERS_LAB_API}/earnings/calendar?fromDateStr=${fromDate}&toDateStr=${toDate}`;
+
+  try {
+    const response = await fetch(url, { next: { revalidate: 300 } }); // 5 minutes revalidation
+
+    if (!response.ok) {
+      const message = `Error fetching earnings calendar`;
+      console.error(message);
+      return message;
+    }
+    const data = await response.json();
+
+    // Validate each entry individually and keep only valid ones
+    const validEarnings = data
+      .map((item: unknown) => EarningsDateSchema.safeParse(item))
+      .filter(
+        (
+          result: z.SafeParseReturnType<unknown, FMPEarningsDate>
+        ): result is z.SafeParseSuccess<FMPEarningsDate> => result.success
+      )
+      .map((result: { data: any }) => result.data);
+
+    if (validEarnings.length === 0) {
+      return "No valid earnings data found";
+    }
+
+    // Sort valid data by date in ascending order
+    const sortedData = validEarnings.sort((a: { date: string | number | Date; }, b: { date: string | number | Date; }) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return dateA.getTime() - dateB.getTime();
+    });
+
+    return sortedData;
+  } catch (error) {
+    console.error("Unable to fetch economic calendar", error);
+    return "Unable to fetch economic calendar";
+  }
+}
+
+
 export async function getBreadthOvervewSnapshot(): Promise<
   CurrentDayMarketBreadthSnapshot | FMPDataLoadingError
 > {
