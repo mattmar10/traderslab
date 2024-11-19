@@ -1,8 +1,8 @@
 import PageContainer from "@/components/layout/page-container";
 import { Lato } from "next/font/google";
 import { Suspense } from "react";
-import ScreenerResultsContainter from "../_components/stock-screener-container";
 import Loading from "@/components/loading";
+import ScreenerResultsContainter from "../_components/stock-screener-container";
 
 const lato = Lato({
   subsets: ["latin"],
@@ -15,9 +15,7 @@ const ErrorBoundary = ({ children }: { children: React.ReactNode }) => {
 };
 
 const ScreenerSkeleton = () => {
-  return (
-    <Loading />
-  );
+  return <Loading />;
 };
 
 const StockScreener: React.FC = () => {

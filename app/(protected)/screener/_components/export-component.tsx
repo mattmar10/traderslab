@@ -11,7 +11,10 @@ import {
 } from "@/components/ui/select";
 
 import { FaXTwitter } from "react-icons/fa6";
-import { ScreenerSortableKeys, SymbolWithStatsWithRank } from "@/lib/types/screener-types";
+import {
+  ScreenerSortableKeys,
+  SymbolWithStatsWithRank,
+} from "@/lib/types/screener-types";
 import {
   Popover,
   PopoverContent,
@@ -20,14 +23,18 @@ import {
 import { useToast } from "@/hooks/use-toast";
 
 interface ExportComponentProps {
-  getAllStocks: () => Promise<SymbolWithStatsWithRank[]>;
-  filterGroupName: string,
-  sortAttribute: ScreenerSortableKeys
+  toExport: SymbolWithStatsWithRank[];
+  filterGroupName: string;
+  sortAttribute: ScreenerSortableKeys;
 }
 
 type ExportFormat = "csv" | "tradingview" | "clipboard" | "twitter";
 
-const ExportComponent: React.FC<ExportComponentProps> = ({ getAllStocks, filterGroupName, sortAttribute }) => {
+const ExportComponent: React.FC<ExportComponentProps> = ({
+  toExport,
+  filterGroupName,
+  sortAttribute,
+}) => {
   const [isExporting, setIsExporting] = useState(false);
   const [exportFormat, setExportFormat] = useState<ExportFormat>("csv");
   const [isOpen, setIsOpen] = useState(false);
@@ -36,7 +43,7 @@ const ExportComponent: React.FC<ExportComponentProps> = ({ getAllStocks, filterG
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      const allStocks = await getAllStocks();
+      const allStocks = toExport;
       if (exportFormat === "clipboard") {
         await copyToClipboard(allStocks);
       } else if (exportFormat === "twitter") {
@@ -59,10 +66,11 @@ const ExportComponent: React.FC<ExportComponentProps> = ({ getAllStocks, filterG
       if (exportFormat !== "twitter") {
         toast({
           title: "Export Successful",
-          description: `Data exported to ${exportFormat === "clipboard"
-            ? "clipboard"
-            : exportFormat.toUpperCase()
-            }`,
+          description: `Data exported to ${
+            exportFormat === "clipboard"
+              ? "clipboard"
+              : exportFormat.toUpperCase()
+          }`,
         });
       }
     } catch (error) {
@@ -164,18 +172,19 @@ const ExportComponent: React.FC<ExportComponentProps> = ({ getAllStocks, filterG
     return sortKeyMap[sortKey] || "Unknown Sort Key";
   };
 
-
   const shareToTwitter = (stocks: SymbolWithStatsWithRank[]) => {
     const symbols = stocks
       .map((stock) => `$${stock.profile.symbol}`)
       .join(", ");
-    const tagline = `${filterGroupName || "Check out these hot stocks"} sorted by ${getSortName(sortAttribute)}.`
+    const tagline = `${
+      filterGroupName || "Check out these hot stocks"
+    } sorted by ${getSortName(sortAttribute)}.`;
     const tweetText = `${tagline}\n\n${symbols}\n\n By @TradersLab_`;
-    const hashtags = "traderslab,stocks,investing";
+    //const hashtags = "traderslab,stocks,investing";
 
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+    const twitterUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(
       tweetText
-    )}&hashtags=${hashtags}`; //&url=${encodeURIComponent(url)}
+    )}`; //&url=${encodeURIComponent(url)}
 
     window.open(twitterUrl, "_blank");
   };
