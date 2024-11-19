@@ -281,18 +281,13 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
     }
 
     if (filterConfig.type === "checkbox") {
-      const handleCheckboxChange = (value: boolean) => {
-        onFilterValueChange(value ? true : undefined);
-      };
 
       return (
         <div className="flex items-center pb-2">
           <Checkbox
             id={filterKey}
             checked={Boolean(filterValue)}
-            onCheckedChange={(checked) => {
-              handleCheckboxChange(checked as boolean);
-            }}
+            disabled={true}
           />
           <label
             htmlFor={filterKey}

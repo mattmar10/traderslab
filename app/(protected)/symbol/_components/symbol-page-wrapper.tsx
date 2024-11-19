@@ -11,14 +11,16 @@ import { useTheme } from "next-themes";
 import { ChartSettings, defaultChartSettings } from "@/components/settings/chart-settings";
 import OverviewPageWrapper from "./overview/overview-wrapper";
 import { useQuery } from "@tanstack/react-query";
+import { FmpStockNewsList } from "@/lib/types/news-types";
 
 export interface SymbolPageProps {
     quote: Quote,
     profile: FullFMPProfile
     candles: Candle[]
+    news: FmpStockNewsList
 }
 
-const SymbolPageWrapper: React.FC<SymbolPageProps> = ({ quote, profile, candles }) => {
+const SymbolPageWrapper: React.FC<SymbolPageProps> = ({ quote, profile, candles, news }) => {
 
     const [activeTab, setActiveTab] = useState("overview")
     const { theme } = useTheme();
@@ -85,7 +87,7 @@ const SymbolPageWrapper: React.FC<SymbolPageProps> = ({ quote, profile, candles 
                         <TabsTrigger value="financials">Financials</TabsTrigger>
                     </TabsList>
                     <TabsContent value="overview">
-                        <OverviewPageWrapper quote={quote} profile={profile} candles={candles} />
+                        <OverviewPageWrapper quote={quote} profile={profile} candles={candles} news={news} />
                     </TabsContent>
                     <TabsContent value="chart">
                         <PriceChart ticker={profile.symbol} dailyCandles={sortedCandles} earningsDates={adjustedDates} theme={resolvedTheme} chartSettings={chartSettings} />
