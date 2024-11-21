@@ -1,4 +1,4 @@
-import { negativeRed, positiveBlue } from "./color-utils";
+import { negativeColor, positiveColor } from "./color-utils";
 
 export const calculateColorFromPercentage = (
   value: number,
@@ -7,9 +7,7 @@ export const calculateColorFromPercentage = (
   neutral: number,
   max: number
 ): string => {
-  // Define colors for light and dark themes
-  const positiveColor = theme === "dark" ? positiveBlue : positiveBlue; // Green
-  const negativeColor = theme === "dark" ? negativeRed : negativeRed; // Red
+
 
   // Calculate opacity based on distance from neutral value
   let opacity;
@@ -43,9 +41,7 @@ export const calculateColorFromPercentageInverted = (
   neutral: number,
   max: number
 ): string => {
-  // Define colors for light and dark themes
-  const positiveColor = positiveBlue;
-  const redColor = negativeRed;
+
 
   // Normalize the value to a 0-1 range
   const normalizedValue = (value - min) / (max - min);
@@ -67,7 +63,7 @@ export const calculateColorFromPercentageInverted = (
   intensity = Math.max(0, Math.min(1, intensity));
 
   // Determine color based on value
-  const color = normalizedValue <= neutralPoint ? positiveColor : redColor;
+  const color = normalizedValue <= neutralPoint ? positiveColor : negativeColor;
 
   // Convert intensity to hex
   const opacityHex = Math.round(intensity * 255)
@@ -81,10 +77,6 @@ export const calculateGreenOrRed = (
   theme: "dark" | "light",
   condition: boolean
 ): string => {
-  // Define colors for light and dark themes
-  const positiveColor = positiveBlue;
-  const negativeColor = negativeRed;
-
   let color = condition ? positiveColor : negativeColor;
 
   color = color + Math.min(50, 100).toString(16).padStart(2, "0");

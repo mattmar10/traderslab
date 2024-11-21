@@ -13,7 +13,7 @@ import {
 import { AiOutlineZoomIn } from "react-icons/ai";
 import McclellanOscillatorTVFull from "./mcclellan-oscillator-full";
 import { BarDataPoint, LineDataPoint } from "@/lib/types/tradingview-types";
-import { negativeRed, positiveBlue } from "@/lib/utils/color-utils";
+import { negativeColor, positiveColor } from "@/lib/utils/color-utils";
 
 export interface McclellanOscillatorProps {
   mcClellanOscillator: McClellanOscillatorPoint[];
@@ -42,10 +42,6 @@ const McclellanOscillatorTV: React.FC<McclellanOscillatorProps> = ({
 
   const bgColor = theme === "light" ? "white" : "black";
   const gridColor = theme === "light" ? "#F0F0F0" : "#333";
-
-  const positiveColor = positiveBlue
-  const negativeColor = negativeRed
-
   const chartOptions = {
     layout: {
       textColor: theme === "light" ? "black" : "white",

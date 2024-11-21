@@ -20,7 +20,7 @@ import {
   FiftyTwoWeekHighsLowsDataPointWithCumulative,
   SMADataPoint,
 } from "@/lib/types/market-breadth-types";
-import { negativeRed, positiveBlue } from "@/lib/utils/color-utils";
+import { negativeColor, positiveColor } from "@/lib/utils/color-utils";
 
 export interface HighsLowsLineLineProps {
   plotStartDate: Date;
@@ -50,9 +50,6 @@ const FiftyTwoWeekHighsLowsLineTV: React.FC<HighsLowsLineProps> = ({
 
   const bgColor = theme === "light" ? "white" : "black";
   const gridColor = theme === "light" ? "#F0F0F0" : "#333";
-
-  const positiveColor = positiveBlue
-  const negativeColor = negativeRed
 
   useEffect(() => {
     const chartOptions = {

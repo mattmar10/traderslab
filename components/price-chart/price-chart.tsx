@@ -24,7 +24,7 @@ import { atr } from "@/lib/indicators/atr";
 import { calculateSMAForChart } from "@/lib/indicators/moving-avg";
 import { match } from "@/lib/utils";
 import { calculateGreenOrRed } from "@/lib/utils/table-utils";
-import { negativeRed, positiveBlue } from "@/lib/utils/color-utils";
+import { negativeColor, positiveColor } from "@/lib/utils/color-utils";
 export interface PriceChartProps {
   candles: Candle[];
   tenEMA: MovingAverageLine;
@@ -437,10 +437,10 @@ const PriceChart: React.FC<PriceChartProps> = ({
     fiftyGreaterThanTwoHundredSMA
   );
 
-  const changeColor = Number(percentChange) >= 0 ? positiveBlue : negativeRed;
+  const changeColor = Number(percentChange) >= 0 ? positiveColor : negativeColor;
 
   const ohlcBGColor = theme === "dark" ? "black" : "white";
-  const cursorChangeColor = cursorPercentChange >= 0 ? positiveBlue : negativeRed;
+  const cursorChangeColor = cursorPercentChange >= 0 ? positiveColor : negativeColor;
   return (
     <>
       <div>
