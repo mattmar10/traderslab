@@ -435,3 +435,50 @@ export const EconomicEventSchema = z.object({
 
 export type EconomicEvent = z.infer<typeof EconomicEventSchema>;
 export type EconomicEventArray = EconomicEvent[];
+
+
+export const IncomeStatementDataSchema = z.object({
+  date: z.string(),
+  symbol: z.string(),
+  reportedCurrency: z.string(),
+  cik: z.string(),
+  fillingDate: z.string(),
+  acceptedDate: z.string(),
+  calendarYear: z.string(),
+  period: z.string(),
+  revenue: z.number(),
+  costOfRevenue: z.number(),
+  grossProfit: z.number(),
+  grossProfitRatio: z.number(),
+  researchAndDevelopmentExpenses: z.number(),
+  generalAndAdministrativeExpenses: z.number(),
+  sellingAndMarketingExpenses: z.number(),
+  sellingGeneralAndAdministrativeExpenses: z.number(),
+  otherExpenses: z.number(),
+  operatingExpenses: z.number(),
+  costAndExpenses: z.number(),
+  interestIncome: z.number().nullable(),
+  interestExpense: z.number().nullable(),
+  depreciationAndAmortization: z.number(),
+  ebitda: z.number(),
+  ebitdaratio: z.number(),
+  operatingIncome: z.number(),
+  operatingIncomeRatio: z.number(),
+  totalOtherIncomeExpensesNet: z.number(),
+  incomeBeforeTax: z.number(),
+  incomeBeforeTaxRatio: z.number(),
+  incomeTaxExpense: z.number(),
+  netIncome: z.number(),
+  netIncomeRatio: z.number(),
+  eps: z.number(),
+  epsdiluted: z.number(),
+  weightedAverageShsOut: z.number(),
+  weightedAverageShsOutDil: z.number(),
+  link: z.string().nullable(),
+  finalLink: z.string().nullable(),
+});
+
+export const IncomeStatementSchema = z.array(IncomeStatementDataSchema);
+
+export type IncomeStatementData = z.infer<typeof IncomeStatementDataSchema>;
+export type IncomeStatement = z.infer<typeof IncomeStatementSchema>;

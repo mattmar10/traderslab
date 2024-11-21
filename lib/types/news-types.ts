@@ -4,7 +4,7 @@ export const FmpStockNewsSchema = z.object({
     symbol: z.string(),
     publishedDate: z.coerce.date(),
     title: z.string(),
-    image: z.string(),
+    image: z.string().nullable(),
     site: z.string(),
     text: z.string(),
     url: z.string(),

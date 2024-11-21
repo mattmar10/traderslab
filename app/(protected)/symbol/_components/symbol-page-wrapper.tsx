@@ -4,7 +4,7 @@ import PageContainer from "@/components/layout/page-container";
 import SymbolPageHeader from "./symbol-page-header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
-import { FMPEarningsCalendar, FMPEarningsCalendarSchema, FullFMPProfile, Quote } from "@/lib/types/fmp-types";
+import { FMPEarningsCalendar, FMPEarningsCalendarSchema, FullFMPProfile, IncomeStatement, Quote } from "@/lib/types/fmp-types";
 import { Candle } from "@/lib/types/basic-types";
 import PriceChart from "./price-chart";
 import { useTheme } from "next-themes";
@@ -18,9 +18,10 @@ export interface SymbolPageProps {
     profile: FullFMPProfile
     candles: Candle[]
     news: FmpStockNewsList
+    incomeStatement?: IncomeStatement
 }
 
-const SymbolPageWrapper: React.FC<SymbolPageProps> = ({ quote, profile, candles, news }) => {
+const SymbolPageWrapper: React.FC<SymbolPageProps> = ({ quote, profile, candles, news, incomeStatement }) => {
 
     const [activeTab, setActiveTab] = useState("overview")
     const { theme } = useTheme();
@@ -87,7 +88,7 @@ const SymbolPageWrapper: React.FC<SymbolPageProps> = ({ quote, profile, candles,
                         <TabsTrigger value="financials">Financials</TabsTrigger>
                     </TabsList>
                     <TabsContent value="overview">
-                        <OverviewPageWrapper quote={quote} profile={profile} candles={candles} news={news} />
+                        <OverviewPageWrapper quote={quote} profile={profile} candles={candles} news={news} incomeStatement={incomeStatement} />
                     </TabsContent>
                     <TabsContent value="chart">
                         <PriceChart ticker={profile.symbol} dailyCandles={sortedCandles} earningsDates={adjustedDates} theme={resolvedTheme} chartSettings={chartSettings} />

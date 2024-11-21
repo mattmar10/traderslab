@@ -72,7 +72,7 @@ const HeadlinesCard: React.FC<HeadlinesCardProps> = ({ generalNews, stockNews })
                                 <div className="flex gap-4">
                                     <div className="flex-shrink-0">
                                         <img
-                                            src={item.image}
+                                            src={item.image!}
                                             alt=""
                                             width={120}
                                             height={120}

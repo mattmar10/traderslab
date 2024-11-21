@@ -1,21 +1,21 @@
 "use client"
-import { FullFMPProfile, Quote } from "@/lib/types/fmp-types";
+import { FullFMPProfile, IncomeStatement, Quote } from "@/lib/types/fmp-types";
 import { Candle } from "@/lib/types/basic-types";
 import OverviewChart from "./overview-chart";
 import KeyStatsCard from "./overview-key-stats";
 import { FmpStockNewsList } from "@/lib/types/news-types";
-import OverviewNewsCard from "./ovewview-news-card";
+import OverviewNewsCard from "./overview-news-card";
+import OverviewFinancialsCard from "./overview-financials-card";
 
 export interface OverviewPageWrapperProps {
     quote: Quote,
     profile: FullFMPProfile
     candles: Candle[]
     news: FmpStockNewsList
+    incomeStatement?: IncomeStatement
 }
 
-const OverviewPageWrapper: React.FC<OverviewPageWrapperProps> = ({ quote, profile, candles, news }) => {
-
-
+const OverviewPageWrapper: React.FC<OverviewPageWrapperProps> = ({ quote, profile, candles, news, incomeStatement }) => {
 
 
     return (
@@ -27,6 +27,11 @@ const OverviewPageWrapper: React.FC<OverviewPageWrapperProps> = ({ quote, profil
             <div>
                 <KeyStatsCard quote={quote} profile={profile} />
             </div>
+            {incomeStatement && incomeStatement.length > 0 && <div className="col-span-3">
+
+                <OverviewFinancialsCard incomeStatement={incomeStatement} />
+
+            </div>}
             <div className="col-span-3">
                 <OverviewNewsCard news={news} />
             </div>

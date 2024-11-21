@@ -18,8 +18,9 @@ import { useQuery } from "@tanstack/react-query";
 import { isRangeKey, RangeKeys } from "../filters-types";
 import SaveToLibrary from "./save-filter-group";
 import { FilterCriteria, FilterGroup, FilterGroupDTO, InclusionExclusion, ScreenerRanges } from "@/lib/types/screener-types";
-import { useAuth } from "@clerk/nextjs";
 import { FilterIcon } from "./filter-icon"
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import ErrorCard from "@/components/error-card";
 
 export interface FilterGroupEditorProps {
   onApplyFilters: (filters: FilterGroupDTO | undefined) => void;
@@ -56,7 +57,7 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
 
   const [showUpdateSection, setShowUpdateSection] = useState<boolean>(false);
 
-  const { userId } = useAuth()
+  const { data: userId, error } = useCurrentUser()
 
   const fetchSectors = async () => {
     const response = await fetch("/api/sectors");
@@ -191,6 +192,10 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
     onClearFilters();
     handleCloseDialog();
   };
+
+  if (error) {
+    return <ErrorCard errorMessage={"User must be logged in"} />
+  }
 
   return (
     <>
