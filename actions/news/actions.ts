@@ -1,4 +1,4 @@
-import { FMPDataLoadingError } from "@/lib/types/fmp-types";
+import { FMPDataLoadingError, IncomeStatement, IncomeStatementSchema } from "@/lib/types/fmp-types";
 import { FmpGeneralNewsList, FmpGeneralNewsListSchema, FmpStockNewsList, FmpStockNewsListSchema } from "@/lib/types/news-types";
 import { formatDateToEST } from "@/lib/utils/epoch-utils";
 
@@ -85,6 +85,7 @@ export async function getNewsForSymbol(ticker: string): Promise<FmpStockNewsList
     try {
         const response = await fetch(url, { next: { revalidate: 0 } });
 
+
         if (!response.ok) {
             const message = `Error fetching stock news`;
             console.error(message);
@@ -95,15 +96,49 @@ export async function getNewsForSymbol(ticker: string): Promise<FmpStockNewsList
         const data = await response.json();
         const parsed = FmpStockNewsListSchema.safeParse(data);
 
+        console.log(parsed.error)
+
         if (parsed.success) {
             return parsed.data;
         } else {
             throw new Error("Schema validation failed: unable to parse data");
         }
 
-        return data;
     } catch (error) {
         const dataError: FMPDataLoadingError = `Unable to fetch news`;
+        return dataError;
+    }
+}
+
+export async function getIncomeStatementForSymbol(ticker: string, period: "annual" | "quarter"): Promise<IncomeStatement | FMPDataLoadingError> {
+    if (!process.env.FINANCIAL_MODELING_PREP_API || !process.env.FMP_API_KEY) {
+        return "FMP URL and key must be specified";
+    }
+
+    const url = `${process.env.FINANCIAL_MODELING_PREP_API}/income-statement/${ticker}?period=${period}&apikey=${process.env.FMP_API_KEY}`;
+
+    try {
+        const response = await fetch(url, { next: { revalidate: 0 } });
+
+        if (!response.ok) {
+            const message = `Error fetching stock income statement`;
+            console.error(message);
+            console.error(JSON.stringify(response));
+            return message;
+        }
+
+        const data = await response.json();
+        const parsed = IncomeStatementSchema.safeParse(data);
+
+        if (parsed.success) {
+            return parsed.data;
+        } else {
+            console.error(parsed.error)
+            throw new Error("Schema validation failed: unable to parse incmome statement data");
+        }
+
+    } catch (error) {
+        const dataError: FMPDataLoadingError = `Unable to fetch income statement data`;
         return dataError;
     }
 }

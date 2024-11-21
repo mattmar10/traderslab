@@ -122,3 +122,25 @@ export async function updateUserByExternalId(
 ): Promise<NewUser> {
   return updateUserByCondition(eq(usersTable.externalId, externalId), userData);
 }
+
+
+export const getCurrentUserIdFromSession = async (clerkId: string): Promise<string | undefined> => {
+  try {
+    const db = await getDatabaseInstance();
+
+    // Convert Drizzle result to plain object
+    const user = await db
+      .select({
+        id: usersTable.id  // explicitly select only the fields you need
+      })
+      .from(usersTable)
+      .where(eq(usersTable.externalId, clerkId))
+      .limit(1)
+      .then(users => users[0] ? { id: users[0].id } : undefined); // Convert to plain object
+
+    return user?.id;
+  } catch (error) {
+    console.error("Error getting user:", error);
+    return undefined;
+  }
+};

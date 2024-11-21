@@ -201,3 +201,12 @@ export const userFavoriteFilterGroupRelations = relations(
     }),
   })
 );
+
+export const prereleaseUsersTable = pgTable("prerelease_users", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  email: varchar("email", { length: 320 }).unique().notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type NewPrereleaseUser = typeof prereleaseUsersTable.$inferInsert;
+export type ExistingPrereleaseUser = typeof prereleaseUsersTable.$inferSelect;

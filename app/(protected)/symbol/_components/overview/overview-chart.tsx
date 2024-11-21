@@ -86,7 +86,7 @@ const OverviewChart: React.FC<OverviewChartProps> = ({ ticker, candles }) => {
                         <div
                             key={frame}
                             onClick={() => setTimeFrame(frame)}
-                            className={`text-sm cursor-pointer border p-1 rounded text-center shadow-sm ${frame === timeFrame ? ' border border-foreground/50' : 'hover:bg-accent/50 '
+                            className={`text-sm cursor-pointer border p-1 rounded text-center shadow-sm ${frame === timeFrame ? 'text-background bg-foreground  border-foreground' : 'hover:bg-accent/50 '
                                 }`}
                             style={{ minWidth: '80px' }}
                         >

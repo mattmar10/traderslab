@@ -27,13 +27,22 @@ const OverviewNewsCard: React.FC<OverviewNewsCardProps> = ({ news }) => {
                             >
                                 <div className="flex gap-4 h-full">
                                     <div className="flex-shrink-0">
-                                        <img
-                                            src={item.image}
-                                            alt=""
-                                            width={100}
-                                            height={100}
-                                            className="rounded-md object-cover w-[100px] h-[100px]"
-                                        />
+                                        {item.image ? (
+                                            <img
+                                                src={item.image}
+                                                alt="Image description"
+                                                width={100}
+                                                height={100}
+                                                className="rounded-md object-cover w-[100px] h-[100px]"
+                                            />
+                                        ) : (
+                                            <div
+                                                style={{ width: 100, height: 100 }}
+                                                className="rounded-md bg-gray-200 flex items-center justify-center"
+                                            >
+                                                No Image
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="space-y-1">
