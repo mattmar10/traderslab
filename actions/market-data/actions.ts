@@ -10,10 +10,9 @@ import {
   FMPIntradayChart,
   FMPIntradayChartSchema,
   FullFMPFullProfileArraySchema,
-  FullFMPFullProfileSchema,
   FullFMPProfile,
   Quote,
-  QuoteArraySchema,
+  QuoteElementSchema,
   RealtimeQuoteResponse,
   SymbolProfile,
 } from "@/lib/types/fmp-types";
@@ -83,25 +82,18 @@ export async function getIntradayChart(
     return Promise.reject("FMP URL and key must be specified");
   }
 
-  const datePart = formatDateToEST(date)
+  const datePart = formatDateToEST(date);
   let url = `${process.env.FINANCIAL_MODELING_PREP_API}/historical-chart/${period}/${ticker}?apikey=${process.env.FMP_API_KEY}&from=${datePart}&to=${datePart}`;
-  const response = await fetchWithRetries(
-    url,
-    { next: { revalidate: 0 } },
-    1
-  );
+  const response = await fetchWithRetries(url, { next: { revalidate: 0 } }, 1);
 
-  const parsed = FMPIntradayChartSchema.safeParse(response)
+  const parsed = FMPIntradayChartSchema.safeParse(response);
 
   if (parsed.success) {
-    return parsed.data
+    return parsed.data;
+  } else {
+    return Promise.reject("Unable to parse Intraday chart");
   }
-  else {
-    return Promise.reject("Unable to parse Intraday chart")
-  }
-
 }
-
 
 export async function getRealTimeQuotes(
   datasource: "sp500" | "ns100" | "iwm" | "nyse"
@@ -135,7 +127,7 @@ export async function getProfile(ticker: string): Promise<SymbolProfile> {
     return Promise.reject("TRADERS_LAB_API must be specified");
   }
   const url = `${process.env.TRADERS_LAB_API}/symbol/${ticker}/profile`;
-  console.log(url)
+  console.log(url);
   try {
     const response = await fetch(url, { next: { revalidate: 0 } });
 
@@ -143,7 +135,7 @@ export async function getProfile(ticker: string): Promise<SymbolProfile> {
       const message = `Error fetching profile`;
       console.error(message);
       console.error(JSON.stringify(response));
-      return Promise.reject("Error fetching profile")
+      return Promise.reject("Error fetching profile");
     }
 
     const data = await response.json();
@@ -155,12 +147,14 @@ export async function getProfile(ticker: string): Promise<SymbolProfile> {
   }
 }
 
-export async function getFullProfile(ticker: string): Promise<FullFMPProfile[]> {
+export async function getFullProfile(
+  ticker: string
+): Promise<FullFMPProfile[]> {
   if (!process.env.FINANCIAL_MODELING_PREP_API || !process.env.FMP_API_KEY) {
     return Promise.reject("FMP URL and key must be specified");
   }
   const url = `${process.env.FINANCIAL_MODELING_PREP_API}/profile/${ticker}?apikey=${process.env.FMP_API_KEY}`;
-  console.log(url)
+  console.log(url);
   try {
     const response = await fetch(url, { next: { revalidate: 0 } });
 
@@ -168,17 +162,16 @@ export async function getFullProfile(ticker: string): Promise<FullFMPProfile[]> 
       const message = `Error fetching profile`;
       console.error(message);
       console.error(JSON.stringify(response));
-      return Promise.reject("Error fetching profile")
+      return Promise.reject("Error fetching profile");
     }
 
     const data = await response.json();
 
-    const parsed = FullFMPFullProfileArraySchema.safeParse(data)
+    const parsed = FullFMPFullProfileArraySchema.safeParse(data);
     if (parsed.success) {
-      return parsed.data
-    }
-    else {
-      return Promise.reject("Unable to parse profiles")
+      return parsed.data;
+    } else {
+      return Promise.reject("Unable to parse profiles");
     }
   } catch (error) {
     const dataError: FMPDataLoadingError = `Unable to fetch profile`;
@@ -186,16 +179,12 @@ export async function getFullProfile(ticker: string): Promise<FullFMPProfile[]> 
   }
 }
 
-
-
-export async function getQuotesFromFMP(
-  tickers: string[]
-): Promise<Quote[]> {
+export async function getQuotesFromFMP(tickers: string[]): Promise<Quote[]> {
   if (!process.env.FINANCIAL_MODELING_PREP_API || !process.env.FMP_API_KEY) {
     return Promise.reject("FMP URL and key must be specified");
   }
 
-  const tickersPart = tickers.join(',')
+  const tickersPart = tickers.join(",");
   const url = `${process.env.FINANCIAL_MODELING_PREP_API}/quote/${tickersPart}?apikey=${process.env.FMP_API_KEY}`;
 
   try {
@@ -205,26 +194,36 @@ export async function getQuotesFromFMP(
       const message = `Error fetching realtime quotes from FMP`;
       console.error(message);
       console.error(JSON.stringify(response));
-      return Promise.reject(message)
+      return Promise.reject(message);
     }
 
     const data = await response.json();
 
-    const parsed = QuoteArraySchema.safeParse(data)
+    // Parse each quote individually
+    const validQuotes: Quote[] = [];
+    const invalidQuotes: any[] = [];
 
-    if (parsed.success) {
-      return parsed.data
-    }
-    else {
-      return Promise.reject("Unable to parse quotes")
+    data.forEach((quote: any) => {
+      const result = QuoteElementSchema.safeParse(quote);
+      if (result.success) {
+        validQuotes.push(result.data);
+      } else {
+        console.warn("Invalid quote:", quote, result.error.errors);
+        invalidQuotes.push(quote);
+      }
+    });
+
+    if (invalidQuotes.length > 0) {
+      console.warn(`${invalidQuotes.length} invalid quotes encountered`);
     }
 
+    return validQuotes;
   } catch (error) {
-    const dataError: FMPDataLoadingError = `Unable to fetch quotes`;
-    return Promise.reject(dataError)
+    const dataError = `Unable to fetch quotes: ${error}`;
+    console.error(dataError);
+    return Promise.reject(dataError);
   }
 }
-
 export async function getMarketPerformers(
   kind: "gainers" | "losers" | "actives"
 ): Promise<Quote[] | FMPDataLoadingError> {
@@ -294,11 +293,16 @@ export async function getEarningsCalendar(): Promise<
     }
 
     // Sort valid data by date in ascending order
-    const sortedData = validEarnings.sort((a: { date: string | number | Date; }, b: { date: string | number | Date; }) => {
-      const dateA = new Date(a.date);
-      const dateB = new Date(b.date);
-      return dateA.getTime() - dateB.getTime();
-    });
+    const sortedData = validEarnings.sort(
+      (
+        a: { date: string | number | Date },
+        b: { date: string | number | Date }
+      ) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateA.getTime() - dateB.getTime();
+      }
+    );
 
     return sortedData;
   } catch (error) {
@@ -307,9 +311,9 @@ export async function getEarningsCalendar(): Promise<
   }
 }
 
-export async function getEarningsCalendarForSymbol(ticker: string): Promise<
-  FMPEarningsDate[] | FMPDataLoadingError
-> {
+export async function getEarningsCalendarForSymbol(
+  ticker: string
+): Promise<FMPEarningsDate[] | FMPDataLoadingError> {
   "use server";
   if (!process.env.FINANCIAL_MODELING_PREP_API || !process.env.FMP_API_KEY) {
     return "FMP URL and key must be specified";
@@ -349,11 +353,16 @@ export async function getEarningsCalendarForSymbol(ticker: string): Promise<
     }
 
     // Sort valid data by date in ascending order
-    const sortedData = validEarnings.sort((a: { date: string | number | Date; }, b: { date: string | number | Date; }) => {
-      const dateA = new Date(a.date);
-      const dateB = new Date(b.date);
-      return dateA.getTime() - dateB.getTime();
-    });
+    const sortedData = validEarnings.sort(
+      (
+        a: { date: string | number | Date },
+        b: { date: string | number | Date }
+      ) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateA.getTime() - dateB.getTime();
+      }
+    );
 
     return sortedData;
   } catch (error) {
@@ -361,7 +370,6 @@ export async function getEarningsCalendarForSymbol(ticker: string): Promise<
     return "Unable to fetch economic calendar";
   }
 }
-
 
 export async function getBreadthOvervewSnapshot(): Promise<
   CurrentDayMarketBreadthSnapshot | FMPDataLoadingError
