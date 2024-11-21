@@ -22,7 +22,7 @@ import {
   PTMMDashboardSettings,
 } from "./ptmm-dashboard-settings";
 import { PercentAboveMAPoint } from "@/lib/types/market-breadth-types";
-import { negativeRed, positiveBlue } from "@/lib/utils/color-utils";
+import { negativeColor, positiveColor } from "@/lib/utils/color-utils";
 
 export interface PercentOfStocksAboveMATVLineProps {
   plotStartDate: Date;
@@ -98,7 +98,7 @@ const PercentOfStocksAboveMAs: React.FC<PercentOfStocksAboveMATVLineProps> = ({
     // Add OB/OS lines
     obosSeries.createPriceLine({
       price: 25,
-      color: positiveBlue,
+      color: positiveColor,
       lineWidth: 2,
       lineStyle: LineStyle.Solid,
       axisLabelVisible: true,
@@ -107,7 +107,7 @@ const PercentOfStocksAboveMAs: React.FC<PercentOfStocksAboveMATVLineProps> = ({
 
     obosSeries.createPriceLine({
       price: 75,
-      color: negativeRed,
+      color: negativeColor,
       lineWidth: 2,
       lineStyle: LineStyle.Solid,
       axisLabelVisible: true,

@@ -108,6 +108,13 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
       // Removing a specific filter criterion from a FilterCriteria
       const criteria = newFilters[groupIndex] as FilterCriteria;
       delete criteria[filterKey];
+
+      if (Object.keys(criteria).length === 0) {
+        newFilters.splice(groupIndex, 1);
+      } else {
+        newFilters[groupIndex] = criteria;
+      }
+
       newFilters[groupIndex] = criteria;
     } else {
       // Removing the entire filter group or criteria

@@ -21,6 +21,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Loading from "@/components/loading";
+import { negativeColor, positiveColor } from "@/lib/utils/color-utils";
 
 interface StockDataPoint {
   ticker: string;
@@ -180,7 +181,7 @@ const SectorSwarmplot: React.FC<SectorSwarmplotResponse> = ({
               {mapped.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={entry.return >= 0 ? "#1e90ff" : "#ff5f5f"}
+                  fill={entry.return >= 0 ? positiveColor : negativeColor}
                 />
               ))}
             </Scatter>

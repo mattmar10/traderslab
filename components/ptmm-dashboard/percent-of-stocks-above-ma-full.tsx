@@ -10,7 +10,7 @@ import {
   createChart,
 } from "lightweight-charts";
 import { PTMMDashboardSettings } from "./ptmm-dashboard-settings";
-import { negativeRed, positiveBlue } from "@/lib/utils/color-utils";
+import { negativeColor, positiveColor } from "@/lib/utils/color-utils";
 
 export interface PercentOfStocksAboveMATVLineProps {
   percentAboveFiveSMA: PercentAboveMAPoint[];
@@ -108,7 +108,7 @@ const PercentOfStocksAboveMAsFull: React.FC<
       // Add OB/OS lines
       obosSeries.createPriceLine({
         price: 25,
-        color: positiveBlue,
+        color: positiveColor,
         lineWidth: 2,
         lineStyle: LineStyle.Solid,
         axisLabelVisible: true,
@@ -116,7 +116,7 @@ const PercentOfStocksAboveMAsFull: React.FC<
       });
       obosSeries.createPriceLine({
         price: 75,
-        color: negativeRed,
+        color: negativeColor,
         lineWidth: 2,
         lineStyle: LineStyle.Solid,
         axisLabelVisible: true,

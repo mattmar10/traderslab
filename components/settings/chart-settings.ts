@@ -1,4 +1,4 @@
-import { negativeRed, positiveBlue } from "@/lib/utils/color-utils";
+import { negativeColor, positiveColor } from "@/lib/utils/color-utils";
 
 export interface ChartSettings {
   priceMovingAverages: MovingAverageSetting[];
@@ -38,12 +38,12 @@ export const defaultChartSettings: ChartSettings = {
   },
   seriesType: "candlestick",
   useThinBars: false,
-  upColor: positiveBlue,
-  downColor: negativeRed,
-  wickUpColor: positiveBlue,
-  wickDownColor: negativeRed,
-  upBorderColor: positiveBlue,
-  downBorderColor: negativeRed,
+  upColor: positiveColor,
+  downColor: negativeColor,
+  wickUpColor: positiveColor,
+  wickDownColor: negativeColor,
+  upBorderColor: positiveColor,
+  downBorderColor: negativeColor,
   screenerRefreshInterval: 30000,
   avwapSettings: {
     color: "#6c71c4",
