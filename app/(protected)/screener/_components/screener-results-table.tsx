@@ -12,13 +12,13 @@ import {
 } from "@/lib/utils/table-utils";
 import { Fira_Code } from "next/font/google";
 import { ChartSettings } from "@/components/settings/chart-settings";
-import ScreenerPriceChart from "./screener-popup-price-chart";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { useRouter } from "next/navigation";
+import ScreenerMiniChartWrapper from "./screener-result-minichart";
 
 const firaCode = Fira_Code({
   subsets: ["latin"],
@@ -56,6 +56,17 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
   };
 
   const columnsToUse = isMobile ? mobileColumns : columns;
+
+  const currentDate = new Date();
+  const startDate = new Date(
+    currentDate.getFullYear() - 2,
+    currentDate.getMonth(),
+    currentDate.getDate(),
+    currentDate.getHours(),
+    currentDate.getMinutes(),
+    currentDate.getSeconds(),
+    currentDate.getMilliseconds()
+  );
 
   return (
     <div className="w-full pt-8 px-4 lg:px-0">
@@ -389,19 +400,13 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
                     })}
                   </tr>
                 </HoverCardTrigger>
-                <HoverCardContent
-                  className="w-[1024px] p-4 h-[48rem]"
-                  sideOffset={0}
-                >
-                  <div className="p-2">
-                    <ScreenerPriceChart
-                      ticker={item.profile.symbol}
-                      isMobile={isMobile}
-                      name={item.profile.companyName}
-                      sector={item.profile.sector || ""}
-                      industry={item.profile.industry || ""}
+                <HoverCardContent className="w-[50vw] p-4 " sideOffset={0}>
+                  <div className="px-2">
+                    <ScreenerMiniChartWrapper
+                      item={item}
                       chartSettings={chartSettings}
                       theme={theme}
+                      startDate={startDate}
                     />
                   </div>
                 </HoverCardContent>

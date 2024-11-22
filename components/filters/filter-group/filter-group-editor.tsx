@@ -1,11 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 
 import { Save, Upload } from "lucide-react";
@@ -17,8 +13,14 @@ import { ExpandableDropDownOption } from "../custom-multi-select";
 import { useQuery } from "@tanstack/react-query";
 import { isRangeKey, RangeKeys } from "../filters-types";
 import SaveToLibrary from "./save-filter-group";
-import { FilterCriteria, FilterGroup, FilterGroupDTO, InclusionExclusion, ScreenerRanges } from "@/lib/types/screener-types";
-import { FilterIcon } from "./filter-icon"
+import {
+  FilterCriteria,
+  FilterGroup,
+  FilterGroupDTO,
+  InclusionExclusion,
+  ScreenerRanges,
+} from "@/lib/types/screener-types";
+import { FilterIcon } from "./filter-icon";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import ErrorCard from "@/components/error-card";
 
@@ -57,7 +59,7 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
 
   const [showUpdateSection, setShowUpdateSection] = useState<boolean>(false);
 
-  const { data: userId, error } = useCurrentUser()
+  const { data: userId, error } = useCurrentUser();
 
   const fetchSectors = async () => {
     const response = await fetch("/api/sectors");
@@ -184,17 +186,17 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
+    setShowSaveToLibrarySection(false);
+    setShowUpdateSection(false);
   };
 
   const resetFilters = () => {
-    //setFilterGroup({ operator: "AND", filters: [] });
-    //setFilterCount(0);
     onClearFilters();
     handleCloseDialog();
   };
 
   if (error) {
-    return <ErrorCard errorMessage={"User must be logged in"} />
+    return <ErrorCard errorMessage={"User must be logged in"} />;
   }
 
   return (
@@ -214,7 +216,16 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
           </span>
         )}
       </div>
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog
+        open={isDialogOpen}
+        onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) {
+            setShowSaveToLibrarySection(false);
+            setShowUpdateSection(false);
+          }
+        }}
+      >
         <DialogContent className="w-[95%] max-w-[85vw] h-[90vh] flex flex-col">
           <div className="flex justify-between items-end w-full">
             <div className="flex items-center space-x-5">
@@ -222,8 +233,9 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
 
               <div className="hidden lg:flex items-center space-x-2">
                 <span
-                  className={`cursor-pointer ${isAdvancedMode ? "font-normal" : "font-semibold"
-                    }`}
+                  className={`cursor-pointer ${
+                    isAdvancedMode ? "font-normal" : "font-semibold"
+                  }`}
                   onClick={() => {
                     if (!isComplex) {
                       setIsAdvancedMode(false);
@@ -239,8 +251,9 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
                   disabled={isComplex} // Disable switch if complex filters are detected
                 />
                 <span
-                  className={`cursor-pointer ${isAdvancedMode ? "font-semibold" : "font-normal"
-                    }`}
+                  className={`cursor-pointer ${
+                    isAdvancedMode ? "font-semibold" : "font-normal"
+                  }`}
                   onClick={() => setIsAdvancedMode(true)}
                 >
                   Advanced
@@ -427,9 +440,7 @@ function adjustFilterCriteriaForSave(
     if (isRangeKey(key)) {
       const rangeKey = key as RangeKeys; // Correctly cast 'key' to 'RangeKeys' type
 
-      const range = ranges[rangeKey as keyof ScreenerRanges] || [
-        1, 100,
-      ];
+      const range = ranges[rangeKey as keyof ScreenerRanges] || [1, 100];
       const numericRange = range as [number, number];
 
       if (
@@ -480,9 +491,7 @@ function adjustFilterCriteriaForLoad(
     if (isRangeKey(key)) {
       const rangeKey = key as RangeKeys;
 
-      const range = ranges[rangeKey as keyof ScreenerRanges] || [
-        1, 100,
-      ];
+      const range = ranges[rangeKey as keyof ScreenerRanges] || [1, 100];
       const numericRange = range as [number, number];
       if (
         criteria[rangeKey] &&

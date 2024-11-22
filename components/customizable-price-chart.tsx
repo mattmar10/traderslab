@@ -12,11 +12,13 @@ import {
 } from "lightweight-charts";
 import { Fira_Code } from "next/font/google";
 
-
-
 import { ChartSettings } from "@/components/settings/chart-settings";
 import { Candle } from "@/lib/types/basic-types";
-import { isPricePoint, LastCrosshairPoint, PricePoint } from "@/lib/types/price-chart-types";
+import {
+  isPricePoint,
+  LastCrosshairPoint,
+  PricePoint,
+} from "@/lib/types/price-chart-types";
 import { adrPercent, isADRPercentError } from "@/lib/indicators/adr-percent";
 import { formatDateToEST } from "@/lib/utils/epoch-utils";
 import { calculateGreenOrRed } from "@/lib/utils/table-utils";
@@ -75,9 +77,9 @@ const CustomizablePriceChart: React.FC<CustomizablePriceChartProps> = ({
   const [maSeriesMap, setMaSeriesMap] = useState<
     Map<number, ISeriesApi<"Line">>
   >(new Map());
-  const [, setLastCrossHairPoint] = useState<
-    LastCrosshairPoint | undefined
-  >(undefined);
+  const [, setLastCrossHairPoint] = useState<LastCrosshairPoint | undefined>(
+    undefined
+  );
   const [avwapSeries, setAvwapSeries] = useState<any[]>([]);
   const [isDrawingMode, setIsDrawingMode] = useState(false);
   const adrP = adrPercent(candles, 20);
@@ -297,27 +299,27 @@ const CustomizablePriceChart: React.FC<CustomizablePriceChartProps> = ({
     const newPriceSeries =
       chartSettings.seriesType === "candlestick"
         ? chart.addCandlestickSeries({
-          upColor: chartSettings.upColor,
-          downColor: chartSettings.downColor,
-          wickUpColor: chartSettings.wickUpColor,
-          wickDownColor: chartSettings.wickDownColor,
-          borderUpColor: chartSettings.upBorderColor,
-          borderDownColor: chartSettings.downBorderColor,
-          borderVisible: true,
-          lastValueVisible: false,
-          priceLineVisible: false,
-          priceLineStyle: 2,
-          priceLineColor: "purple",
-        })
+            upColor: chartSettings.upColor,
+            downColor: chartSettings.downColor,
+            wickUpColor: chartSettings.wickUpColor,
+            wickDownColor: chartSettings.wickDownColor,
+            borderUpColor: chartSettings.upBorderColor,
+            borderDownColor: chartSettings.downBorderColor,
+            borderVisible: true,
+            lastValueVisible: false,
+            priceLineVisible: false,
+            priceLineStyle: 2,
+            priceLineColor: "purple",
+          })
         : chart.addBarSeries({
-          upColor: chartSettings.upColor,
-          downColor: chartSettings.downColor,
-          thinBars: chartSettings.useThinBars,
-          lastValueVisible: false,
-          priceLineVisible: false,
-          priceLineStyle: 2,
-          priceLineColor: "purple",
-        });
+            upColor: chartSettings.upColor,
+            downColor: chartSettings.downColor,
+            thinBars: chartSettings.useThinBars,
+            lastValueVisible: false,
+            priceLineVisible: false,
+            priceLineStyle: 2,
+            priceLineColor: "purple",
+          });
     setPriceSeries(newPriceSeries);
 
     chart.subscribeClick((param) => {
@@ -464,7 +466,7 @@ const CustomizablePriceChart: React.FC<CustomizablePriceChartProps> = ({
     });
 
     chartRef.current.timeScale().setVisibleLogicalRange({
-      from: candles.length - 80,
+      from: candles.length - 100,
       to: candles.length,
     });
     chartRef.current.timeScale().applyOptions({
