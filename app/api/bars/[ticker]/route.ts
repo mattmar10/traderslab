@@ -33,7 +33,7 @@ export async function GET(
       {
         next: { revalidate: 0 }, // Revalidate every 60 seconds
       },
-      3
+      0
     );
 
     return NextResponse.json(data);

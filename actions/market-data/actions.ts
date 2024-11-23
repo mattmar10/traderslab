@@ -18,6 +18,10 @@ import {
 } from "@/lib/types/fmp-types";
 import { CurrentDayMarketBreadthSnapshot } from "@/lib/types/market-breadth-types";
 import {
+  MarketOverviewPerformanceResponse,
+  MarketOverviewPerformanceResponseSchema,
+} from "@/lib/types/submarkets-sectors-themes-types";
+import {
   dateSringToMillisSinceEpochInET,
   formatDateToEST,
 } from "@/lib/utils/epoch-utils";
@@ -394,6 +398,43 @@ export async function getBreadthOvervewSnapshot(): Promise<
   } catch (error) {
     console.log(error);
     const dataError: FMPDataLoadingError = `Unable to fetch all trend models`;
+    return dataError;
+  }
+}
+
+export async function getSubMarketsSectorsThemesData(): Promise<
+  MarketOverviewPerformanceResponse | FMPDataLoadingError
+> {
+  if (!process.env.TRADERS_LAB_API) {
+    return Promise.resolve("TRADERS_LAB_API must be specified");
+  }
+
+  const url = `${process.env.TRADERS_LAB_API}/market-performance`;
+
+  try {
+    const response = await fetch(url, { next: { revalidate: 0 } });
+
+    if (!response.ok) {
+      const message = `Error fetching breadth snapshot overview`;
+      console.error(message);
+      console.error(JSON.stringify(response));
+      return message;
+    }
+
+    const rawData = await response.json();
+
+    // Use Zod to parse and validate the data
+    const validatedData =
+      MarketOverviewPerformanceResponseSchema.safeParse(rawData);
+
+    if (!validatedData.success) {
+      console.error("Data validation failed:", validatedData.error);
+      return "Data validation failed";
+    }
+
+    return validatedData.data;
+  } catch (error) {
+    const dataError: FMPDataLoadingError = `Unable to fetch market breadth`;
     return dataError;
   }
 }
