@@ -110,7 +110,7 @@ export const navItems: NavItem[] = [
     items: [
       {
         title: "Sectors and Themes",
-        url: "/sectors-and-themes",
+        url: "/sectors-themes",
         icon: "userPen",
       },
       {
