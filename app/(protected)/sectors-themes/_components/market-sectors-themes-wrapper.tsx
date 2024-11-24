@@ -11,6 +11,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FMPHistoricalResultsSchema } from "@/lib/types/fmp-types";
 import { formatDateToEST } from "@/lib/utils/epoch-utils";
 import Loading from "@/components/loading";
+import { rankMarketData } from "../utils";
+import RankedMarketDataGrid from "./ranked-etf-data-grid";
 
 export interface ReturnsData {
   date: string;
@@ -59,13 +61,10 @@ const calculateMarketData = (
   Object.entries(candles).forEach(([ticker, tickerCandles]) => {
     //if (ticker === 'RSP') return; // Skip RSP for market data array as it's just for comparison
 
-    // Calculate returns (existing logic)
     returns[ticker] = calculateReturns(tickerCandles);
 
-    // Get the most recent candle
     const latestCandle = tickerCandles[tickerCandles.length - 1];
 
-    // Find relevant historical candles for different timeframes
     const findHistoricalCandle = (daysAgo: number) => {
       const targetDate = new Date(latestCandle.date);
       targetDate.setDate(targetDate.getDate() - daysAgo);
@@ -134,7 +133,6 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
   const resolvedTheme = (theme as "light" | "dark") || "light";
 
   const tickers = useMemo(() => {
-    // Create a Set with RSP and all tickers from data to ensure uniqueness
     const uniqueTickers = new Set(["RSP", ...data.map((d) => d.ticker)]);
     return Array.from(uniqueTickers);
   }, [data]);
@@ -144,7 +142,6 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
       RSP: "S&P 500 Equal Weight",
     };
 
-    // Add names from data
     data.forEach((d) => {
       names[d.ticker] = d.name;
     });
@@ -180,7 +177,6 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
     now.getDate()
   );
 
-  // Now use these directly in useQueries
   const tickerQueries = useQueries({
     queries: tickers.map((ticker) => ({
       queryKey: ["daily", ticker],
@@ -238,7 +234,11 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
     return <Loading />;
   }
 
-  console.log(processedData)
+
+  let sortedData: EtfMarketData[] = []
+  if (processedData && processedData?.marketData.length > 6) {
+    sortedData = rankMarketData([...processedData?.marketData].filter(d => d.ticker !== 'RSP'), true)
+  }
 
   return (
     <div className="flex-col space-y-2">
@@ -257,6 +257,8 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
           </div>
         )}
       </div>
+      {sortedData.length > 0 && <RankedMarketDataGrid theme={resolvedTheme} rankedData={sortedData.slice(0, 10)}
+        title={title} />}
       <Card>
         <CardHeader className="p-3"></CardHeader>
         <CardContent>
