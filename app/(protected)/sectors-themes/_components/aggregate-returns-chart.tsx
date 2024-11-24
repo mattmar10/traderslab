@@ -13,36 +13,44 @@ import {
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { ReturnsData } from "./market-sectors-themes-wrapper";
 
-interface Returns {
-  date: string;
-  dailyReturn: number;
-  cumulativeReturn: number;
+interface TimeframeOption {
+  label: string;
+  months: number;
 }
 
+const TIMEFRAME_OPTIONS: TimeframeOption[] = [
+  { label: "1M", months: 1 },
+  { label: "3M", months: 3 },
+  { label: "6M", months: 6 },
+  { label: "1Y", months: 12 },
+];
+
 interface AggregateReturnsChartProps {
-  returnsData: Record<string, Returns[]>;
+  returnsData: Record<string, ReturnsData[]>;
   title?: string;
   returnType?: "daily" | "cumulative";
-  startDate?: Date;
   endDate?: Date;
   colorMap?: Record<string, string>;
   tickerNames: Record<string, string>;
 }
 
 const DEFAULT_COLORS = [
-  "#2563eb", // blue-600
-  "#dc2626", // red-600
-  "#16a34a", // green-600
-  "#9333ea", // purple-600
-  "#ea580c", // orange-600
-  "#0891b2", // cyan-600
+  "#2563eb",
+  "#dc2626",
+  "#16a34a",
+  "#9333ea",
+  "#ea580c",
+  "#0891b2",
 ];
 
 const CustomTooltip = ({
@@ -51,13 +59,16 @@ const CustomTooltip = ({
   label,
   config,
   tickerNames,
+  isRelativeStrength,
 }: any) => {
   if (!active || !payload || !payload.length || !config) return null;
+
+  const sortedPayload = [...payload].sort((a, b) => b.value - a.value);
 
   return (
     <div className="bg-background p-3 border rounded-lg shadow-lg">
       <p className="font-medium mb-2">{label}</p>
-      {payload.map((entry: any) => (
+      {sortedPayload.map((entry: any) => (
         <div
           key={entry.dataKey}
           className="flex items-center justify-between gap-4"
@@ -71,7 +82,7 @@ const CustomTooltip = ({
             <span>{` - ${tickerNames?.[entry.dataKey] || entry.dataKey}`}</span>
           </div>
           <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground">
-            {entry.value?.toFixed(2)}%
+            {isRelativeStrength ? entry.value?.toFixed(4) : `${entry.value?.toFixed(2)}%`}
           </div>
         </div>
       ))}
@@ -83,13 +94,77 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
   returnsData,
   title = "Returns Comparison",
   returnType = "cumulative",
-  startDate,
-  endDate,
+  endDate = new Date(),
   colorMap = {},
   tickerNames,
 }) => {
-  // Process the data for the chart
+  const [selectedTickers, setSelectedTickers] = useState<string[]>(
+    Object.keys(returnsData)
+  );
+  const [isRelativeStrength, setIsRelativeStrength] = useState(false);
+  const [selectedTimeframe, setSelectedTimeframe] = useState<TimeframeOption>(
+    TIMEFRAME_OPTIONS[3]
+  );
+
+  const getTickDates = (data: any[], timeframe: TimeframeOption) => {
+    if (!data.length) return [];
+
+    // For 12M view, use monthly ticks
+    if (timeframe.months === 12) {
+      return data.reduce((acc, item) => {
+        const monthYear = item.date.substring(0, 7);
+        if (!acc.has(monthYear)) {
+          acc.set(monthYear, item.date);
+        }
+        return acc;
+      }, new Map<string, string>());
+    }
+
+    // For 1M view, use daily ticks
+    if (timeframe.months === 1) {
+      return data.reduce((acc, item) => {
+        acc.set(item.date, item.date);
+        return acc;
+      }, new Map<string, string>());
+    }
+
+    // For 3M and 6M timeframes, use bi-weekly ticks
+    const twoWeeksMs = 14 * 24 * 60 * 60 * 1000;
+    const dates = data.map(item => new Date(item.date));
+    const startDate = dates[0];
+    const endDate = dates[dates.length - 1];
+
+    const ticks = new Map<string, string>();
+    let currentDate = new Date(startDate);
+
+    while (currentDate <= endDate) {
+      // Find the closest actual data point to this tick
+      const closest = data.reduce((prev, curr) => {
+        const prevDate = new Date(prev.date);
+        const currDate = new Date(curr.date);
+        const prevDiff = Math.abs(prevDate.getTime() - currentDate.getTime());
+        const currDiff = Math.abs(currDate.getTime() - currentDate.getTime());
+        return currDiff < prevDiff ? curr : prev;
+      });
+
+      ticks.set(currentDate.toISOString(), closest.date);
+
+      // Move to next tick
+      currentDate = new Date(currentDate.getTime() + twoWeeksMs);
+    }
+
+    return ticks;
+  };
+
+  const calculateStartDate = React.useCallback((timeframe: TimeframeOption) => {
+    const date = new Date(endDate);
+    date.setMonth(date.getMonth() - timeframe.months);
+    return date;
+  }, [endDate]);
+
   const processedData = React.useMemo(() => {
+    const startDate = calculateStartDate(selectedTimeframe);
+
     // Get all unique dates across all tickers
     const allDates = new Set<string>();
     Object.values(returnsData).forEach((returns) => {
@@ -98,34 +173,65 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
 
     const sortedDates = Array.from(allDates)
       .map((date) => new Date(date))
-      .sort((a, b) => a.getTime() - b.getTime());
+      .sort((a, b) => a.getTime() - b.getTime())
+      .filter((date) => date >= startDate && date <= endDate);
 
-    // Filter dates if start/end dates are provided
-    const filteredDates = sortedDates.filter((date) => {
-      if (startDate && date < startDate) return false;
-      if (endDate && date > endDate) return false;
-      return true;
+    // Find starting prices for each ticker at the start date
+    const startingPrices: Record<string, number> = {};
+    Object.entries(returnsData).forEach(([ticker, returns]) => {
+      // Find the closest date to startDate
+      const startPoint = returns
+        .filter(r => new Date(r.date) >= startDate)
+        .sort((a, b) => Math.abs(new Date(a.date).getTime() - startDate.getTime()) -
+          Math.abs(new Date(b.date).getTime() - startDate.getTime()))[0];
+
+      if (startPoint) {
+        startingPrices[ticker] = startPoint.price;
+      }
     });
 
-    return filteredDates.map((date) => {
+    return sortedDates.map((date) => {
       const dataPoint: Record<string, any> = {
         date: date.toISOString().split("T")[0],
       };
 
-      Object.entries(returnsData).forEach(([ticker, returns]) => {
-        const returnForDate = returns.find(
-          (r) => new Date(r.date).toISOString().split("T")[0] === dataPoint.date
+      if (isRelativeStrength) {
+        const rspData = returnsData["RSP"]?.find(
+          (r) => new Date(r.date).getTime() === date.getTime()
         );
-        dataPoint[ticker] = returnForDate
-          ? returnType === "daily"
-            ? returnForDate.dailyReturn
-            : returnForDate.cumulativeReturn
-          : null;
-      });
+        const rspPrice = rspData?.price;
+
+        Object.entries(returnsData).forEach(([ticker, returns]) => {
+          const returnForDate = returns.find(
+            (r) => new Date(r.date).getTime() === date.getTime()
+          );
+
+          if (returnForDate?.price && rspPrice) {
+            dataPoint[ticker] = returnForDate.price / rspPrice;
+          } else {
+            dataPoint[ticker] = null;
+          }
+        });
+      } else {
+        // Calculate returns relative to the timeframe start
+        Object.entries(returnsData).forEach(([ticker, returns]) => {
+          const returnForDate = returns.find(
+            (r) => new Date(r.date).getTime() === date.getTime()
+          );
+
+          if (returnForDate?.price && startingPrices[ticker]) {
+            // Calculate return relative to the timeframe start
+            const periodReturn = ((returnForDate.price - startingPrices[ticker]) / startingPrices[ticker]) * 100;
+            dataPoint[ticker] = periodReturn;
+          } else {
+            dataPoint[ticker] = null;
+          }
+        });
+      }
 
       return dataPoint;
     });
-  }, [returnsData, returnType, startDate, endDate]);
+  }, [returnsData, returnType, endDate, selectedTimeframe, isRelativeStrength]);
 
   const chartConfig = React.useMemo(() => {
     const config: ChartConfig = {};
@@ -137,25 +243,13 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
       };
     });
     return config;
-  }, [returnsData, colorMap]);
+  }, [returnsData, colorMap, tickerNames]);
 
-  const monthlyTicks = React.useMemo(() => {
-    if (!processedData.length) return [];
+  const chartTicks: string[] = React.useMemo(() => {
+    const ticks = getTickDates(processedData, selectedTimeframe);
+    return Array.from(ticks.values());
+  }, [processedData, selectedTimeframe]);
 
-    const monthTicks = processedData.reduce((acc, item) => {
-      const monthYear = item.date.substring(0, 7);
-      if (!acc.has(monthYear)) {
-        acc.set(monthYear, item.date);
-      }
-      return acc;
-    }, new Map<string, string>());
-
-    return Array.from(monthTicks.values()) as string[];
-  }, [processedData]);
-
-  const [selectedTickers, setSelectedTickers] = useState<string[]>(
-    Object.keys(returnsData)
-  );
 
   const handleTickerToggle = (ticker: string) => {
     setSelectedTickers((prevSelectedTickers) => {
@@ -170,7 +264,50 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>{title}</CardTitle>
+            <CardDescription>
+              {isRelativeStrength
+                ? "Showing relative strength (price relative to RSP)"
+                : `Showing returns for ${selectedTimeframe.label}`}
+            </CardDescription>
+          </div>
+          <div className="flex items-center gap-8">
+            <div className="flex items-center gap-1">
+              {TIMEFRAME_OPTIONS.map((timeframe) => (
+                <Button
+                  key={timeframe.label}
+                  variant={timeframe === selectedTimeframe ? "secondary" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedTimeframe(timeframe)}
+                >
+                  {timeframe.label}
+                </Button>
+              ))}
+            </div>
+            <div className="flex items-center space-x-2">
+              <span
+                className={`text-sm transition-colors duration-200 ${!isRelativeStrength ? 'text-foreground' : 'text-muted-foreground'
+                  }`}
+              >
+                Returns
+              </span>
+              <Switch
+                checked={isRelativeStrength}
+                onCheckedChange={setIsRelativeStrength}
+                id="chart-mode"
+                className="mx-2"
+              />
+              <span
+                className={`text-sm transition-colors duration-200 ${isRelativeStrength ? 'text-foreground' : 'text-muted-foreground'
+                  }`}
+              >
+                Relative Strength
+              </span>
+            </div>
+          </div>
+        </div>
       </CardHeader>
 
       <CardContent>
@@ -188,19 +325,30 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
             }}
           >
             <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" />
-            <ReferenceLine y={0} stroke="#999" strokeWidth={1.5} />
-
+            <ReferenceLine
+              y={isRelativeStrength ? 1 : 0}
+              stroke="#999"
+              strokeWidth={1.5}
+            />
             <XAxis
               dataKey="date"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              ticks={monthlyTicks}
+              ticks={chartTicks}
               tickFormatter={(value) => {
                 const date = new Date(value);
+                // For 12M view, show month and year
+                if (selectedTimeframe.months === 12) {
+                  return date.toLocaleDateString("en-US", {
+                    month: "short",
+                    year: "2-digit",
+                  });
+                }
+                // For shorter timeframes, show month and day
                 return date.toLocaleDateString("en-US", {
                   month: "short",
-                  year: "2-digit",
+                  day: "numeric",
                 });
               }}
             />
@@ -208,44 +356,20 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => `${value.toFixed(1)}%`}
+              tickFormatter={(value) =>
+                isRelativeStrength ? value.toFixed(2) : `${value.toFixed(1)}%`
+              }
             />
             <Tooltip
               content={
-                <CustomTooltip config={chartConfig} tickerNames={tickerNames} />
+                <CustomTooltip
+                  config={chartConfig}
+                  tickerNames={tickerNames}
+                  isRelativeStrength={isRelativeStrength}
+                />
               }
               cursor={{ strokeDasharray: "3 3" }}
             />
-            {/*<ChartTooltip
-              content={
-                <ChartTooltipContent
-                  hideLabel
-                  className="w-[325px] p-2"
-                  formatter={(value, name, item, index) => (
-                    <>
-                      <div
-                        className="h-2.5 w-2.5 shrink-0 rounded-[2px] bg-[--color-bg]"
-                        style={
-                          {
-                            "--color-bg": `var(--color-${name})`,
-                          } as React.CSSProperties
-                        }
-                      />
-                      <span className="font-semibold">{name}</span>
-                      {chartConfig[name as keyof typeof chartConfig]?.label}
-                      <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground">
-                        {value}
-                        <span className="font-normal text-muted-foreground">
-                          %
-                        </span>
-                      </div>
-                    </>
-                  )}
-                />
-              }
-              cursor={false}
-              defaultIndex={1}
-            />*/}
             {Object.keys(returnsData).map((ticker) => (
               <Line
                 key={ticker}
@@ -263,9 +387,10 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
         </ChartContainer>
       </CardContent>
       <CardFooter>
-        <div>
-          <div className="flex flex-wrap gap-2 mb-4">
-            {Object.keys(returnsData).map((ticker) => (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {Object.keys(returnsData)
+            .sort((a, b) => (tickerNames[a] || a).localeCompare(tickerNames[b] || b))
+            .map((ticker) => (
               <Button
                 key={ticker}
                 variant={
@@ -277,7 +402,6 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
                 {tickerNames?.[ticker] || ticker}
               </Button>
             ))}
-          </div>
         </div>
       </CardFooter>
     </Card>
