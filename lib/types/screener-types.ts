@@ -116,6 +116,17 @@ export interface FilterGroupDTO {
   filterGroup: FilterGroup;
 }
 
+export const EtfHoldingSchema = z.object({
+  asset: z.string(),
+  name: z.string(),
+  sharesNumber: z.number(),
+  weightPercentage: z.number(),
+});
+
+export type EtfHolding = z.infer<typeof EtfHoldingSchema>;
+
+
+
 const SymbolWithStatsSchema = z.object({
   profile: FMPSymbolProfileDataSchema,
   quote: QuoteElementSchema,
@@ -154,6 +165,20 @@ export type SymbolWithStatsWithRank = z.infer<
   typeof SymbolWithStatsWithRankSchema
 >;
 
+export const EtfHoldingWithStatsSchema = EtfHoldingSchema.merge(
+  SymbolWithStatsSchema
+);
+
+export type EtfHoldingWithStats = z.infer<typeof EtfHoldingWithStatsSchema>;
+
+const EtfHoldingWithStatsWithRankSchema = EtfHoldingWithStatsSchema.extend({
+  rsRank: z.number(),
+});
+
+export type EtfHoldingWithStatsWithRank = z.infer<
+  typeof EtfHoldingWithStatsWithRankSchema
+>;
+
 export const ScreenerRangesSchema = z.object({
   countries: z.array(z.string()),
   priceRange: z.tuple([z.number(), z.number()]),
@@ -181,6 +206,19 @@ export const ScreenerRangesSchema = z.object({
 });
 
 export type ScreenerRanges = z.infer<typeof ScreenerRangesSchema>;
+
+export const EtfScreenerResultsSchema = z.object({
+  holdings: z.array(EtfHoldingWithStatsWithRankSchema),
+  ranges: ScreenerRangesSchema,
+  total: z.number(),
+  pages: z.number(),
+  currentPage: z.number(),
+  pageSize: z.number(),
+});
+
+export type EtfScreenerResults = z.infer<
+  typeof EtfScreenerResultsSchema
+>;
 
 export const ScreenerResultsSchema = z.object({
   stocks: z.array(SymbolWithStatsWithRankSchema),
