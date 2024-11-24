@@ -12,18 +12,14 @@ import { FMPHistoricalResultsSchema } from "@/lib/types/fmp-types";
 import { formatDateToEST } from "@/lib/utils/epoch-utils";
 import Loading from "@/components/loading";
 
-interface Returns {
+export interface ReturnsData {
   date: string;
   dailyReturn: number;
   cumulativeReturn: number;
+  price: number
 }
 
-interface ProcessedData {
-  candles: Record<string, Candle[]>;
-  returns: Record<string, Returns[]>;
-}
-
-const calculateReturns = (candles: Candle[]): Returns[] => {
+const calculateReturns = (candles: Candle[]): ReturnsData[] => {
   if (!candles.length) return [];
 
   return candles.map((candle, index) => {
@@ -31,8 +27,8 @@ const calculateReturns = (candles: Candle[]): Returns[] => {
       index === 0
         ? 0
         : ((candle.close - candles[index - 1].close) /
-            candles[index - 1].close) *
-          100;
+          candles[index - 1].close) *
+        100;
 
     // Calculate cumulative return from the first day
     const cumulativeReturn =
@@ -42,9 +38,88 @@ const calculateReturns = (candles: Candle[]): Returns[] => {
       date: candle.dateStr!,
       dailyReturn: Number(dailyReturn.toFixed(2)),
       cumulativeReturn: Number(cumulativeReturn.toFixed(2)),
+      price: candle.close
     };
   });
 };
+
+interface MarketDataCalculations {
+  returns: Record<string, ReturnsData[]>;
+  marketData: EtfMarketData[];
+}
+
+const calculateMarketData = (
+  candles: Record<string, Candle[]>,
+  tickerNames: Record<string, string>
+): MarketDataCalculations => {
+  const returns: Record<string, ReturnsData[]> = {};
+  const marketData: EtfMarketData[] = [];
+
+  // Process each ticker's data
+  Object.entries(candles).forEach(([ticker, tickerCandles]) => {
+    if (ticker === 'RSP') return; // Skip RSP for market data array as it's just for comparison
+
+    // Calculate returns (existing logic)
+    returns[ticker] = calculateReturns(tickerCandles);
+
+    // Get the most recent candle
+    const latestCandle = tickerCandles[tickerCandles.length - 1];
+
+    // Find relevant historical candles for different timeframes
+    const findHistoricalCandle = (daysAgo: number) => {
+      const targetDate = new Date(latestCandle.date);
+      targetDate.setDate(targetDate.getDate() - daysAgo);
+
+      return tickerCandles.reduce((closest, candle) => {
+        if (!closest) return candle;
+        const closestDiff = Math.abs(closest.date - targetDate.getTime());
+        const currentDiff = Math.abs(candle.date - targetDate.getTime());
+        return currentDiff < closestDiff ? candle : closest;
+      });
+    };
+
+    const oneDayAgoCandle = findHistoricalCandle(1);
+    const oneWeekAgoCandle = findHistoricalCandle(7);
+    const oneMonthAgoCandle = findHistoricalCandle(30);
+    const threeMonthAgoCandle = findHistoricalCandle(90);
+    const sixMonthAgoCandle = findHistoricalCandle(180);
+
+    // Calculate percentages
+    const calculatePercentChange = (oldValue: number, newValue: number) =>
+      ((newValue - oldValue) / oldValue) * 100;
+
+    // Calculate ADRP (Average Daily Return Percentage) for the last month
+    const last30Days = tickerCandles.slice(-30);
+    const dailyReturns = last30Days.map((candle, index) =>
+      index === 0 ? 0 : calculatePercentChange(last30Days[index - 1].close, candle.close)
+    );
+    const oneMonthDailyADRP = dailyReturns.reduce((sum, ret) => sum + ret, 0) / dailyReturns.length;
+
+    // Find 52-week high and low
+    const yearCandles = tickerCandles.slice(-252); // Approximate trading days in a year
+    const fiftyTwoWeekHigh = Math.max(...yearCandles.map(c => c.high));
+    const fiftyTwoWeekLow = Math.min(...yearCandles.map(c => c.low));
+
+    // Create market data object
+    const marketDataEntry: EtfMarketData = {
+      ticker,
+      name: tickerNames[ticker],
+      percentDailyChange: calculatePercentChange(oneDayAgoCandle.close, latestCandle.close),
+      percentWeeklyChange: calculatePercentChange(oneWeekAgoCandle.close, latestCandle.close),
+      percentMonthlyChange: calculatePercentChange(oneMonthAgoCandle.close, latestCandle.close),
+      percentThreeMonthChange: calculatePercentChange(threeMonthAgoCandle.close, latestCandle.close),
+      percentSixMonthChange: calculatePercentChange(sixMonthAgoCandle.close, latestCandle.close),
+      percentFromFiftyTwoWeekLow: calculatePercentChange(fiftyTwoWeekLow, latestCandle.close),
+      percentFromFiftyTwoWeekHigh: calculatePercentChange(fiftyTwoWeekHigh, latestCandle.close),
+      oneMonthDailyADRP
+    };
+
+    marketData.push(marketDataEntry);
+  });
+
+  return { returns, marketData };
+};
+
 
 export interface MarketSectorsThemesWrapperProps {
   title: string;
@@ -123,10 +198,7 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
       return null;
     }
 
-    const processed: ProcessedData = {
-      candles: {},
-      returns: {},
-    };
+    const candlesData: Record<string, Candle[]> = {};
 
     tickerQueries.forEach((query, index) => {
       if (query.isSuccess && query.data) {
@@ -134,15 +206,13 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
         const sortedCandles = [...query.data].sort(
           (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
         );
-
-        processed.candles[ticker] = sortedCandles;
-        processed.returns[ticker] = calculateReturns(sortedCandles);
+        candlesData[ticker] = sortedCandles;
       }
     });
 
-    return processed;
-  }, [tickerQueries, tickers]);
-
+    // Calculate all market data from candles
+    return calculateMarketData(candlesData, tickerNames);
+  }, [tickerQueries, tickers, tickerNames]);
   const errors = tickerQueries
     .filter((query) => query.isError)
     .map((query) => query.error);
@@ -187,7 +257,9 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
       <Card>
         <CardHeader className="p-3"></CardHeader>
         <CardContent>
-          <MarketRankGroupAggregateTable data={data} />
+          {processedData && (
+            <MarketRankGroupAggregateTable data={processedData.marketData} />
+          )}
         </CardContent>
       </Card>
     </div>
