@@ -57,7 +57,7 @@ const calculateMarketData = (
 
   // Process each ticker's data
   Object.entries(candles).forEach(([ticker, tickerCandles]) => {
-    if (ticker === 'RSP') return; // Skip RSP for market data array as it's just for comparison
+    //if (ticker === 'RSP') return; // Skip RSP for market data array as it's just for comparison
 
     // Calculate returns (existing logic)
     returns[ticker] = calculateReturns(tickerCandles);
@@ -237,6 +237,9 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
   if (isLoading) {
     return <Loading />;
   }
+
+  console.log(processedData)
+
   return (
     <div className="flex-col space-y-2">
       <div>
@@ -244,7 +247,7 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
           <div className="mt-4 ">
             <AggregateReturnsChart
               returnsData={processedData.returns}
-              title={`${title} 1 Year Cumulative Returns Comparison`}
+              title={`${title} Cumulative Returns and Relative Strength Comparison`}
               returnType="cumulative"
               colorMap={{
                 RSP: resolvedTheme === "light" ? "#404040" : "#e5e7eb",

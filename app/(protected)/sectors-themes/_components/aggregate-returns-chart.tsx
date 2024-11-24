@@ -261,15 +261,16 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
     });
   };
 
+
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>{title}</CardTitle>
             <CardDescription>
               {isRelativeStrength
-                ? "Showing relative strength (price relative to RSP)"
+                ? "Showing relative strength (to RSP)"
                 : `Showing returns for ${selectedTimeframe.label}`}
             </CardDescription>
           </div>
