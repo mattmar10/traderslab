@@ -83,6 +83,15 @@ export async function getLeadingStocksForEtf(etfSymbol: string): Promise<EtfScre
     return getScreenerResultsForEtfFromFGId(etfSymbol, process.env.LEADING_STOCKS_FG_ID)
 }
 
+export async function getSettingUpStocksForEtf(etfSymbol: string): Promise<EtfScreenerResults> {
+
+    if (!process.env.SETTING_UP_STOCKS_FG_ID) {
+        throw new Error("SETTING_UP_STOCKS_FG_ID must be specified")
+    }
+
+    return getScreenerResultsForEtfFromFGId(etfSymbol, process.env.SETTING_UP_STOCKS_FG_ID)
+}
+
 
 async function getScreenerResultsForEtfFromFGId(etf: string, fgId: string): Promise<EtfScreenerResults> {
     const db = await getDatabaseInstance();
