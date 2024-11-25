@@ -26,6 +26,4 @@ export type MarketOverviewPerformanceResponse = z.infer<
 export type EtfMarketData = z.infer<typeof EtfMarketDataSchema>;
 export type RankedEtfMarketData = EtfMarketData & {
   rank: number;
-  score: number;
-  ptScore: number;
 };

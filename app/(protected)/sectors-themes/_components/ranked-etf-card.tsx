@@ -6,12 +6,10 @@ import {
 } from "@/components/ui/card";
 import { EtfMarketData } from "@/lib/types/submarkets-sectors-themes-types";
 import { useQuery } from "@tanstack/react-query";
-import { getLeadingStocksForEtf } from "@/actions/screener/actions";
+import { getLeadingStocksForEtf, getSettingUpStocksForEtf } from "@/actions/screener/actions";
 import { ChartSettings } from "@/components/settings/chart-settings";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import ScreenerMiniChartWrapper from "../../screener/_components/screener-result-minichart";
-import { Button } from "@/components/ui/button";
-
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 interface RankedEtfCardProps {
     rank: number;
@@ -21,20 +19,33 @@ interface RankedEtfCardProps {
 }
 
 const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, theme, chartSettings }) => {
-    const { data, error, isLoading } = useQuery({
+    const { data: leadersData, error: leadersError, isLoading: leadersIsLoading } = useQuery({
         queryKey: [`leading-stocks`, etf],
         queryFn: async () => {
             try {
                 const result = await getLeadingStocksForEtf(etf.ticker);
                 return result;
             } catch (error) {
-                console.error("Error fetching market performers for etf:", error);
+                console.error("Error fetching leaders for etf:", error);
                 throw error;
             }
         },
         refetchInterval: 120000,
     });
 
+    const { data: settingUpData, error: settingUpError, isLoading: settingUpIsLoading } = useQuery({
+        queryKey: [`setting-up-stocks`, etf],
+        queryFn: async () => {
+            try {
+                const result = await getSettingUpStocksForEtf(etf.ticker);
+                return result;
+            } catch (error) {
+                console.error("Error fetching setting up for etf:", error);
+                throw error;
+            }
+        },
+        refetchInterval: 120000,
+    });
 
     const currentDate = new Date();
     const twoYearsAgo = new Date(
@@ -46,7 +57,6 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, theme, chartSe
         0,
         0
     );
-
 
     return (
         <Card className="h-full">
@@ -60,50 +70,30 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, theme, chartSe
                 </div>
             </CardHeader>
             <CardContent className="p-4 pt-0">
-                {/*<div className="space-y-1">
-                    <div className="flex justify-between">
-                        <span className="text-sm">1M</span>
-                        <span className={`font-mono ${etf.percentMonthlyChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                            {etf.percentMonthlyChange.toFixed(1)}%
-                        </span>
-                    </div>
-                    <div className="flex justify-between">
-                        <span className="text-sm">3M</span>
-                        <span className={`font-mono ${etf.percentThreeMonthChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                            {etf.percentThreeMonthChange.toFixed(1)}%
-                        </span>
-                    </div>
-                    <div className="flex justify-between">
-                        <span className="text-sm">6M</span>
-                        <span className={`font-mono ${etf.percentSixMonthChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                            {etf.percentSixMonthChange.toFixed(1)}%
-                        </span>
-                    </div>
-                </div>*/}
-                {/* Holdings Section */}
                 <div className="mt-4">
-                    <div className="text-sm font-medium ">Leaders</div>
-                    {isLoading && (
-                        <div className="h-4 p-1 bg-muted animate-pulse rounded w-full" />)}
-                    {error && (
+                    <div className="text-sm font-medium">Leaders</div>
+                    {leadersIsLoading && (
+                        <div className="h-4 p-1 bg-muted animate-pulse rounded w-full" />
+                    )}
+                    {leadersError && (
                         <div className="text-sm text-red-500">
-                            Error loading holdings
+                            Error loading leaders
                         </div>
                     )}
-                    {data && (
+                    {leadersData && (
                         <div className="text-sm">
-                            {(!data?.holdings || data.holdings.length === 0) ? (
+                            {(!leadersData?.holdings || leadersData.holdings.length === 0) ? (
                                 <span className="text-muted-foreground">N/A</span>
                             ) : (
-                                data.holdings.slice(0, 5).map((holding, index) => (
+                                leadersData.holdings.slice(0, 5).map((holding, index) => (
                                     <span key={`${holding.asset}-${index}`} className="inline">
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <Button variant={'link'} className="p-0 h-auto min-h-0 font-normal leading-none">
+                                        <HoverCard>
+                                            <HoverCardTrigger>
+                                                <span className="text-primary hover:underline cursor-pointer">
                                                     {holding.asset}
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-[52rem] p-4">
+                                                </span>
+                                            </HoverCardTrigger>
+                                            <HoverCardContent className="w-[52rem] p-4">
                                                 <div className="space-y-2">
                                                     <ScreenerMiniChartWrapper
                                                         item={holding}
@@ -112,9 +102,9 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, theme, chartSe
                                                         startDate={twoYearsAgo}
                                                     />
                                                 </div>
-                                            </PopoverContent>
-                                        </Popover>
-                                        {index < Math.min(data.holdings.length - 1, 4) && (
+                                            </HoverCardContent>
+                                        </HoverCard>
+                                        {index < Math.min(leadersData.holdings.length - 1, 4) && (
                                             <span className="text-muted-foreground">, </span>
                                         )}
                                     </span>
@@ -122,6 +112,49 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, theme, chartSe
                             )}
                         </div>
                     )}
+
+                    <div className="text-sm font-medium mt-2">Setting Up</div>
+                    {settingUpIsLoading && (
+                        <div className="h-4 p-1 bg-muted animate-pulse rounded w-full" />
+                    )}
+                    {settingUpError && (
+                        <div className="text-sm text-red-500">
+                            Error loading setting up stocks
+                        </div>
+                    )}
+                    {settingUpData && (
+                        <div className="text-sm">
+                            {(!settingUpData?.holdings || settingUpData.holdings.length === 0) ? (
+                                <span className="text-muted-foreground">N/A</span>
+                            ) : (
+                                settingUpData.holdings.slice(0, 5).map((holding, index) => (
+                                    <span key={`${holding.asset}-${index}`} className="inline">
+                                        <HoverCard>
+                                            <HoverCardTrigger>
+                                                <span className="text-primary hover:underline cursor-pointer">
+                                                    {holding.asset}
+                                                </span>
+                                            </HoverCardTrigger>
+                                            <HoverCardContent className="w-[52rem] p-4">
+                                                <div className="space-y-2">
+                                                    <ScreenerMiniChartWrapper
+                                                        item={holding}
+                                                        chartSettings={chartSettings}
+                                                        theme={theme}
+                                                        startDate={twoYearsAgo}
+                                                    />
+                                                </div>
+                                            </HoverCardContent>
+                                        </HoverCard>
+                                        {index < Math.min(settingUpData.holdings.length - 1, 4) && (
+                                            <span className="text-muted-foreground">, </span>
+                                        )}
+                                    </span>
+                                ))
+                            )}
+                        </div>
+                    )}
+
                 </div>
             </CardContent>
         </Card>
@@ -129,4 +162,3 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, theme, chartSe
 };
 
 export default RankedEtfCard;
-

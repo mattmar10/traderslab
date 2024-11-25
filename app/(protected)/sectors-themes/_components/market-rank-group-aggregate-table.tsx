@@ -11,6 +11,7 @@ import {
   calculateColorFromPercentage,
   calculateColorFromPercentageInverted,
 } from "@/lib/utils/table-utils";
+import { calculateMarketPTScore, calculateMarketScore } from "../utils";
 
 export type SortableKeys =
   | "rank"
@@ -20,8 +21,7 @@ export type SortableKeys =
   | "percentThreeMonthChange"
   | "percentSixMonthChange"
   | "percentFromFiftyTwoWeekLow"
-  | "percentFromFiftyTwoWeekHigh"
-  | "ptScore";
+  | "percentFromFiftyTwoWeekHigh";
 
 const firaCode = Fira_Code({
   subsets: ["latin"],
@@ -98,7 +98,7 @@ export const MarketRankGroupAggregateTable: React.FC<
       });
     }
     return ranked;
-  }, [data, sortConfig.key, sortConfig.direction]);
+  }, [data, sortConfig, sortConfig.key, sortConfig.direction]);
 
   const getHeaderClass = (key: SortableKeys) => {
     if (!sortConfig || sortConfig.key !== key) return "";
@@ -368,23 +368,6 @@ export const MarketRankGroupAggregateTable: React.FC<
 
 export default MarketRankGroupAggregateTable;
 
-export function calculateMarketScore(data: EtfMarketData): number {
-  return (
-    20 * data.percentFromFiftyTwoWeekHigh +
-    2 * data.percentFromFiftyTwoWeekLow +
-    5 * data.percentMonthlyChange +
-    1 * data.percentWeeklyChange
-  );
-}
-
-export function calculateMarketPTScore(data: EtfMarketData): number {
-  return (
-    20 * (data.percentFromFiftyTwoWeekHigh / data.oneMonthDailyADRP) +
-    2 * (data.percentFromFiftyTwoWeekLow / data.oneMonthDailyADRP) +
-    5 * (data.percentMonthlyChange / data.oneMonthDailyADRP) +
-    1 * (data.percentWeeklyChange / data.oneMonthDailyADRP)
-  );
-}
 
 export function rankMarketData(
   marketDataArray: EtfMarketData[],
