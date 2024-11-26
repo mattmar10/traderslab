@@ -25,8 +25,6 @@ async function SymbolPageContent({ ticker }: SymbolPageContentProps) {
     )
   }
 
-
-
   const q: Quote = quoteData[0]
 
   return (
