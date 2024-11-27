@@ -27,9 +27,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { getSettingUpStocks } from "@/actions/screener/actions";
 import Link from "next/link";
+import { FMPDataLoadingError } from "@/lib/types/fmp-types";
+import { Either, isRight } from "@/lib/utils";
 
 export interface SettingUpStocksCardProps {
-  stocks: ScreenerResults;
+  stocks: Either<FMPDataLoadingError, ScreenerResults>;
 }
 
 const SettingUpStocksCard: React.FC<SettingUpStocksCardProps> = ({
@@ -71,7 +73,7 @@ const SettingUpStocksCard: React.FC<SettingUpStocksCardProps> = ({
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden">
         <ScrollArea className="h-full w-full overflow-auto mt-2 pb-4">
-          {data && data.stocks && data.stocks.length > 0 ? (
+          {data && isRight(data) && data.value.stocks && data.value.stocks.length > 0 ? (
             <Table>
               <TableHeader className="sticky top-0 bg-background z-10">
                 <TableRow>
@@ -85,7 +87,7 @@ const SettingUpStocksCard: React.FC<SettingUpStocksCardProps> = ({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.stocks.map((stock: SymbolWithStatsWithRank) => (
+                {data.value.stocks.map((stock: SymbolWithStatsWithRank) => (
                   <TableRow key={`${stock.profile.symbol}-setting-up`}>
                     <Link
                       href={`/symbol/${stock.profile.symbol}`}

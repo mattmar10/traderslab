@@ -8,3 +8,7 @@ export const rspColor = "#b58900"
 export const qqqeColor = "#cb4b16"
 export const iwmColor = "#6c71c4"
 
+
+
+export const solarizedMagenta = "#d33682"
+export const solarizedViolet = "#6c71c4"

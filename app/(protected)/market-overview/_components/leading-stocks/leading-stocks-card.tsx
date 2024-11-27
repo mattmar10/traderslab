@@ -27,13 +27,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { getLeadingStocks } from "@/actions/screener/actions";
 import Link from "next/link";
+import { FMPDataLoadingError } from "@/lib/types/fmp-types";
+import { Either, isLeft, isRight } from "@/lib/utils";
+import ErrorCard from "@/components/error-card";
 
 export interface LeadingStocksCardProps {
-  stocks: ScreenerResults;
+  stocks: Either<FMPDataLoadingError, ScreenerResults>;
 }
 
 const LeadingStocksCard: React.FC<LeadingStocksCardProps> = ({ stocks }) => {
-  const { data, error, isLoading, refetch } = useQuery({
+  const { data, error, isLoading } = useQuery({
     queryKey: [`leading-stocks`],
     queryFn: async () => {
       try {
@@ -45,7 +48,7 @@ const LeadingStocksCard: React.FC<LeadingStocksCardProps> = ({ stocks }) => {
       }
     },
     refetchInterval: 60000,
-    initialData: stocks,
+    initialData: stocks
   });
 
   if (isLoading) {
@@ -53,8 +56,9 @@ const LeadingStocksCard: React.FC<LeadingStocksCardProps> = ({ stocks }) => {
   }
 
   if (error || !data) {
-    return <ErrorState refetch={refetch} />;
+    return <ErrorCard errorMessage={"Unable to load leaders"} />;
   }
+
 
   return (
     <Card className="h-full min-h-[300px] max-h-[30vh] flex flex-col">
@@ -70,7 +74,7 @@ const LeadingStocksCard: React.FC<LeadingStocksCardProps> = ({ stocks }) => {
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden ">
         <ScrollArea className="h-full w-full overflow-auto mt-2 pb-4">
-          {data && data.stocks && data.stocks.length > 0 ? (
+          {data && isRight(data) && data.value.stocks.length > 0 ? (
             <Table>
               <TableHeader className="sticky top-0 bg-background z-10">
                 <TableRow>
@@ -84,7 +88,7 @@ const LeadingStocksCard: React.FC<LeadingStocksCardProps> = ({ stocks }) => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.stocks.map((stock: SymbolWithStatsWithRank) => (
+                {data.value.stocks.map((stock: SymbolWithStatsWithRank) => (
                   <TableRow key={`${stock.profile.symbol}-leading`}>
                     <Link
                       href={`/symbol/${stock.profile.symbol}`}

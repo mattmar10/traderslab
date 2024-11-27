@@ -14,7 +14,7 @@ export interface OverviewChartProps {
 const timeFrames = ['2Y', '1Y', '6M', '3M', '1M'];
 
 const OverviewChart: React.FC<OverviewChartProps> = ({ ticker, candles }) => {
-    const [timeFrame, setTimeFrame] = useState('1Y');
+    const [timeFrame, setTimeFrame] = useState('2Y');
     const [filteredCandles, setFilteredCandles] = useState<Candle[]>([]);
     const [timeFrameChanges, setTimeFrameChanges] = useState<{ [key: string]: number }>({});
 
@@ -86,7 +86,7 @@ const OverviewChart: React.FC<OverviewChartProps> = ({ ticker, candles }) => {
                         <div
                             key={frame}
                             onClick={() => setTimeFrame(frame)}
-                            className={`text-sm cursor-pointer border p-1 rounded text-center shadow-sm ${frame === timeFrame ? 'text-background bg-foreground  border-foreground' : 'hover:bg-accent/50 '
+                            className={`text-sm cursor-pointer border p-1 rounded text-center shadow-sm ${frame === timeFrame ? ' bg-accent  ' : 'hover:bg-accent/50 '
                                 }`}
                             style={{ minWidth: '80px' }}
                         >

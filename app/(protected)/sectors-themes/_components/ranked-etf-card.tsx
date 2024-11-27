@@ -10,6 +10,7 @@ import { getLeadingStocksForEtf, getSettingUpStocksForEtf } from "@/actions/scre
 import { ChartSettings } from "@/components/settings/chart-settings";
 import ScreenerMiniChartWrapper from "../../screener/_components/screener-result-minichart";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { isRight } from "@/lib/utils";
 
 interface RankedEtfCardProps {
     rank: number;
@@ -80,12 +81,12 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, theme, chartSe
                             Error loading leaders
                         </div>
                     )}
-                    {leadersData && (
+                    {leadersData && isRight(leadersData) && (
                         <div className="text-sm">
-                            {(!leadersData?.holdings || leadersData.holdings.length === 0) ? (
+                            {(!leadersData?.value.holdings || leadersData.value.holdings.length === 0) ? (
                                 <span className="text-muted-foreground">N/A</span>
                             ) : (
-                                leadersData.holdings.slice(0, 5).map((holding, index) => (
+                                leadersData.value.holdings.slice(0, 5).map((holding, index) => (
                                     <span key={`${holding.asset}-${index}`} className="inline">
                                         <HoverCard>
                                             <HoverCardTrigger>
@@ -104,7 +105,7 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, theme, chartSe
                                                 </div>
                                             </HoverCardContent>
                                         </HoverCard>
-                                        {index < Math.min(leadersData.holdings.length - 1, 4) && (
+                                        {index < Math.min(leadersData.value.holdings.length - 1, 4) && (
                                             <span className="text-muted-foreground">, </span>
                                         )}
                                     </span>
@@ -122,12 +123,12 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, theme, chartSe
                             Error loading setting up stocks
                         </div>
                     )}
-                    {settingUpData && (
+                    {settingUpData && isRight(settingUpData) && (
                         <div className="text-sm">
-                            {(!settingUpData?.holdings || settingUpData.holdings.length === 0) ? (
+                            {(!settingUpData?.value.holdings || settingUpData.value.holdings.length === 0) ? (
                                 <span className="text-muted-foreground">N/A</span>
                             ) : (
-                                settingUpData.holdings.slice(0, 5).map((holding, index) => (
+                                settingUpData.value.holdings.slice(0, 5).map((holding, index) => (
                                     <span key={`${holding.asset}-${index}`} className="inline">
                                         <HoverCard>
                                             <HoverCardTrigger>
@@ -146,7 +147,7 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, theme, chartSe
                                                 </div>
                                             </HoverCardContent>
                                         </HoverCard>
-                                        {index < Math.min(settingUpData.holdings.length - 1, 4) && (
+                                        {index < Math.min(settingUpData.value.holdings.length - 1, 4) && (
                                             <span className="text-muted-foreground">, </span>
                                         )}
                                     </span>
