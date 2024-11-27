@@ -1,29 +1,31 @@
 "use server"
 import { filterGroups } from "@/drizzle/schema";
 import { getDatabaseInstance } from "@/lib/db";
+import { FMPDataLoadingError } from "@/lib/types/fmp-types";
 import { EtfScreenerResults, EtfScreenerResultsSchema, FilterGroup, ScreenerResults, ScreenerResultsSchema } from "@/lib/types/screener-types";
+import { Either, Right, Left } from "@/lib/utils";
 import { eq } from "drizzle-orm";
 
-export async function getLeadingStocks(): Promise<ScreenerResults> {
+export async function getLeadingStocks(): Promise<Either<FMPDataLoadingError, ScreenerResults>> {
 
     if (!process.env.LEADING_STOCKS_FG_ID) {
-        throw new Error("LEADING_STOCKS_FG_ID must be specified")
+        return Left("LEADING_STOCKS_FG_ID must be specified")
     }
 
     return getScreenerResultsFromFGId(process.env.LEADING_STOCKS_FG_ID)
 }
 
-export async function getSettingUpStocks(): Promise<ScreenerResults> {
+export async function getSettingUpStocks(): Promise<Either<FMPDataLoadingError, ScreenerResults>> {
 
     if (!process.env.SETTING_UP_STOCKS_FG_ID) {
-        throw new Error("SETTING_UP_STOCKS_FG_ID must be specified")
+        return Left("SETTING_UP_STOCKS_FG_ID must be specified")
     }
 
     return getScreenerResultsFromFGId(process.env.SETTING_UP_STOCKS_FG_ID)
 }
 
 
-async function getScreenerResultsFromFGId(fgId: string): Promise<ScreenerResults> {
+async function getScreenerResultsFromFGId(fgId: string): Promise<Either<FMPDataLoadingError, ScreenerResults>> {
     const db = await getDatabaseInstance();
 
     const filterGroupRecord = await db
@@ -34,7 +36,7 @@ async function getScreenerResultsFromFGId(fgId: string): Promise<ScreenerResults
 
 
     if (!filterGroupRecord || filterGroupRecord.length === 0) {
-        throw new Error("Filter group not found");
+        return Left("Filter group not found");
     }
 
     // Access the payload from the first record
@@ -42,7 +44,7 @@ async function getScreenerResultsFromFGId(fgId: string): Promise<ScreenerResults
 
     // Check if `filters` is defined in the payload
     if (!filterGroup.filters) {
-        throw new Error("Filters not found in filter group payload");
+        return Left("Filters not found in filter group payload");
     }
 
     const url = `${process.env.TRADERS_LAB_API}/market-performance/stocks`;
@@ -57,24 +59,24 @@ async function getScreenerResultsFromFGId(fgId: string): Promise<ScreenerResults
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            return Left(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
         const parsed = ScreenerResultsSchema.safeParse(data);
 
         if (parsed.success) {
-            return parsed.data;
+            return Right(parsed.data);
         } else {
-            throw new Error("Schema validation failed: unable to parse data");
+            return Left("Schema validation failed: unable to parse data");
         }
     } catch (error) {
         console.error("Error:", error);
-        throw new Error("Unable to fetch Leading Stocks");
+        return Left("Unable to fetch Leading Stocks");
     }
 }
 
-export async function getLeadingStocksForEtf(etfSymbol: string): Promise<EtfScreenerResults> {
+export async function getLeadingStocksForEtf(etfSymbol: string): Promise<Either<FMPDataLoadingError, EtfScreenerResults>> {
 
     if (!process.env.LEADING_STOCKS_FG_ID) {
         throw new Error("LEADING_STOCKS_FG_ID must be specified")
@@ -83,7 +85,7 @@ export async function getLeadingStocksForEtf(etfSymbol: string): Promise<EtfScre
     return getScreenerResultsForEtfFromFGId(etfSymbol, process.env.LEADING_STOCKS_FG_ID)
 }
 
-export async function getSettingUpStocksForEtf(etfSymbol: string): Promise<EtfScreenerResults> {
+export async function getSettingUpStocksForEtf(etfSymbol: string): Promise<Either<FMPDataLoadingError, EtfScreenerResults>> {
 
     if (!process.env.SETTING_UP_STOCKS_FG_ID) {
         throw new Error("SETTING_UP_STOCKS_FG_ID must be specified")
@@ -93,7 +95,7 @@ export async function getSettingUpStocksForEtf(etfSymbol: string): Promise<EtfSc
 }
 
 
-async function getScreenerResultsForEtfFromFGId(etf: string, fgId: string): Promise<EtfScreenerResults> {
+async function getScreenerResultsForEtfFromFGId(etf: string, fgId: string): Promise<Either<FMPDataLoadingError, EtfScreenerResults>> {
     const db = await getDatabaseInstance();
 
     const filterGroupRecord = await db
@@ -104,7 +106,7 @@ async function getScreenerResultsForEtfFromFGId(etf: string, fgId: string): Prom
 
 
     if (!filterGroupRecord || filterGroupRecord.length === 0) {
-        throw new Error("Filter group not found");
+        return Left("Filter group not found");
     }
 
     // Access the payload from the first record
@@ -112,7 +114,7 @@ async function getScreenerResultsForEtfFromFGId(etf: string, fgId: string): Prom
 
     // Check if `filters` is defined in the payload
     if (!filterGroup.filters) {
-        throw new Error("Filters not found in filter group payload");
+        return Left("Filters not found in filter group payload");
     }
 
     const url = `${process.env.TRADERS_LAB_API}/market-performance/etf/${etf}`;
@@ -127,19 +129,19 @@ async function getScreenerResultsForEtfFromFGId(etf: string, fgId: string): Prom
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            return Left(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
         const parsed = EtfScreenerResultsSchema.safeParse(data);
 
         if (parsed.success) {
-            return parsed.data;
+            return Right(parsed.data);
         } else {
             throw new Error("Schema validation failed: unable to parse data");
         }
     } catch (error) {
         console.error("Error:", error);
-        throw new Error("Unable to fetch Leading Stocks");
+        return Left("Unable to fetch Leading Stocks");
     }
 }

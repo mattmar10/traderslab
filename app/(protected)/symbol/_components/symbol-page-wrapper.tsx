@@ -12,6 +12,7 @@ import { ChartSettings, defaultChartSettings } from "@/components/settings/chart
 import OverviewPageWrapper from "./overview/overview-wrapper";
 import { useQuery } from "@tanstack/react-query";
 import { FmpStockNewsList } from "@/lib/types/news-types";
+import RelativeStrengthWrapper from "./relative-strength/relative-strength-wrapper";
 
 export interface SymbolPageProps {
     quote: Quote,
@@ -94,7 +95,7 @@ const SymbolPageWrapper: React.FC<SymbolPageProps> = ({ quote, profile, candles,
                         <PriceChart ticker={profile.symbol} dailyCandles={sortedCandles} earningsDates={adjustedDates} theme={resolvedTheme} chartSettings={chartSettings} />
                     </TabsContent>
                     <TabsContent value="relative-strength">
-                        <div>rs</div>
+                        <RelativeStrengthWrapper quote={quote} profile={profile} candles={candles} startDate={startDate} />
                     </TabsContent>
                     <TabsContent value="financials">
                         <div>financials</div>
