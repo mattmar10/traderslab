@@ -18,18 +18,17 @@ import {
 } from "@/components/ui/table";
 
 import Loading from "@/components/loading";
-import { AlertCircle, Trophy } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import {
   ScreenerResults,
   SymbolWithStatsWithRank,
 } from "@/lib/types/screener-types";
-import { Button } from "@/components/ui/button";
 import { getLeadingStocks } from "@/actions/screener/actions";
 import Link from "next/link";
 import { FMPDataLoadingError } from "@/lib/types/fmp-types";
-import { Either, isLeft, isRight } from "@/lib/utils";
+import { Either, isRight } from "@/lib/utils";
 import ErrorCard from "@/components/error-card";
+import { Trophy } from "lucide-react";
 
 export interface LeadingStocksCardProps {
   stocks: Either<FMPDataLoadingError, ScreenerResults>;
@@ -146,30 +145,4 @@ const loadingState = (
   </Card>
 );
 
-interface ErrorStateProps {
-  refetch: () => void;
-}
-const ErrorState = ({ refetch }: ErrorStateProps) => (
-  <Card className="w-full min-h-[300px] max-h-[500px] h-[30vh] animate-in fade-in duration-500">
-    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-      <div className="space-y-1">
-        <CardTitle>Leading Stocks</CardTitle>
-        <CardDescription>TradersLab market leaders</CardDescription>
-      </div>
-      <Trophy className="h-5 w-5 text-muted-foreground" />
-    </CardHeader>
-    <CardContent className="h-[calc(100%-5rem)] flex items-center">
-      <div className="w-full flex flex-col items-center justify-center space-y-4 text-center">
-        <AlertCircle className="h-12 w-12 text-destructive animate-in zoom-in duration-300" />
-        <div className="text-lg font-semibold">Unable to load data</div>
-        <p className="text-muted-foreground max-w-[380px] mx-auto">
-          There was an issue retrieving the data. Please check your connection
-          and try again.
-        </p>
-        <Button onClick={() => refetch()} className="mt-2">
-          Retry
-        </Button>
-      </div>
-    </CardContent>
-  </Card>
-);
+

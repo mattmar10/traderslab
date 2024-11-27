@@ -12,3 +12,5 @@ export const iwmColor = "#6c71c4"
 
 export const solarizedMagenta = "#d33682"
 export const solarizedViolet = "#6c71c4"
+export const solarizedYellow = "#b58900"
+export const solarizedBlue = "#268bd2"

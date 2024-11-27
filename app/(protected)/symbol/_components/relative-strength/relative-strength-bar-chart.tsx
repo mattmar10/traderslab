@@ -1,10 +1,8 @@
-import { TrendingUp } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
@@ -44,9 +42,6 @@ const RelativeStrengthBarChart: React.FC<RelativeStrengthBarChartProps> = ({ rsD
         { period: "Comp", standard: rsData.relativeStrengthStats.composite, adjusted: rsData.volAdjustedRelativeStrengthStats.composite }
     ];
 
-    const compositeChange = ((rsData.relativeStrengthStats.composite - rsData.relativeStrengthStats.oneMonth) / rsData.relativeStrengthStats.oneMonth * 100).toFixed(1);
-    const isPositive = parseFloat(compositeChange) > 0;
-
     return (
         <Card>
             <CardHeader>
@@ -75,7 +70,15 @@ const RelativeStrengthBarChart: React.FC<RelativeStrengthBarChartProps> = ({ rsD
                                 content={<ChartTooltipContent indicator="dashed" />}
                             />
 
-                            <Legend />
+                            <Legend
+                                verticalAlign="bottom"
+                                height={36}
+                                payload={[
+                                    { value: "Relative Strength", type: "square", color: solarizedViolet },
+                                    { value: "Volatility Adj. Relative Strength", type: "square", color: solarizedMagenta }
+                                ]}
+                                wrapperStyle={{ bottom: -20 }}
+                            />
                             <Bar dataKey="standard" fill={solarizedViolet} radius={2} />
                             <Bar dataKey="adjusted" fill={solarizedMagenta} radius={2} />
                         </BarChart>

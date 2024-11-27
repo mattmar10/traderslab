@@ -1,14 +1,15 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts";
+import { LineChart, Line, CartesianGrid, Tooltip, XAxis, Legend } from "recharts";
 import { Card, CardContent, CardHeader, } from "@/components/ui/card";
 import { Candle } from '@/lib/types/basic-types';
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
+import { solarizedBlue } from '@/lib/utils/color-utils';
 
 export interface RSLineChartProps {
     symbol: string;
     symbolCandles: Candle[];
-    benchmark?: string;
+    benchmark: string;
     benchmarkCandles: Candle[];
 }
 
@@ -18,13 +19,12 @@ const MA_PERIOD = 20;
 const RSLineChart: React.FC<RSLineChartProps> = ({
     symbol,
     symbolCandles,
-    benchmark = 'RSP',
+    benchmark,
     benchmarkCandles
 }) => {
-    const [timeFrame, setTimeFrame] = useState('Y');
+    const [timeFrame, setTimeFrame] = useState('1Y');
     const [rsLineData, setRsLineData] = useState<any[]>([]);
 
-    // Calculate Moving Average
     const calculateMA = (data: number[], period: number) => {
         const result = [];
         for (let i = 0; i < data.length; i++) {
@@ -39,13 +39,11 @@ const RSLineChart: React.FC<RSLineChartProps> = ({
         return result;
     };
 
-    // Calculate RS Line data with MA
     const calculateRSLine = (symbolData: Candle[], benchmarkData: Candle[]) => {
         const benchmarkMap = new Map(
             benchmarkData.map(candle => [candle.dateStr!, candle.close])
         );
 
-        // Calculate basic RS values
         const rsData = symbolData
             .filter(candle => benchmarkMap.has(candle.dateStr!))
             .map(candle => ({
@@ -55,11 +53,9 @@ const RSLineChart: React.FC<RSLineChartProps> = ({
             }))
             .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-        // Calculate 20-period MA
         const rsValues = rsData.map(d => d.rsValue);
         const maValues = calculateMA(rsValues, MA_PERIOD);
 
-        // Add MA values
         return rsData.map((point, i) => ({
             ...point,
             ma20: maValues[i],
@@ -116,7 +112,7 @@ const RSLineChart: React.FC<RSLineChartProps> = ({
                 }}>
                     <LineChart
                         data={rsLineData}
-                        margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
+                        margin={{ top: 10, right: 20, left: 20, bottom: 10 }}
                     >
                         <XAxis
                             dataKey="dateStr"
@@ -133,9 +129,9 @@ const RSLineChart: React.FC<RSLineChartProps> = ({
                         />
 
                         <CartesianGrid
-                            strokeDasharray="3 3"
                             vertical={false}
-                            className="stroke-muted"
+                            stroke={"#94A3B8"}
+                            strokeOpacity={0.2}
                         />
                         <Tooltip
                             content={
@@ -157,10 +153,19 @@ const RSLineChart: React.FC<RSLineChartProps> = ({
                             }
                             cursor={{ stroke: "rgba(0, 0, 0, 0.2)" }}
                         />
+                        <Legend
+                            verticalAlign="bottom"
+                            height={36}
+                            payload={[
+                                { value: "RS Line", type: "line", color: solarizedBlue },
+                                { value: "20 SMA", type: "line", color: "#666" }
+                            ]}
+                            wrapperStyle={{ bottom: -20 }}
+                        />
                         <Line
                             type="monotone"
                             dataKey="rsValue"
-                            stroke="rgb(21, 128, 61)"
+                            stroke={solarizedBlue}
                             strokeWidth={2}
                             dot={false}
                         />

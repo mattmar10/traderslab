@@ -1,14 +1,14 @@
 "use client"
-import { getRelativeStrengthStatsForSymbol } from "@/actions/relative-strength/actions";
+
 import ErrorCard from "@/components/error-card";
 import Loading from "@/components/loading";
 import { Candle } from "@/lib/types/basic-types";
 import { FMPHistoricalResultsSchema, FullFMPProfile, isFMPDataLoadingError, Quote } from "@/lib/types/fmp-types";
 import { formatDateToEST } from "@/lib/utils/epoch-utils";
 import { useQuery } from "@tanstack/react-query";
-import RelativeStrengthCard from "./relative-strength-card";
 import RelativeStrengthBarChart from "./relative-strength-bar-chart";
 import RSLineChart from "./relative-strength-multitimeframe-chart";
+import { getRelativeStrengthStatsForSymbol } from "@/actions/relativer-strength/actions";
 
 export interface RelativeStrengthWrapperProps {
     quote: Quote,
@@ -17,7 +17,7 @@ export interface RelativeStrengthWrapperProps {
     startDate: Date
 }
 
-const RelativeStrengthWrapper: React.FC<RelativeStrengthWrapperProps> = ({ quote, profile, candles, startDate }) => {
+const RelativeStrengthWrapper: React.FC<RelativeStrengthWrapperProps> = ({ profile, candles, startDate }) => {
 
     const { data: rsData, error: rsError, isLoading: rsIsLoading } = useQuery({
         queryKey: [`relative-strength-stats`, profile.symbol],

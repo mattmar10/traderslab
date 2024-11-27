@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { RelativeStrengthResults, RelativeStrengthStats } from '@/lib/types/relative-strength-types';
+import { RelativeStrengthResults } from '@/lib/types/relative-strength-types';
 
 
 export interface RelativeStrengthCardProps {
