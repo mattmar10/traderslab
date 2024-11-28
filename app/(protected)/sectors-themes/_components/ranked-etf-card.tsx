@@ -11,15 +11,17 @@ import { ChartSettings } from "@/components/settings/chart-settings";
 import ScreenerMiniChartWrapper from "../../screener/_components/screener-result-minichart";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { isRight } from "@/lib/utils";
+import EtfReturnsRadarChart from "./etf-returns-radar-chart";
 
 interface RankedEtfCardProps {
     rank: number;
     etf: EtfMarketData;
+    allEtfs: EtfMarketData[];
     theme: "light" | "dark";
     chartSettings: ChartSettings
 }
 
-const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, theme, chartSettings }) => {
+const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, allEtfs, theme, chartSettings }) => {
     const { data: leadersData, error: leadersError, isLoading: leadersIsLoading } = useQuery({
         queryKey: [`leading-stocks`, etf],
         queryFn: async () => {
@@ -71,7 +73,10 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, theme, chartSe
                 </div>
             </CardHeader>
             <CardContent className="p-4 pt-0">
-                <div className="mt-4">
+                <div>
+                    <EtfReturnsRadarChart etf={etf} all={allEtfs} />
+                </div>
+                <div className="mt-2">
                     <div className="text-sm font-medium">Leaders</div>
                     {leadersIsLoading && (
                         <div className="h-4 p-1 bg-muted animate-pulse rounded w-full" />

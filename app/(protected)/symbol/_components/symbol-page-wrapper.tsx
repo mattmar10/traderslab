@@ -108,7 +108,7 @@ const SymbolPageWrapper: React.FC<SymbolPageProps> = ({
             <OverviewPageWrapper
               quote={quote}
               profile={profile}
-              candles={candles}
+              candles={sortedCandles}
               news={news}
               incomeStatement={incomeStatement}
               relativeStrengthResults={relativeStrengthResults}
@@ -127,7 +127,7 @@ const SymbolPageWrapper: React.FC<SymbolPageProps> = ({
             <StatisticsWrapper
               quote={quote}
               profile={profile}
-              candles={candles}
+              candles={sortedCandles}
               startDate={startDate}
             />
           </TabsContent>
