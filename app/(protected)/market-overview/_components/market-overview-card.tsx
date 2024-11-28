@@ -1,13 +1,7 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  ArrowUpIcon,
-  ArrowDownIcon,
-  TrendingUpIcon,
-  TrendingDownIcon,
-  AlertCircle,
-} from "lucide-react";
+import { TrendingUpIcon, TrendingDownIcon, AlertCircle } from "lucide-react";
 
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -21,6 +15,7 @@ export interface MarketOverviewCardProps {
   description: string;
   medianReturn: number;
   trendModel: PTTrendModel;
+  globalDailyBreadthRank: number;
 }
 
 const MarketOverviewCard: React.FC<MarketOverviewCardProps> = ({
@@ -28,6 +23,7 @@ const MarketOverviewCard: React.FC<MarketOverviewCardProps> = ({
   description,
   medianReturn,
   trendModel,
+  globalDailyBreadthRank,
 }) => {
   const key = `/api/quote/${ticker}`;
 
@@ -71,7 +67,7 @@ const MarketOverviewCard: React.FC<MarketOverviewCardProps> = ({
     switch (trend) {
       case "BULLISH":
       case "UPTREND":
-        return "text-blue-500";
+        return "text-uptrend";
       case "BEARISH":
       case "PULLBACK":
         return "text-orange-500";
@@ -86,9 +82,9 @@ const MarketOverviewCard: React.FC<MarketOverviewCardProps> = ({
   const getColorClass = (value: number | null | undefined): string => {
     if (typeof value !== "number") return "text-gray-500";
     return value > 0
-      ? "text-blue-500"
+      ? "text-uptrend"
       : value < 0
-      ? "text-red-500"
+      ? "text-destructive"
       : "text-gray-500";
   };
 
@@ -121,7 +117,6 @@ const MarketOverviewCard: React.FC<MarketOverviewCardProps> = ({
 
   const quoteReturn = data.changesPercentage;
   const price = data.price;
-  const isQuotePositive = isPositive(quoteReturn);
   const quoteColorClass = getColorClass(quoteReturn);
   const trendColorClass = getTrendColor(trendModel.trendStateModel);
   const isMedianPositive = isPositive(medianReturn);
@@ -133,37 +128,47 @@ const MarketOverviewCard: React.FC<MarketOverviewCardProps> = ({
           <div>
             <p className="text-sm text-muted-foreground">{description}</p>
           </div>
-          <Badge
-            variant="secondary"
-            className={`text-sm font-medium ${trendColorClass}`}
-          >
-            {trendModel.trendStateModel}
-          </Badge>
-        </div>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="text-3xl font-bold">
-              {ticker}{" "}
-              <span className="ml-1 font-normal">{price.toFixed(2)}</span>
-            </div>
-            <div className={`flex items-center ${quoteColorClass}`}>
-              {isQuotePositive ? (
-                <ArrowUpIcon className="mr-1 h-5 w-5" />
-              ) : (
-                <ArrowDownIcon className="mr-1 h-5 w-5" />
-              )}
-              <span className="text-xl font-semibold">
-                {Math.abs(quoteReturn || 0).toFixed(2)}
+          <div className="flex items-center space-x-1">
+            <Badge
+              variant="secondary"
+              className={`text-sm font-medium ${trendColorClass}`}
+            >
+              {trendModel.trendStateModel}
+            </Badge>
+            <div className={`flex items-center `}>
+              <span className="text-sm font-semibold">
+                {globalDailyBreadthRank.toFixed(2)} GDB{" "}
               </span>
             </div>
           </div>
+        </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="text-3xl font-bold">{ticker} </div>
+            {/*<div className={`flex items-center `}>
+              <span className="text-xl font-semibold">
+                {globalDailyBreadthRank.toFixed(2)} GDB{" "}
+              </span>
+            </div>*/}
+            <div className="flex space-x-2 items-end">
+              <div className="text-xl">
+                <span className="ml-1 font-medium">${price.toFixed(2)}</span>
+              </div>
+              <div>
+                <span className={`font-medium text-xl ${quoteColorClass}`}>
+                  {formatPercentage(quoteReturn)}
+                </span>
+              </div>
+            </div>
+          </div>
           <div className="flex flex-col space-y-1">
-            <div className="flex items-center justify-between text-sm">
+            {/*}  <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Change %</span>
               <span className={`font-medium ${quoteColorClass}`}>
                 {formatPercentage(quoteReturn)}
               </span>
             </div>
+            */}
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Median Return</span>
               <div

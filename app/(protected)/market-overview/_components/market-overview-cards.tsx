@@ -104,6 +104,7 @@ const MarketOverViewCards: React.FC = () => {
                 description={description}
                 medianReturn={data.returns?.median || 0}
                 trendModel={ptTrendModel as PTTrendModel}
+                globalDailyBreadthRank={data.globalDailyBreadthPercentileRank}
               />
             </Link>
           )}
