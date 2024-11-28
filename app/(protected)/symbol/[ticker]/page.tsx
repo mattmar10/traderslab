@@ -1,33 +1,45 @@
-import { Suspense } from 'react';
-import Loading from '@/components/loading';
+import { Suspense } from "react";
+import Loading from "@/components/loading";
 import { notFound } from "next/navigation";
-import { getFullProfile, getPriceBars, getQuotesFromFMP } from '@/actions/market-data/actions';
-import SymbolPageWrapper from '../_components/symbol-page-wrapper';
-import { isFMPDataLoadingError, Quote } from '@/lib/types/fmp-types';
-import { getIncomeStatementForSymbol, getNewsForSymbol } from '@/actions/news/actions';
+import {
+  getFullProfile,
+  getPriceBars,
+  getQuotesFromFMP,
+} from "@/actions/market-data/actions";
+import SymbolPageWrapper from "../_components/symbol-page-wrapper";
+import { isFMPDataLoadingError, Quote } from "@/lib/types/fmp-types";
+import {
+  getIncomeStatementForSymbol,
+  getNewsForSymbol,
+} from "@/actions/news/actions";
+import { getRelativeStrengthStatsForSymbol } from "@/actions/relativer-strength/actions";
 
 interface SymbolPageContentProps {
   ticker: string;
 }
 
 async function SymbolPageContent({ ticker }: SymbolPageContentProps) {
-  const [quoteData, profile, bars, news, incomeStatement] = await Promise.all([
+  const [
+    quoteData,
+    profile,
+    bars,
+    news,
+    incomeStatement,
+    relativeStrengthStats,
+  ] = await Promise.all([
     getQuotesFromFMP([ticker]),
     getFullProfile(ticker),
     getPriceBars(ticker),
     getNewsForSymbol(ticker),
-    getIncomeStatementForSymbol(ticker, "quarter")
+    getIncomeStatementForSymbol(ticker, "quarter"),
+    getRelativeStrengthStatsForSymbol(ticker),
   ]);
 
   if (isFMPDataLoadingError(bars)) {
-    return (
-      <div>Error fetching price data</div>
-    )
+    return <div>Error fetching price data</div>;
   }
 
-
-
-  const q: Quote = quoteData[0]
+  const q: Quote = quoteData[0];
 
   return (
     <SymbolPageWrapper
@@ -35,7 +47,17 @@ async function SymbolPageContent({ ticker }: SymbolPageContentProps) {
       profile={profile[0]}
       candles={bars}
       news={isFMPDataLoadingError(news) ? [] : news}
-      incomeStatement={!incomeStatement || isFMPDataLoadingError(incomeStatement) ? [] : incomeStatement} />
+      incomeStatement={
+        !incomeStatement || isFMPDataLoadingError(incomeStatement)
+          ? []
+          : incomeStatement
+      }
+      relativeStrengthResults={
+        isFMPDataLoadingError(relativeStrengthStats)
+          ? undefined
+          : relativeStrengthStats
+      }
+    />
   );
 }
 
@@ -46,7 +68,6 @@ function SymbolPageServer({ ticker }: SymbolPageContentProps) {
     </Suspense>
   );
 }
-
 
 interface PageProps {
   params: {
