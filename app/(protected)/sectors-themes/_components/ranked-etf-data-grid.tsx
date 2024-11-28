@@ -36,7 +36,7 @@ const RankedMarketDataGrid: React.FC<RankedEtfDataGridProps> = ({ rankedData, ti
                             key={etf.ticker}
                             rank={index}
                             etf={etf}
-                            chartSettings={chartSettings} theme={theme} />
+                            chartSettings={chartSettings} theme={theme} allEtfs={rankedData} />
                     ))}
                 </div>
             </CardContent>

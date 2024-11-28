@@ -91,7 +91,7 @@ const OverviewChart: React.FC<OverviewChartProps> = ({ ticker, candles }) => {
                             style={{ minWidth: '80px' }}
                         >
                             <div className="p-1 text-sm font-medium">{frame}
-                                <span className={` text-sm pl-2 ${timeFrameChanges[frame] >= 0 ? 'text-traderslabblue' : 'text-red-500'}`}>
+                                <span className={` text-sm pl-2 ${timeFrameChanges[frame] >= 0 ? 'text-uptrend' : 'text-red-500'}`}>
                                     {timeFrameChanges[frame]?.toFixed(2)}%
                                 </span>
                             </div>
