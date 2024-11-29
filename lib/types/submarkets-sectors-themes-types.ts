@@ -8,6 +8,7 @@ export const EtfMarketDataSchema = z.object({
   percentMonthlyChange: z.number(),
   percentThreeMonthChange: z.number(),
   percentSixMonthChange: z.number(),
+  percent1YearChange: z.number(),
   percentFromFiftyTwoWeekLow: z.number(),
   percentFromFiftyTwoWeekHigh: z.number(),
   oneMonthDailyADRP: z.number(),
