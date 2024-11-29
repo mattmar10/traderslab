@@ -1,6 +1,9 @@
 "use client";
 
-import { EtfMarketData, RankedEtfMarketData } from "@/lib/types/submarkets-sectors-themes-types";
+import {
+  EtfMarketData,
+  RankedEtfMarketData,
+} from "@/lib/types/submarkets-sectors-themes-types";
 import MarketRankGroupAggregateTable from "./market-rank-group-aggregate-table";
 import { useQueries } from "@tanstack/react-query";
 import { useMemo } from "react";
@@ -19,7 +22,7 @@ export interface ReturnsData {
   date: string;
   dailyReturn: number;
   cumulativeReturn: number;
-  price: number
+  price: number;
 }
 
 const calculateReturns = (candles: Candle[]): ReturnsData[] => {
@@ -30,8 +33,8 @@ const calculateReturns = (candles: Candle[]): ReturnsData[] => {
       index === 0
         ? 0
         : ((candle.close - candles[index - 1].close) /
-          candles[index - 1].close) *
-        100;
+            candles[index - 1].close) *
+          100;
 
     // Calculate cumulative return from the first day
     const cumulativeReturn =
@@ -41,7 +44,7 @@ const calculateReturns = (candles: Candle[]): ReturnsData[] => {
       date: candle.dateStr!,
       dailyReturn: Number(dailyReturn.toFixed(2)),
       cumulativeReturn: Number(cumulativeReturn.toFixed(2)),
-      price: candle.close
+      price: candle.close,
     };
   });
 };
@@ -59,7 +62,6 @@ const calculateMarketData = (
   const marketData: EtfMarketData[] = [];
 
   Object.entries(candles).forEach(([ticker, tickerCandles]) => {
-
     returns[ticker] = calculateReturns(tickerCandles);
 
     const latestCandle = tickerCandles[tickerCandles.length - 1];
@@ -81,42 +83,64 @@ const calculateMarketData = (
     const oneMonthAgoCandle = findHistoricalCandle(30);
     const threeMonthAgoCandle = findHistoricalCandle(90);
     const sixMonthAgoCandle = findHistoricalCandle(180);
+    const oneYearAgo = findHistoricalCandle(252);
 
     // Calculate percentages
     const calculatePercentChange = (oldValue: number, newValue: number) =>
       ((newValue - oldValue) / oldValue) * 100;
 
-
-    const oneMonthDailyADRP = adrPercent(tickerCandles, 20)
+    const oneMonthDailyADRP = adrPercent(tickerCandles, 20);
 
     const yearCandles = tickerCandles.slice(-252); // Approximate trading days in a year
-    const fiftyTwoWeekHigh = Math.max(...yearCandles.map(c => c.high));
-    const fiftyTwoWeekLow = Math.min(...yearCandles.map(c => c.low));
+    const fiftyTwoWeekHigh = Math.max(...yearCandles.map((c) => c.high));
+    const fiftyTwoWeekLow = Math.min(...yearCandles.map((c) => c.low));
 
     if (oneMonthDailyADRP && !isADRPercentError(oneMonthDailyADRP)) {
-
       const marketDataEntry: EtfMarketData = {
         ticker,
         name: tickerNames[ticker],
-        percentDailyChange: calculatePercentChange(oneDayAgoCandle.close, latestCandle.close),
-        percentWeeklyChange: calculatePercentChange(oneWeekAgoCandle.close, latestCandle.close),
-        percentMonthlyChange: calculatePercentChange(oneMonthAgoCandle.close, latestCandle.close),
-        percentThreeMonthChange: calculatePercentChange(threeMonthAgoCandle.close, latestCandle.close),
-        percentSixMonthChange: calculatePercentChange(sixMonthAgoCandle.close, latestCandle.close),
-        percentFromFiftyTwoWeekLow: calculatePercentChange(fiftyTwoWeekLow, latestCandle.close),
-        percentFromFiftyTwoWeekHigh: calculatePercentChange(fiftyTwoWeekHigh, latestCandle.close),
+        percentDailyChange: calculatePercentChange(
+          oneDayAgoCandle.close,
+          latestCandle.close
+        ),
+        percentWeeklyChange: calculatePercentChange(
+          oneWeekAgoCandle.close,
+          latestCandle.close
+        ),
+        percentMonthlyChange: calculatePercentChange(
+          oneMonthAgoCandle.close,
+          latestCandle.close
+        ),
+        percentThreeMonthChange: calculatePercentChange(
+          threeMonthAgoCandle.close,
+          latestCandle.close
+        ),
+        percentSixMonthChange: calculatePercentChange(
+          sixMonthAgoCandle.close,
+          latestCandle.close
+        ),
+        percentFromFiftyTwoWeekLow: calculatePercentChange(
+          fiftyTwoWeekLow,
+          latestCandle.close
+        ),
+        percentFromFiftyTwoWeekHigh: calculatePercentChange(
+          fiftyTwoWeekHigh,
+          latestCandle.close
+        ),
         oneMonthDailyADRP,
+        percent1YearChange: calculatePercentChange(
+          oneYearAgo.close,
+          latestCandle.close
+        ),
       };
       marketData.push(marketDataEntry);
     }
-
   });
 
-  const ranked = rankMarketData(marketData, true)
+  const ranked = rankMarketData(marketData, true);
 
   return { returns, marketData: ranked };
 };
-
 
 export interface MarketSectorsThemesWrapperProps {
   title: string;
@@ -232,10 +256,12 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
     return <Loading />;
   }
 
-
-  let sortedData: EtfMarketData[] = []
+  let sortedData: EtfMarketData[] = [];
   if (processedData && processedData?.marketData.length > 6) {
-    sortedData = rankMarketData([...processedData?.marketData].filter(d => d.ticker !== 'RSP'), true)
+    sortedData = rankMarketData(
+      [...processedData?.marketData].filter((d) => d.ticker !== "RSP"),
+      true
+    );
   }
 
   return (
@@ -255,8 +281,13 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
           </div>
         )}
       </div>
-      {sortedData.length > 0 && <RankedMarketDataGrid theme={resolvedTheme} rankedData={sortedData.slice(0, 10)}
-        title={title} />}
+      {sortedData.length > 0 && (
+        <RankedMarketDataGrid
+          theme={resolvedTheme}
+          rankedData={sortedData.slice(0, 10)}
+          title={title}
+        />
+      )}
       <Card>
         <CardHeader className="p-3"></CardHeader>
         <CardContent>
@@ -270,4 +301,3 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
 };
 
 export default MarketSectorsThemesWrapper;
-

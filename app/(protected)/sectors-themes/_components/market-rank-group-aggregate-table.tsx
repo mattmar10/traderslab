@@ -20,6 +20,7 @@ export type SortableKeys =
   | "percentMonthlyChange"
   | "percentThreeMonthChange"
   | "percentSixMonthChange"
+  | "percent1YearChange"
   | "percentFromFiftyTwoWeekLow"
   | "percentFromFiftyTwoWeekHigh";
 
@@ -186,6 +187,17 @@ export const MarketRankGroupAggregateTable: React.FC<
                     </div>
                   </th>
                   <th
+                    className={`text-right px-1 w-28 min-w-[6rem] ${getSortableHeaderClass(
+                      "percent1YearChange"
+                    )} cursor-pointer`}
+                    onClick={() => requestSort("percent1YearChange")}
+                  >
+                    <div className="flex justify-end items-center">
+                      <span className="mr-1">1Y</span>
+                      <span>{getHeaderClass("percent1YearChange")}</span>
+                    </div>
+                  </th>
+                  <th
                     className={`text-right px-1 w-44 min-w-[8rem] ${getSortableHeaderClass(
                       "percentFromFiftyTwoWeekLow"
                     )} cursor-pointer`}
@@ -262,6 +274,14 @@ export const MarketRankGroupAggregateTable: React.FC<
                     20
                   );
 
+                  const oneYearChangeBg = calculateColorFromPercentage(
+                    item.percent1YearChange,
+                    themeColor,
+                    -25,
+                    0,
+                    25
+                  );
+
                   return (
                     <LinkedTableRow
                       href={`/market-performance/${item.ticker}`}
@@ -311,6 +331,12 @@ export const MarketRankGroupAggregateTable: React.FC<
                         style={{ background: sixMonthChangeBg }}
                       >
                         {item.percentSixMonthChange.toFixed(2)}%
+                      </td>
+                      <td
+                        className={`${firaCode.className} text-right px-2 border-r border-foreground/80 w-28`}
+                        style={{ background: oneYearChangeBg }}
+                      >
+                        {item.percent1YearChange.toFixed(2)}%
                       </td>
                       <td
                         className={`${firaCode.className} text-left px-2 relative border-r border-foreground/80 w-44`}
@@ -367,7 +393,6 @@ export const MarketRankGroupAggregateTable: React.FC<
 };
 
 export default MarketRankGroupAggregateTable;
-
 
 export function rankMarketData(
   marketDataArray: EtfMarketData[],
