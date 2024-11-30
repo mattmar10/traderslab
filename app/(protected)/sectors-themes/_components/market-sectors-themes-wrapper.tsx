@@ -33,8 +33,8 @@ const calculateReturns = (candles: Candle[]): ReturnsData[] => {
       index === 0
         ? 0
         : ((candle.close - candles[index - 1].close) /
-            candles[index - 1].close) *
-          100;
+          candles[index - 1].close) *
+        100;
 
     // Calculate cumulative return from the first day
     const cumulativeReturn =
@@ -265,10 +265,10 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
   }
 
   return (
-    <div className="flex-col space-y-2">
+    <div className="flex-col space-y-2 ">
       <div>
         {processedData && (
-          <div className="mt-4 ">
+          <div className="mt-4 w-full">
             <AggregateReturnsChart
               returnsData={processedData.returns}
               title={`${title} Cumulative Returns and Relative Strength Comparison`}

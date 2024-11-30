@@ -9,6 +9,7 @@ import {
   YAxis,
   Tooltip,
   ReferenceLine,
+  ResponsiveContainer,
 } from "recharts";
 import {
   Card,
@@ -263,7 +264,7 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
 
 
   return (
-    <Card className="w-full">
+    <Card >
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
@@ -311,80 +312,82 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
         </div>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="w-full">
         <ChartContainer
           config={chartConfig}
-          className="h-[60vh] 4xl:h-[30vh] w-full"
+
         >
-          <LineChart
-            data={processedData}
-            margin={{
-              left: 12,
-              right: 12,
-              top: 12,
-              bottom: 12,
-            }}
-          >
-            <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" />
-            <ReferenceLine
-              y={isRelativeStrength ? 1 : 0}
-              stroke="#999"
-              strokeWidth={1.5}
-            />
-            <XAxis
-              dataKey="date"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              ticks={chartTicks}
-              tickFormatter={(value) => {
-                const date = new Date(value);
-                // For 12M view, show month and year
-                if (selectedTimeframe.months === 12) {
+          <ResponsiveContainer>
+            <LineChart
+              data={processedData}
+              margin={{
+                left: 12,
+                right: 12,
+                top: 12,
+                bottom: 12,
+              }}
+            >
+              <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" />
+              <ReferenceLine
+                y={isRelativeStrength ? 1 : 0}
+                stroke="#999"
+                strokeWidth={1.5}
+              />
+              <XAxis
+                dataKey="date"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                ticks={chartTicks}
+                tickFormatter={(value) => {
+                  const date = new Date(value);
+                  // For 12M view, show month and year
+                  if (selectedTimeframe.months === 12) {
+                    return date.toLocaleDateString("en-US", {
+                      month: "short",
+                      year: "2-digit",
+                    });
+                  }
+                  // For shorter timeframes, show month and day
                   return date.toLocaleDateString("en-US", {
                     month: "short",
-                    year: "2-digit",
+                    day: "numeric",
                   });
-                }
-                // For shorter timeframes, show month and day
-                return date.toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                });
-              }}
-            />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) =>
-                isRelativeStrength ? value.toFixed(2) : `${value.toFixed(1)}%`
-              }
-            />
-            <Tooltip
-              content={
-                <CustomTooltip
-                  config={chartConfig}
-                  tickerNames={tickerNames}
-                  isRelativeStrength={isRelativeStrength}
-                />
-              }
-              cursor={{ strokeDasharray: "3 3" }}
-            />
-            {Object.keys(returnsData).map((ticker) => (
-              <Line
-                key={ticker}
-                type="monotone"
-                dataKey={ticker}
-                name={ticker}
-                stroke={chartConfig[ticker].color}
-                strokeWidth={ticker === "RSP" ? 3 : 1}
-                dot={false}
-                activeDot={{ r: 4 }}
-                hide={!selectedTickers.includes(ticker)}
+                }}
               />
-            ))}
-          </LineChart>
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(value) =>
+                  isRelativeStrength ? value.toFixed(2) : `${value.toFixed(1)}%`
+                }
+              />
+              <Tooltip
+                content={
+                  <CustomTooltip
+                    config={chartConfig}
+                    tickerNames={tickerNames}
+                    isRelativeStrength={isRelativeStrength}
+                  />
+                }
+                cursor={{ strokeDasharray: "3 3" }}
+              />
+              {Object.keys(returnsData).map((ticker) => (
+                <Line
+                  key={ticker}
+                  type="monotone"
+                  dataKey={ticker}
+                  name={ticker}
+                  stroke={chartConfig[ticker].color}
+                  strokeWidth={ticker === "RSP" ? 3 : 1}
+                  dot={false}
+                  activeDot={{ r: 4 }}
+                  hide={!selectedTickers.includes(ticker)}
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
         </ChartContainer>
       </CardContent>
       <CardFooter>

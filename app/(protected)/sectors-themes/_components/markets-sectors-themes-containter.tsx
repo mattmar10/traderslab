@@ -22,7 +22,7 @@ const MarketsSectorsThemesContainer: React.FC = async () => {
           <TabsTrigger value="themes">Themes</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="markets">
+        <TabsContent value="markets" >
           <MarketSectorsThemesWrapper
             data={data.subMarketData}
             title={"Sub Markets"}
