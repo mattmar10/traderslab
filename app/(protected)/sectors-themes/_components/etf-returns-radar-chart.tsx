@@ -37,12 +37,12 @@ const EtfReturnsRadarChart: React.FC<EtfRetursRadarChartProps> = ({
 
   const rankingData = [
     {
-      period: "Weekly",
+      period: "Week",
       ranking: calculateRankingForMetric("percentWeeklyChange"),
       actualChange: etf.percentWeeklyChange.toFixed(2),
     },
     {
-      period: "Monthly",
+      period: "Month",
       ranking: calculateRankingForMetric("percentMonthlyChange"),
       actualChange: etf.percentMonthlyChange.toFixed(2),
     },
@@ -77,7 +77,7 @@ const EtfReturnsRadarChart: React.FC<EtfRetursRadarChartProps> = ({
   };
 
   return (
-    <div className="w-full aspect-square max-h-[250px]">
+    <div className="w-full aspect-square max-h-[200px]">
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart
           data={rankingData}
@@ -93,7 +93,7 @@ const EtfReturnsRadarChart: React.FC<EtfRetursRadarChartProps> = ({
             name="Relative Strength"
             dataKey="ranking"
             fill={solarizedBase01}
-            fillOpacity={0.6}
+            fillOpacity={0.4}
             stroke={solarizedBase01}
             dot={{
               fill: solarizedBase01,
@@ -104,7 +104,7 @@ const EtfReturnsRadarChart: React.FC<EtfRetursRadarChartProps> = ({
               fill: solarizedBase01,
               strokeWidth: 2,
               stroke: solarizedBase01,
-              r: 5,
+              r: 3,
             }}
           />
         </RadarChart>

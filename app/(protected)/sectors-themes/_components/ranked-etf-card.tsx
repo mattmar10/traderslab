@@ -64,20 +64,18 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, allEtfs, theme
     return (
         <Card className="h-full">
             <CardHeader className="p-4">
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between border-b pb-2">
                     <div>
-                        <div className="font-semibold">{etf.ticker}</div>
-                        <div className="text-sm text-muted-foreground truncate">{etf.name}</div>
+                        <div className="font-semibold">{etf.name} </div>
+
                     </div>
                     <div className="text-lg font-semibold text-foreground">#{rank + 1}</div>
                 </div>
             </CardHeader>
-            <CardContent className="p-4 pt-0">
-                <div>
-                    <EtfReturnsRadarChart etf={etf} all={allEtfs} />
-                </div>
-                <div className="mt-2">
-                    <div className="text-sm font-medium">Leaders</div>
+            <CardContent className=" pb-0 pt-0">
+
+                <div className="">
+                    <div className="text-base font-medium">Leaders</div>
                     {leadersIsLoading && (
                         <div className="h-4 p-1 bg-muted animate-pulse rounded w-full" />
                     )}
@@ -119,7 +117,7 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, allEtfs, theme
                         </div>
                     )}
 
-                    <div className="text-sm font-medium mt-2">Setting Up</div>
+                    <div className="text-base font-medium mt-3">Setting Up</div>
                     {settingUpIsLoading && (
                         <div className="h-4 p-1 bg-muted animate-pulse rounded w-full" />
                     )}
@@ -160,7 +158,9 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, allEtfs, theme
                             )}
                         </div>
                     )}
-
+                    <div className="mt-2">
+                        <EtfReturnsRadarChart etf={etf} all={allEtfs} />
+                    </div>
                 </div>
             </CardContent>
         </Card>
