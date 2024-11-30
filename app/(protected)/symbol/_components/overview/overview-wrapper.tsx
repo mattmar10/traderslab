@@ -8,6 +8,7 @@ import OverviewNewsCard from "./overview-news-card";
 import OverviewFinancialsCard from "./overview-financials-card";
 import { RelativeStrengthResults } from "@/lib/types/relative-strength-types";
 import RelativeStrengthBarChart from "../relative-strength/relative-strength-bar-chart";
+import OverviewAbout from "./overview-about";
 
 export interface OverviewPageWrapperProps {
   quote: Quote;
@@ -35,6 +36,7 @@ const OverviewPageWrapper: React.FC<OverviewPageWrapperProps> = ({
       <div>
         <KeyStatsCard quote={quote} profile={profile} />
       </div>
+
       {incomeStatement && incomeStatement.length > 0 && (
         <div className="col-span-2">
           <OverviewFinancialsCard incomeStatement={incomeStatement} />
@@ -45,6 +47,9 @@ const OverviewPageWrapper: React.FC<OverviewPageWrapperProps> = ({
           <RelativeStrengthBarChart rsData={relativeStrengthResults} />
         </div>
       )}
+      <div className="col-span-3">
+        <OverviewAbout profile={profile} />
+      </div>
       <div className="col-span-3">
         <OverviewNewsCard news={news} />
       </div>

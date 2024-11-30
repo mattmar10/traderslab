@@ -12,6 +12,7 @@ import ScreenerMiniChartWrapper from "../../screener/_components/screener-result
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { isRight } from "@/lib/utils";
 import EtfReturnsRadarChart from "./etf-returns-radar-chart";
+import Link from "next/link";
 
 interface RankedEtfCardProps {
     rank: number;
@@ -73,7 +74,6 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, allEtfs, theme
                 </div>
             </CardHeader>
             <CardContent className=" pb-0 pt-0">
-
                 <div className="">
                     <div className="text-base font-medium">Leaders</div>
                     {leadersIsLoading && (
@@ -94,7 +94,7 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, allEtfs, theme
                                         <HoverCard>
                                             <HoverCardTrigger>
                                                 <span className="text-primary hover:underline cursor-pointer">
-                                                    {holding.asset}
+                                                    <Link href={`/symbol/${holding.asset}`}>{holding.asset}</Link>
                                                 </span>
                                             </HoverCardTrigger>
                                             <HoverCardContent className="w-[52rem] p-4">
@@ -158,7 +158,7 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, allEtfs, theme
                             )}
                         </div>
                     )}
-                    <div className="mt-2">
+                    <div className="">
                         <EtfReturnsRadarChart etf={etf} all={allEtfs} />
                     </div>
                 </div>

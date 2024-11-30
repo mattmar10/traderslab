@@ -10,8 +10,6 @@ import { ChartSettings, defaultChartSettings } from "@/components/settings/chart
 import { useState } from "react";
 
 
-
-
 export interface RankedEtfDataGridProps {
     rankedData: EtfMarketData[]
     title: string
