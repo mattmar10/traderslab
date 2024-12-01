@@ -20,7 +20,7 @@ import {
 import OverviewPageWrapper from "./overview/overview-wrapper";
 import { useQuery } from "@tanstack/react-query";
 import { FmpStockNewsList } from "@/lib/types/news-types";
-import StatisticsWrapper from "./relative-strength/statistics-wrapper";
+import StatisticsWrapper from "./statistics/statistics-wrapper";
 import { RelativeStrengthResults } from "@/lib/types/relative-strength-types";
 
 export interface SymbolPageProps {

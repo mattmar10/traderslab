@@ -86,7 +86,7 @@ const ReturnDistribution: React.FC<ReturnDistributionProps> = ({
           (r * 100 - stats.mean * 100) / (stats.stdDev * 100);
         return acc + Math.pow(normalizedReturn, 4);
       }, 0) /
-        (n - 1) -
+      (n - 1) -
       3; // Excess kurtosis (normal = 0)
 
     // Percentiles
@@ -236,7 +236,7 @@ const ReturnDistribution: React.FC<ReturnDistributionProps> = ({
                 />
                 <Bar
                   dataKey="frequency"
-                  fill={solarizedBlue}
+                  fill={solarizedBase01}
                   fillOpacity={0.6}
                   name="Distribution"
                 />

@@ -8,7 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Switch } from "@/components/ui/switch"; // Import Switch component
+import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useKeyPress } from "@/hooks/useKeyPress";
@@ -49,6 +49,7 @@ const SearchInput = () => {
   );
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const [hasFocus, setHasFocus] = useState(false);
 
   const debouncedSearch = useDebounce(searchTerm, 300);
 
@@ -66,8 +67,8 @@ const SearchInput = () => {
   );
 
   const handleNavigation = (symbol: string) => {
-    setSearchTerm(""); // Clear input
-    setIsOpen(false); // Close popover
+    setSearchTerm("");
+    setIsOpen(false);
     router.push(`/symbol/${symbol}`);
   };
 
@@ -138,22 +139,12 @@ const SearchInput = () => {
     return results;
   }
 
-  // Enhanced focus management
+  // Simplified focus management
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      // Store the current cursor position
-      const cursorPosition = inputRef.current.selectionStart;
-
-      // Use requestAnimationFrame to ensure focus happens after React updates
-      requestAnimationFrame(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
-          // Restore the cursor position
-          inputRef.current.setSelectionRange(cursorPosition, cursorPosition);
-        }
-      });
+    if (!hasFocus && inputRef.current) {
+      inputRef.current.focus();
     }
-  }, [isOpen, searchResults, isLoading]); // Added isLoading as a dependency
+  }, [hasFocus]);
 
   return (
     <div className="w-full space-y-2">
@@ -166,6 +157,8 @@ const SearchInput = () => {
               placeholder="Search..."
               type="search"
               value={searchTerm}
+              onFocus={() => setHasFocus(true)}
+              onBlur={() => setHasFocus(false)}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
                 setIsOpen(e.target.value.length > 0);
@@ -223,16 +216,10 @@ const SearchInput = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border bg-accent">
-                      <th className="py-2 px-3 text-left font-medium">
-                        Symbol
-                      </th>
+                      <th className="py-2 px-3 text-left font-medium">Symbol</th>
                       <th className="py-2 px-2 text-left font-medium">Name</th>
-                      <th className="py-2 px-2 text-left font-medium">
-                        Sector
-                      </th>
-                      <th className="py-2 px-2 text-left font-medium">
-                        Industry
-                      </th>
+                      <th className="py-2 px-2 text-left font-medium">Sector</th>
+                      <th className="py-2 px-2 text-left font-medium">Industry</th>
                       <th className="py-2 px-2 text-right font-medium">Type</th>
                     </tr>
                   </thead>
@@ -240,11 +227,10 @@ const SearchInput = () => {
                     {filteredResults.map((result, index) => (
                       <tr
                         key={`${result.type}-${result.symbol}`}
-                        className={`cursor-pointer border-b border-border/50 transition-colors ${
-                          index === currentIndex
-                            ? "bg-accent"
-                            : "hover:bg-accent/50"
-                        }`}
+                        className={`cursor-pointer border-b border-border/50 transition-colors ${index === currentIndex
+                          ? "bg-accent"
+                          : "hover:bg-accent/50"
+                          }`}
                         onClick={() => handleNavigation(result.symbol)}
                       >
                         <td className="py-2 px-3 font-medium">
