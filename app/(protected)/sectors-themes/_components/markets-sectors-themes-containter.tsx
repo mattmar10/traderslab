@@ -15,29 +15,31 @@ const MarketsSectorsThemesContainer: React.FC = async () => {
     );
   } else {
     return (
-      <Tabs defaultValue="markets">
+      <Tabs defaultValue="themes">
         <TabsList className="mb-4">
-          <TabsTrigger value="markets">Sub Markets</TabsTrigger>
-          <TabsTrigger value="sectors">Sectors</TabsTrigger>
           <TabsTrigger value="themes">Themes</TabsTrigger>
+          <TabsTrigger value="sectors">Sectors</TabsTrigger>
+          <TabsTrigger value="markets">Sub Markets</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="markets" >
+        <TabsContent value="themes">
           <MarketSectorsThemesWrapper
-            data={data.subMarketData}
-            title={"Sub Markets"}
+            data={data.themeMarketData}
+            title={"Themes"}
           />
         </TabsContent>
+
         <TabsContent value="sectors">
           <MarketSectorsThemesWrapper
             data={data.sectorMarketData}
             title="Sectors"
           />
         </TabsContent>
-        <TabsContent value="themes">
+
+        <TabsContent value="markets">
           <MarketSectorsThemesWrapper
-            data={data.themeMarketData}
-            title={"Themes"}
+            data={data.subMarketData}
+            title={"Sub Markets"}
           />
         </TabsContent>
       </Tabs>

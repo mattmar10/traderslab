@@ -17,6 +17,7 @@ import Loading from "@/components/loading";
 import { rankMarketData } from "../utils";
 import RankedMarketDataGrid from "./ranked-etf-data-grid";
 import { adrPercent, isADRPercentError } from "@/lib/indicators/adr-percent";
+import { BorderBeam } from "@/components/magicui/border-beam";
 
 export interface ReturnsData {
   date: string;
@@ -33,8 +34,8 @@ const calculateReturns = (candles: Candle[]): ReturnsData[] => {
       index === 0
         ? 0
         : ((candle.close - candles[index - 1].close) /
-          candles[index - 1].close) *
-        100;
+            candles[index - 1].close) *
+          100;
 
     // Calculate cumulative return from the first day
     const cumulativeReturn =
@@ -65,26 +66,19 @@ const calculateMarketData = (
     returns[ticker] = calculateReturns(tickerCandles);
 
     const latestCandle = tickerCandles[tickerCandles.length - 1];
+    const latestCandleIndex = tickerCandles.length - 1;
 
-    const findHistoricalCandle = (daysAgo: number) => {
-      const targetDate = new Date(latestCandle.date);
-      targetDate.setDate(targetDate.getDate() - daysAgo);
-
-      return tickerCandles.reduce((closest, candle) => {
-        if (!closest) return candle;
-        const closestDiff = Math.abs(closest.date - targetDate.getTime());
-        const currentDiff = Math.abs(candle.date - targetDate.getTime());
-        return currentDiff < closestDiff ? candle : closest;
-      });
+    const getCandleByOffset = (offset: number) => {
+      const index = latestCandleIndex - offset;
+      return index >= 0 ? tickerCandles[index] : tickerCandles[0]; // Use the first candle as fallback
     };
 
-    const oneDayAgoCandle = findHistoricalCandle(1);
-    const oneWeekAgoCandle = findHistoricalCandle(7);
-    const oneMonthAgoCandle = findHistoricalCandle(30);
-    const threeMonthAgoCandle = findHistoricalCandle(90);
-    const sixMonthAgoCandle = findHistoricalCandle(180);
-    const oneYearAgo = findHistoricalCandle(252);
-
+    const oneDayAgoCandle = getCandleByOffset(1); // Second to last
+    const oneWeekAgoCandle = getCandleByOffset(7);
+    const oneMonthAgoCandle = getCandleByOffset(30);
+    const threeMonthAgoCandle = getCandleByOffset(90);
+    const sixMonthAgoCandle = getCandleByOffset(180);
+    const oneYearAgoCandle = getCandleByOffset(252);
     // Calculate percentages
     const calculatePercentChange = (oldValue: number, newValue: number) =>
       ((newValue - oldValue) / oldValue) * 100;
@@ -129,7 +123,7 @@ const calculateMarketData = (
         ),
         oneMonthDailyADRP,
         percent1YearChange: calculatePercentChange(
-          oneYearAgo.close,
+          oneYearAgoCandle.close,
           latestCandle.close
         ),
       };
@@ -268,7 +262,7 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
     <div className="flex-col space-y-2 ">
       <div>
         {processedData && (
-          <div className="mt-4 w-full">
+          <div className="relative mt-4 w-full">
             <AggregateReturnsChart
               returnsData={processedData.returns}
               title={`${title} Cumulative Returns and Relative Strength Comparison`}
@@ -282,11 +276,15 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
         )}
       </div>
       {sortedData.length > 0 && (
-        <RankedMarketDataGrid
-          theme={resolvedTheme}
-          rankedData={sortedData.slice(0, 10)}
-          title={title}
-        />
+        <div className="relative">
+          <BorderBeam />
+
+          <RankedMarketDataGrid
+            theme={resolvedTheme}
+            rankedData={sortedData.slice(0, 10)}
+            title={title}
+          />
+        </div>
       )}
       <Card>
         <CardHeader className="p-3"></CardHeader>

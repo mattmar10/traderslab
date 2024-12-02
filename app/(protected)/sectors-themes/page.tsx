@@ -24,7 +24,7 @@ const StockScreener: React.FC = () => {
       <div className="space-y-4 mt-2">
         <div className="flex items-center justify-between space-y-2">
           <h2 className={`text-2xl font-bold tracking-tight ${lato.className}`}>
-            Sub Markets, Sectors, and Themes
+            Themes, Sectors, and Sub Markets
           </h2>
         </div>
 
