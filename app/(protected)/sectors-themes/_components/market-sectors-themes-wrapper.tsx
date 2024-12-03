@@ -10,13 +10,13 @@ import { useMemo } from "react";
 import { Candle } from "@/lib/types/basic-types";
 import AggregateReturnsChart from "./aggregate-returns-chart";
 import { useTheme } from "next-themes";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FMPHistoricalResultsSchema } from "@/lib/types/fmp-types";
 import { formatDateToEST } from "@/lib/utils/epoch-utils";
 import Loading from "@/components/loading";
 import { rankMarketData } from "../utils";
 import RankedMarketDataGrid from "./ranked-etf-data-grid";
 import { adrPercent, isADRPercentError } from "@/lib/indicators/adr-percent";
+import { BorderBeam } from "@/components/magicui/border-beam";
 
 export interface ReturnsData {
   date: string;
@@ -65,26 +65,19 @@ const calculateMarketData = (
     returns[ticker] = calculateReturns(tickerCandles);
 
     const latestCandle = tickerCandles[tickerCandles.length - 1];
+    const latestCandleIndex = tickerCandles.length - 1;
 
-    const findHistoricalCandle = (daysAgo: number) => {
-      const targetDate = new Date(latestCandle.date);
-      targetDate.setDate(targetDate.getDate() - daysAgo);
-
-      return tickerCandles.reduce((closest, candle) => {
-        if (!closest) return candle;
-        const closestDiff = Math.abs(closest.date - targetDate.getTime());
-        const currentDiff = Math.abs(candle.date - targetDate.getTime());
-        return currentDiff < closestDiff ? candle : closest;
-      });
+    const getCandleByOffset = (offset: number) => {
+      const index = latestCandleIndex - offset;
+      return index >= 0 ? tickerCandles[index] : tickerCandles[0]; // Use the first candle as fallback
     };
 
-    const oneDayAgoCandle = findHistoricalCandle(1);
-    const oneWeekAgoCandle = findHistoricalCandle(7);
-    const oneMonthAgoCandle = findHistoricalCandle(30);
-    const threeMonthAgoCandle = findHistoricalCandle(90);
-    const sixMonthAgoCandle = findHistoricalCandle(180);
-    const oneYearAgo = findHistoricalCandle(252);
-
+    const oneDayAgoCandle = getCandleByOffset(1); // Second to last
+    const oneWeekAgoCandle = getCandleByOffset(7);
+    const oneMonthAgoCandle = getCandleByOffset(30);
+    const threeMonthAgoCandle = getCandleByOffset(90);
+    const sixMonthAgoCandle = getCandleByOffset(180);
+    const oneYearAgoCandle = getCandleByOffset(252);
     // Calculate percentages
     const calculatePercentChange = (oldValue: number, newValue: number) =>
       ((newValue - oldValue) / oldValue) * 100;
@@ -129,7 +122,7 @@ const calculateMarketData = (
         ),
         oneMonthDailyADRP,
         percent1YearChange: calculatePercentChange(
-          oneYearAgo.close,
+          oneYearAgoCandle.close,
           latestCandle.close
         ),
       };
@@ -266,12 +259,24 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
 
   return (
     <div className="flex-col space-y-2 ">
+
+      {sortedData.length > 0 && (
+        <div className="relative">
+          <BorderBeam />
+
+          <RankedMarketDataGrid
+            theme={resolvedTheme}
+            rankedData={sortedData.slice(0, 10)}
+            title={title}
+          />
+        </div>
+      )}
       <div>
         {processedData && (
-          <div className="mt-4 w-full">
+          <div className="relative mt-4 w-full">
             <AggregateReturnsChart
               returnsData={processedData.returns}
-              title={`${title} Cumulative Returns and Relative Strength Comparison`}
+              title={`${title} Cumulative Returns Comparison`}
               returnType="cumulative"
               colorMap={{
                 RSP: resolvedTheme === "light" ? "#404040" : "#e5e7eb",
@@ -281,21 +286,11 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
           </div>
         )}
       </div>
-      {sortedData.length > 0 && (
-        <RankedMarketDataGrid
-          theme={resolvedTheme}
-          rankedData={sortedData.slice(0, 10)}
-          title={title}
-        />
+
+      {processedData && (
+        <MarketRankGroupAggregateTable data={processedData.marketData} title={title} />
       )}
-      <Card>
-        <CardHeader className="p-3"></CardHeader>
-        <CardContent>
-          {processedData && (
-            <MarketRankGroupAggregateTable data={processedData.marketData} />
-          )}
-        </CardContent>
-      </Card>
+
     </div>
   );
 };

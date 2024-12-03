@@ -236,6 +236,7 @@ export type ScreenerSortableKeys =
   | "rsRank"
   | "rsScore"
   | "oneDayReturnPercent"
+  | "oneDayAbsoluteChange"
   | "oneWeekReturnPercent"
   | "oneMonthReturnPercent"
   | "threeMonthReturnPercent"

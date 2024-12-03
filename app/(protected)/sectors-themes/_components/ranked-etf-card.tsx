@@ -93,8 +93,8 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, allEtfs, theme
                                     <span key={`${holding.asset}-${index}`} className="inline">
                                         <HoverCard>
                                             <HoverCardTrigger>
-                                                <span className="text-primary hover:underline cursor-pointer">
-                                                    <Link href={`/symbol/${holding.asset}`}>{holding.asset}</Link>
+                                                <span className="text-foreground/70 hover:text-foreground cursor-pointer">
+                                                    <Link href={`/symbol/${holding.asset}`}>${holding.asset}</Link>
                                                 </span>
                                             </HoverCardTrigger>
                                             <HoverCardContent className="w-[52rem] p-4">
@@ -135,8 +135,8 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, allEtfs, theme
                                     <span key={`${holding.asset}-${index}`} className="inline">
                                         <HoverCard>
                                             <HoverCardTrigger>
-                                                <span className="text-primary hover:underline cursor-pointer">
-                                                    {holding.asset}
+                                                <span className="text-foreground/70 hover:text-foreground cursor-pointer">
+                                                    <Link href={`/symbol/${holding.asset}`}>${holding.asset}</Link>
                                                 </span>
                                             </HoverCardTrigger>
                                             <HoverCardContent className="w-[52rem] p-4">

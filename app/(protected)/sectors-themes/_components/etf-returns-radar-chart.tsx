@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React from "react";
 import {
@@ -11,7 +11,7 @@ import {
   Tooltip,
 } from "recharts";
 import { EtfMarketData } from "@/lib/types/submarkets-sectors-themes-types";
-import { solarizedBase01, solarizedMagenta } from "@/lib/utils/color-utils";
+import { solarizedBlue, solarizedMagenta } from "@/lib/utils/color-utils";
 
 export interface EtfRetursRadarChartProps {
   etf: EtfMarketData;
@@ -62,35 +62,43 @@ const EtfReturnsRadarChart: React.FC<EtfRetursRadarChartProps> = ({
     {
       period: "Week",
       ranking: calculateRankingForMetric("percentWeeklyChange"),
-      volAdjustedRanking: calculateRankingVolAdustedForMetric("percentWeeklyChange"),
+      volAdjustedRanking: calculateRankingVolAdustedForMetric(
+        "percentWeeklyChange"
+      ),
       actualChange: etf.percentWeeklyChange.toFixed(2),
     },
     {
       period: "Month",
       ranking: calculateRankingForMetric("percentMonthlyChange"),
-      volAdjustedRanking: calculateRankingVolAdustedForMetric("percentMonthlyChange"),
+      volAdjustedRanking: calculateRankingVolAdustedForMetric(
+        "percentMonthlyChange"
+      ),
       actualChange: etf.percentMonthlyChange.toFixed(2),
     },
     {
       period: "3M",
       ranking: calculateRankingForMetric("percentThreeMonthChange"),
-      volAdjustedRanking: calculateRankingVolAdustedForMetric("percentThreeMonthChange"),
+      volAdjustedRanking: calculateRankingVolAdustedForMetric(
+        "percentThreeMonthChange"
+      ),
       actualChange: etf.percentThreeMonthChange.toFixed(2),
     },
     {
       period: "6M",
       ranking: calculateRankingForMetric("percentSixMonthChange"),
-      volAdjustedRanking: calculateRankingVolAdustedForMetric("percentSixMonthChange"),
+      volAdjustedRanking: calculateRankingVolAdustedForMetric(
+        "percentSixMonthChange"
+      ),
       actualChange: etf.percentSixMonthChange.toFixed(2),
     },
     {
       period: "1Y",
       ranking: calculateRankingForMetric("percent1YearChange"),
-      volAdjustedRanking: calculateRankingVolAdustedForMetric("percent1YearChange"),
+      volAdjustedRanking:
+        calculateRankingVolAdustedForMetric("percent1YearChange"),
       actualChange: etf.percent1YearChange.toFixed(2),
     },
   ];
-
 
   const renderLegendContent = (props: any) => {
     const { payload } = props;
@@ -99,7 +107,10 @@ const EtfReturnsRadarChart: React.FC<EtfRetursRadarChartProps> = ({
       <ul className="flex justify-center items-center space-x-4 text-xs">
         {payload.map((entry: any, index: number) => (
           <li key={`item-${index}`} className="flex items-center space-x-2">
-            <span className="inline-block w-3 h-3" style={{ backgroundColor: entry.color }} />
+            <span
+              className="inline-block w-3 h-3"
+              style={{ backgroundColor: entry.color }}
+            />
             <span className="text-foreground/70">{entry.value}</span>
           </li>
         ))}
@@ -110,15 +121,28 @@ const EtfReturnsRadarChart: React.FC<EtfRetursRadarChartProps> = ({
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const period = payload[0].payload.period;
-      const regularRanking = payload.find((p: { dataKey: string; }) => p.dataKey === "ranking")?.value.toFixed(1);
-      const volAdjustedRanking = payload.find((p: { dataKey: string; }) => p.dataKey === "volAdjustedRanking")?.value.toFixed(1);
+      const regularRanking = payload
+        .find((p: { dataKey: string }) => p.dataKey === "ranking")
+        ?.value.toFixed(1);
+      const volAdjustedRanking = payload
+        .find((p: { dataKey: string }) => p.dataKey === "volAdjustedRanking")
+        ?.value.toFixed(1);
 
       return (
-        <div className="bg-background border rounded p-2 shadow-sm">
+        <div className="bg-background border rounded p-2 shadow-sm tabular-nums">
           <p className="font-medium">{period}</p>
-          <p className="text-sm">RS Rank: {regularRanking}%</p>
-          <p className="text-sm">Vol-Adjusted RS: {volAdjustedRanking}%</p>
-          <p className="text-sm">Change: {payload[0].payload.actualChange}%</p>
+          <p className="text-sm">
+            <span className="font-semibold">RS Rank: </span>
+            {regularRanking}%
+          </p>
+          <p className="text-sm">
+            <span className="font-semibold">Vol-Adjusted RS: </span>
+            {volAdjustedRanking}%
+          </p>
+          <p className="text-sm">
+            <span className="font-semibold">Change: </span>
+            {payload[0].payload.actualChange}%
+          </p>
         </div>
       );
     }
@@ -146,20 +170,20 @@ const EtfReturnsRadarChart: React.FC<EtfRetursRadarChartProps> = ({
               wrapperStyle={{ bottom: "-5px" }}
             />
             <Radar
-              name="RS Rank"
+              name="RS"
               dataKey="ranking"
-              fill={solarizedBase01}
+              fill={solarizedBlue}
               fillOpacity={0.4}
-              stroke={solarizedBase01}
+              stroke={solarizedBlue}
               dot={{
-                fill: solarizedBase01,
+                fill: solarizedBlue,
                 strokeWidth: 0,
                 r: 3,
               }}
               activeDot={{
-                fill: solarizedBase01,
+                fill: solarizedBlue,
                 strokeWidth: 2,
-                stroke: solarizedBase01,
+                stroke: solarizedBlue,
                 r: 3,
               }}
             />
@@ -189,4 +213,3 @@ const EtfReturnsRadarChart: React.FC<EtfRetursRadarChartProps> = ({
 };
 
 export default EtfReturnsRadarChart;
-

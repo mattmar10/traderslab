@@ -14,15 +14,20 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
-  CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { ReturnsData } from "./market-sectors-themes-wrapper";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChartLineIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface TimeframeOption {
   label: string;
@@ -83,7 +88,9 @@ const CustomTooltip = ({
             <span>{` - ${tickerNames?.[entry.dataKey] || entry.dataKey}`}</span>
           </div>
           <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground">
-            {isRelativeStrength ? entry.value?.toFixed(4) : `${entry.value?.toFixed(2)}%`}
+            {isRelativeStrength
+              ? entry.value?.toFixed(4)
+              : `${entry.value?.toFixed(2)}%`}
           </div>
         </div>
       ))}
@@ -99,6 +106,8 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
   colorMap = {},
   tickerNames,
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   const [selectedTickers, setSelectedTickers] = useState<string[]>(
     Object.keys(returnsData)
   );
@@ -131,7 +140,7 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
 
     // For 3M and 6M timeframes, use bi-weekly ticks
     const twoWeeksMs = 14 * 24 * 60 * 60 * 1000;
-    const dates = data.map(item => new Date(item.date));
+    const dates = data.map((item) => new Date(item.date));
     const startDate = dates[0];
     const endDate = dates[dates.length - 1];
 
@@ -157,11 +166,14 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
     return ticks;
   };
 
-  const calculateStartDate = React.useCallback((timeframe: TimeframeOption) => {
-    const date = new Date(endDate);
-    date.setMonth(date.getMonth() - timeframe.months);
-    return date;
-  }, [endDate]);
+  const calculateStartDate = React.useCallback(
+    (timeframe: TimeframeOption) => {
+      const date = new Date(endDate);
+      date.setMonth(date.getMonth() - timeframe.months);
+      return date;
+    },
+    [endDate]
+  );
 
   const processedData = React.useMemo(() => {
     const startDate = calculateStartDate(selectedTimeframe);
@@ -182,9 +194,12 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
     Object.entries(returnsData).forEach(([ticker, returns]) => {
       // Find the closest date to startDate
       const startPoint = returns
-        .filter(r => new Date(r.date) >= startDate)
-        .sort((a, b) => Math.abs(new Date(a.date).getTime() - startDate.getTime()) -
-          Math.abs(new Date(b.date).getTime() - startDate.getTime()))[0];
+        .filter((r) => new Date(r.date) >= startDate)
+        .sort(
+          (a, b) =>
+            Math.abs(new Date(a.date).getTime() - startDate.getTime()) -
+            Math.abs(new Date(b.date).getTime() - startDate.getTime())
+        )[0];
 
       if (startPoint) {
         startingPrices[ticker] = startPoint.price;
@@ -222,7 +237,10 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
 
           if (returnForDate?.price && startingPrices[ticker]) {
             // Calculate return relative to the timeframe start
-            const periodReturn = ((returnForDate.price - startingPrices[ticker]) / startingPrices[ticker]) * 100;
+            const periodReturn =
+              ((returnForDate.price - startingPrices[ticker]) /
+                startingPrices[ticker]) *
+              100;
             dataPoint[ticker] = periodReturn;
           } else {
             dataPoint[ticker] = null;
@@ -251,7 +269,6 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
     return Array.from(ticks.values());
   }, [processedData, selectedTimeframe]);
 
-
   const handleTickerToggle = (ticker: string) => {
     setSelectedTickers((prevSelectedTickers) => {
       if (prevSelectedTickers.includes(ticker)) {
@@ -261,26 +278,47 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
       }
     });
   };
-
-
   return (
-    <Card >
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>{title}</CardTitle>
-            <CardDescription>
-              {isRelativeStrength
-                ? "Showing relative strength (to RSP)"
-                : `Showing returns for ${selectedTimeframe.label}`}
-            </CardDescription>
+    <Card className="w-full">
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <div className="flex items-center justify-between p-6">
+          <div className="flex items-center gap-4">
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="ghost"
+                className={cn(
+                  "relative flex items-center gap-4 h-6 w-auto p-2",
+                  "hover:bg-muted/0 transition-all duration-200"
+                )}
+              >
+                <div
+                  className={cn(
+                    "relative",
+                    !isOpen &&
+                    "after:absolute after:inset-0 after:rounded-full after:border after:border-primary/20 after:animate-[ping_3s_ease-in-out_infinite]"
+                  )}
+                >
+                  <ChartLineIcon
+                    className={cn(
+                      "h-5 w-5 hover:text-primary/70 transition-colors duration-200",
+                      isOpen &&
+                      "rotate-90 transform transition-transform duration-200"
+                    )}
+                  />
+                </div>
+                <CardTitle className="font-semibold text-lg">{title}</CardTitle>
+                <span className="sr-only">Toggle chart</span>
+              </Button>
+            </CollapsibleTrigger>
           </div>
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-1">
               {TIMEFRAME_OPTIONS.map((timeframe) => (
                 <Button
                   key={timeframe.label}
-                  variant={timeframe === selectedTimeframe ? "secondary" : "outline"}
+                  variant={
+                    timeframe === selectedTimeframe ? "secondary" : "outline"
+                  }
                   size="sm"
                   onClick={() => setSelectedTimeframe(timeframe)}
                 >
@@ -290,7 +328,9 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
             </div>
             <div className="flex items-center space-x-2">
               <span
-                className={`text-sm transition-colors duration-200 ${!isRelativeStrength ? 'text-foreground' : 'text-muted-foreground'
+                className={`text-sm transition-colors duration-200 ${!isRelativeStrength
+                  ? "text-foreground"
+                  : "text-muted-foreground"
                   }`}
               >
                 Returns
@@ -302,7 +342,9 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
                 className="mx-2"
               />
               <span
-                className={`text-sm transition-colors duration-200 ${isRelativeStrength ? 'text-foreground' : 'text-muted-foreground'
+                className={`text-sm transition-colors duration-200 ${isRelativeStrength
+                  ? "text-foreground"
+                  : "text-muted-foreground"
                   }`}
               >
                 Relative Strength
@@ -310,104 +352,105 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
             </div>
           </div>
         </div>
-      </CardHeader>
 
-      <CardContent className="w-full">
-        <ChartContainer
-          config={chartConfig}
-
-        >
-          <ResponsiveContainer>
-            <LineChart
-              data={processedData}
-              margin={{
-                left: 12,
-                right: 12,
-                top: 12,
-                bottom: 12,
-              }}
-            >
-              <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" />
-              <ReferenceLine
-                y={isRelativeStrength ? 1 : 0}
-                stroke="#999"
-                strokeWidth={1.5}
-              />
-              <XAxis
-                dataKey="date"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                ticks={chartTicks}
-                tickFormatter={(value) => {
-                  const date = new Date(value);
-                  // For 12M view, show month and year
-                  if (selectedTimeframe.months === 12) {
-                    return date.toLocaleDateString("en-US", {
-                      month: "short",
-                      year: "2-digit",
-                    });
-                  }
-                  // For shorter timeframes, show month and day
-                  return date.toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  });
-                }}
-              />
-              <YAxis
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                tickFormatter={(value) =>
-                  isRelativeStrength ? value.toFixed(2) : `${value.toFixed(1)}%`
-                }
-              />
-              <Tooltip
-                content={
-                  <CustomTooltip
-                    config={chartConfig}
-                    tickerNames={tickerNames}
-                    isRelativeStrength={isRelativeStrength}
+        <CollapsibleContent>
+          <CardContent className="w-full">
+            <ChartContainer config={chartConfig}>
+              <ResponsiveContainer>
+                <LineChart
+                  data={processedData}
+                  margin={{
+                    left: 12,
+                    right: 12,
+                    top: 12,
+                    bottom: 12,
+                  }}
+                >
+                  <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" />
+                  <ReferenceLine
+                    y={isRelativeStrength ? 1 : 0}
+                    stroke="#999"
+                    strokeWidth={1.5}
                   />
-                }
-                cursor={{ strokeDasharray: "3 3" }}
-              />
-              {Object.keys(returnsData).map((ticker) => (
-                <Line
-                  key={ticker}
-                  type="monotone"
-                  dataKey={ticker}
-                  name={ticker}
-                  stroke={chartConfig[ticker].color}
-                  strokeWidth={ticker === "RSP" ? 3 : 1}
-                  dot={false}
-                  activeDot={{ r: 4 }}
-                  hide={!selectedTickers.includes(ticker)}
-                />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-      </CardContent>
-      <CardFooter>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {Object.keys(returnsData)
-            .sort((a, b) => (tickerNames[a] || a).localeCompare(tickerNames[b] || b))
-            .map((ticker) => (
-              <Button
-                key={ticker}
-                variant={
-                  selectedTickers.includes(ticker) ? "secondary" : "outline"
-                }
-                size="sm"
-                onClick={() => handleTickerToggle(ticker)}
-              >
-                {tickerNames?.[ticker] || ticker}
-              </Button>
-            ))}
-        </div>
-      </CardFooter>
+                  <XAxis
+                    dataKey="date"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    ticks={chartTicks}
+                    tickFormatter={(value) => {
+                      const date = new Date(value);
+                      if (selectedTimeframe.months === 12) {
+                        return date.toLocaleDateString("en-US", {
+                          month: "short",
+                          year: "2-digit",
+                        });
+                      }
+                      return date.toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      });
+                    }}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    tickFormatter={(value) =>
+                      isRelativeStrength
+                        ? value.toFixed(2)
+                        : `${value.toFixed(1)}%`
+                    }
+                  />
+                  <Tooltip
+                    content={
+                      <CustomTooltip
+                        config={chartConfig}
+                        tickerNames={tickerNames}
+                        isRelativeStrength={isRelativeStrength}
+                      />
+                    }
+                    cursor={{ strokeDasharray: "3 3" }}
+                  />
+                  {Object.keys(returnsData).map((ticker) => (
+                    <Line
+                      key={ticker}
+                      type="monotone"
+                      dataKey={ticker}
+                      name={ticker}
+                      stroke={chartConfig[ticker].color}
+                      strokeWidth={ticker === "RSP" ? 3 : 1}
+                      dot={false}
+                      activeDot={{ r: 4 }}
+                      hide={!selectedTickers.includes(ticker)}
+                    />
+                  ))}
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
+          <CardFooter>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {Object.keys(returnsData)
+                .sort((a, b) =>
+                  (tickerNames[a] || a).localeCompare(tickerNames[b] || b)
+                )
+                .map((ticker) => (
+                  <Button
+                    key={ticker}
+                    variant={
+                      selectedTickers.includes(ticker) ? "secondary" : "outline"
+                    }
+                    size="sm"
+                    onClick={() => handleTickerToggle(ticker)}
+                  >
+                    {tickerNames?.[ticker] || ticker}
+                  </Button>
+                ))}
+            </div>
+          </CardFooter>
+        </CollapsibleContent>
+      </Collapsible>
     </Card>
   );
 };

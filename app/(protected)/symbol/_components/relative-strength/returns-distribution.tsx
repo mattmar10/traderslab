@@ -86,7 +86,7 @@ const ReturnDistribution: React.FC<ReturnDistributionProps> = ({
           (r * 100 - stats.mean * 100) / (stats.stdDev * 100);
         return acc + Math.pow(normalizedReturn, 4);
       }, 0) /
-        (n - 1) -
+      (n - 1) -
       3; // Excess kurtosis (normal = 0)
 
     // Percentiles
@@ -177,7 +177,7 @@ const ReturnDistribution: React.FC<ReturnDistributionProps> = ({
                   stroke={solarizedYellow}
                   strokeWidth={2}
                   label={{
-                    value: `μ: ${meanFormatted}%`,
+                    value: `${meanFormatted}%`,
                     position: "top",
                     fill: solarizedYellow,
                   }}
@@ -188,7 +188,7 @@ const ReturnDistribution: React.FC<ReturnDistributionProps> = ({
                   x={(stats.mean + stats.stdDev) * 100}
                   stroke={solarizedBase01}
                   label={{
-                    value: `+1σ: ${((stats.mean + stats.stdDev) * 100).toFixed(
+                    value: `${((stats.mean + stats.stdDev) * 100).toFixed(
                       2
                     )}%`,
                     position: "top",
@@ -201,7 +201,7 @@ const ReturnDistribution: React.FC<ReturnDistributionProps> = ({
                   x={(stats.mean - stats.stdDev) * 100}
                   stroke={solarizedBase01}
                   label={{
-                    value: `-1σ: ${((stats.mean - stats.stdDev) * 100).toFixed(
+                    value: `${((stats.mean - stats.stdDev) * 100).toFixed(
                       2
                     )}%`,
                     position: "top",
@@ -213,7 +213,7 @@ const ReturnDistribution: React.FC<ReturnDistributionProps> = ({
                   x={(stats.mean + 2 * stats.stdDev) * 100}
                   stroke={solarizedMagenta}
                   label={{
-                    value: `+2σ: ${(
+                    value: `${(
                       (stats.mean + 2 * stats.stdDev) *
                       100
                     ).toFixed(2)}%`,
@@ -226,7 +226,7 @@ const ReturnDistribution: React.FC<ReturnDistributionProps> = ({
                   x={(stats.mean - 2 * stats.stdDev) * 100}
                   stroke={solarizedMagenta}
                   label={{
-                    value: `-2σ: ${(
+                    value: `${(
                       (stats.mean - 2 * stats.stdDev) *
                       100
                     ).toFixed(2)}%`,
