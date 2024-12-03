@@ -1,14 +1,10 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { ArrowRight, Search } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Switch } from "@/components/ui/switch"; // Import Switch component
+
+import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useKeyPress } from "@/hooks/useKeyPress";
@@ -42,7 +38,6 @@ const filterOptions: FilterOption[] = [
 ];
 
 const SearchInput = () => {
-  const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilters, setSelectedFilters] = useState<Set<SearchResultType>>(
     new Set(["stock"])
@@ -67,7 +62,6 @@ const SearchInput = () => {
 
   const handleNavigation = (symbol: string) => {
     setSearchTerm(""); // Clear input
-    setIsOpen(false); // Close popover
     router.push(`/symbol/${symbol}`);
   };
 
@@ -88,7 +82,7 @@ const SearchInput = () => {
   });
 
   useKeyPress("Escape", () => {
-    setIsOpen(false);
+    setSearchTerm('')
   });
 
   const toggleFilter = (type: SearchResultType) => {
@@ -138,60 +132,40 @@ const SearchInput = () => {
     return results;
   }
 
-  // Enhanced focus management
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      // Store the current cursor position
-      const cursorPosition = inputRef.current.selectionStart;
-
-      // Use requestAnimationFrame to ensure focus happens after React updates
-      requestAnimationFrame(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
-          // Restore the cursor position
-          inputRef.current.setSelectionRange(cursorPosition, cursorPosition);
-        }
-      });
-    }
-  }, [isOpen, searchResults, isLoading]); // Added isLoading as a dependency
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setSearchTerm(newValue);
+    setCurrentIndex(-1);
+  };
 
   return (
-    <div className="w-full space-y-2">
-      <Popover open={isOpen && searchTerm.length > 0} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild>
-          <div className="relative w-full">
-            <Input
-              ref={inputRef}
-              className="peer w-full pl-9 pr-9"
-              placeholder="Search..."
-              type="search"
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setIsOpen(e.target.value.length > 0);
-                setCurrentIndex(-1);
-              }}
-            />
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center pl-3 text-muted-foreground/80 peer-disabled:opacity-50">
-              <Search size={16} strokeWidth={2} aria-hidden="true" />
-            </div>
-            <button
-              className="absolute inset-y-px right-px flex h-full w-9 items-center justify-center rounded-r-lg text-muted-foreground/80 ring-offset-background transition-shadow hover:text-foreground"
-              aria-label="Submit search"
-              type="submit"
-            >
-              <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />
-            </button>
-          </div>
-        </PopoverTrigger>
-        {searchTerm && (
-          <PopoverContent
-            className="p-4"
-            align="center"
-            style={{
-              width: "60vw",
-              maxWidth: "60vw",
-            }}
+    <div className="w-full">
+      <div className="relative w-full">
+        <Input
+          ref={inputRef}
+          className="peer w-full pl-9 pr-9"
+          placeholder="Search..."
+          type="search"
+          value={searchTerm}
+          onChange={handleInputChange}
+        />
+        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center pl-3 text-muted-foreground/80 peer-disabled:opacity-50">
+          <Search size={16} strokeWidth={2} aria-hidden="true" />
+        </div>
+        <button
+          className="absolute inset-y-px right-px flex h-full w-9 items-center justify-center rounded-r-lg text-muted-foreground/80 ring-offset-background transition-shadow hover:text-foreground"
+          aria-label="Submit search"
+          type="submit"
+        >
+          <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />
+        </button>
+      </div>
+
+      {/* Centered Popover */}
+      {searchTerm && (
+        <div className="fixed inset-x-0 z-50 flex justify-center" style={{ top: "4rem" }}>
+          <div
+            className="w-full max-w-[60vw] rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none"
           >
             <div className="px-4 py-2 border-b">
               <div className="flex gap-4">
@@ -210,7 +184,7 @@ const SearchInput = () => {
                 ))}
               </div>
             </div>
-            <div className="max-h-[300px] overflow-y-auto">
+            <div className="max-h-[calc(100vh-8rem)] overflow-y-auto">
               {isLoading ? (
                 <div className="p-4 text-sm text-muted-foreground">
                   Loading...
@@ -223,13 +197,9 @@ const SearchInput = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border bg-accent">
-                      <th className="py-2 px-3 text-left font-medium">
-                        Symbol
-                      </th>
+                      <th className="py-2 px-3 text-left font-medium">Symbol</th>
                       <th className="py-2 px-2 text-left font-medium">Name</th>
-                      <th className="py-2 px-2 text-left font-medium">
-                        Sector
-                      </th>
+                      <th className="py-2 px-2 text-left font-medium">Sector</th>
                       <th className="py-2 px-2 text-left font-medium">
                         Industry
                       </th>
@@ -240,11 +210,10 @@ const SearchInput = () => {
                     {filteredResults.map((result, index) => (
                       <tr
                         key={`${result.type}-${result.symbol}`}
-                        className={`cursor-pointer border-b border-border/50 transition-colors ${
-                          index === currentIndex
-                            ? "bg-accent"
-                            : "hover:bg-accent/50"
-                        }`}
+                        className={`cursor-pointer border-b border-border/50 transition-colors ${index === currentIndex
+                          ? "bg-accent"
+                          : "hover:bg-accent/50"
+                          }`}
                         onClick={() => handleNavigation(result.symbol)}
                       >
                         <td className="py-2 px-3 font-medium">
@@ -266,9 +235,9 @@ const SearchInput = () => {
                 </table>
               )}
             </div>
-          </PopoverContent>
-        )}
-      </Popover>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
