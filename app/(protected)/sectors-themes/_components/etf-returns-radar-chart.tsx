@@ -170,7 +170,7 @@ const EtfReturnsRadarChart: React.FC<EtfRetursRadarChartProps> = ({
               wrapperStyle={{ bottom: "-5px" }}
             />
             <Radar
-              name="RS Rank"
+              name="RS"
               dataKey="ranking"
               fill={solarizedBlue}
               fillOpacity={0.4}

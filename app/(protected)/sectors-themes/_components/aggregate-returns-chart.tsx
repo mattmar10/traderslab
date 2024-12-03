@@ -14,9 +14,7 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
-  CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
@@ -30,7 +28,6 @@ import {
 } from "@/components/ui/collapsible";
 import { ChartLineIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { BorderBeam } from "@/components/magicui/border-beam";
 
 interface TimeframeOption {
   label: string;
@@ -290,26 +287,26 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
               <Button
                 variant="ghost"
                 className={cn(
-                  "relative flex items-center gap-4 h-9 w-auto p-2",
-                  "hover:bg-muted/50 transition-all duration-200"
+                  "relative flex items-center gap-4 h-6 w-auto p-2",
+                  "hover:bg-muted/0 transition-all duration-200"
                 )}
               >
                 <div
                   className={cn(
                     "relative",
                     !isOpen &&
-                      "after:absolute after:inset-0 after:rounded-full after:border after:border-primary/20 after:animate-[ping_3s_ease-in-out_infinite]"
+                    "after:absolute after:inset-0 after:rounded-full after:border after:border-primary/20 after:animate-[ping_3s_ease-in-out_infinite]"
                   )}
                 >
                   <ChartLineIcon
                     className={cn(
                       "h-5 w-5 hover:text-primary/70 transition-colors duration-200",
                       isOpen &&
-                        "rotate-90 transform transition-transform duration-200"
+                      "rotate-90 transform transition-transform duration-200"
                     )}
                   />
                 </div>
-                <CardTitle className="font-medium">{title}</CardTitle>
+                <CardTitle className="font-semibold text-lg">{title}</CardTitle>
                 <span className="sr-only">Toggle chart</span>
               </Button>
             </CollapsibleTrigger>
@@ -331,11 +328,10 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
             </div>
             <div className="flex items-center space-x-2">
               <span
-                className={`text-sm transition-colors duration-200 ${
-                  !isRelativeStrength
-                    ? "text-foreground"
-                    : "text-muted-foreground"
-                }`}
+                className={`text-sm transition-colors duration-200 ${!isRelativeStrength
+                  ? "text-foreground"
+                  : "text-muted-foreground"
+                  }`}
               >
                 Returns
               </span>
@@ -346,11 +342,10 @@ const AggregateReturnsChart: React.FC<AggregateReturnsChartProps> = ({
                 className="mx-2"
               />
               <span
-                className={`text-sm transition-colors duration-200 ${
-                  isRelativeStrength
-                    ? "text-foreground"
-                    : "text-muted-foreground"
-                }`}
+                className={`text-sm transition-colors duration-200 ${isRelativeStrength
+                  ? "text-foreground"
+                  : "text-muted-foreground"
+                  }`}
               >
                 Relative Strength
               </span>

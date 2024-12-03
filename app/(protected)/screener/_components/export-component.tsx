@@ -66,11 +66,10 @@ const ExportComponent: React.FC<ExportComponentProps> = ({
       if (exportFormat !== "twitter") {
         toast({
           title: "Export Successful",
-          description: `Data exported to ${
-            exportFormat === "clipboard"
-              ? "clipboard"
-              : exportFormat.toUpperCase()
-          }`,
+          description: `Data exported to ${exportFormat === "clipboard"
+            ? "clipboard"
+            : exportFormat.toUpperCase()
+            }`,
         });
       }
     } catch (error) {
@@ -155,6 +154,7 @@ const ExportComponent: React.FC<ExportComponentProps> = ({
       price: "Price",
       rsRank: "RS Rank",
       rsScore: "RS Score",
+      oneDayAbsoluteChange: "1-Day Change",
       oneDayReturnPercent: "1-Day Return",
       oneWeekReturnPercent: "1-Week Return",
       oneMonthReturnPercent: "1-Month Return",
@@ -176,9 +176,10 @@ const ExportComponent: React.FC<ExportComponentProps> = ({
     const symbols = stocks
       .map((stock) => `$${stock.profile.symbol}`)
       .join(", ");
-    const tagline = `${
-      filterGroupName || "Check out these hot stocks"
-    } sorted by ${getSortName(sortAttribute)}.`;
+    const tagline = `${filterGroupName || "Check out these hot stocks"
+      } sorted by ${getSortName(sortAttribute)}.`;
+    console.log(tagline)
+
     const tweetText = `${tagline}\n\n${symbols}\n\n By @TradersLab_`;
     //const hashtags = "traderslab,stocks,investing";
 

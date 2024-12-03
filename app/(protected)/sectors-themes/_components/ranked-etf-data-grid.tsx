@@ -23,7 +23,7 @@ const RankedMarketDataGrid: React.FC<RankedEtfDataGridProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Top {title}</CardTitle>
+        <CardTitle className="text-lg">Top {title}</CardTitle>
       </CardHeader>
 
       <CardContent>

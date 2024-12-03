@@ -10,7 +10,6 @@ import { useMemo } from "react";
 import { Candle } from "@/lib/types/basic-types";
 import AggregateReturnsChart from "./aggregate-returns-chart";
 import { useTheme } from "next-themes";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FMPHistoricalResultsSchema } from "@/lib/types/fmp-types";
 import { formatDateToEST } from "@/lib/utils/epoch-utils";
 import Loading from "@/components/loading";
@@ -34,8 +33,8 @@ const calculateReturns = (candles: Candle[]): ReturnsData[] => {
       index === 0
         ? 0
         : ((candle.close - candles[index - 1].close) /
-            candles[index - 1].close) *
-          100;
+          candles[index - 1].close) *
+        100;
 
     // Calculate cumulative return from the first day
     const cumulativeReturn =
@@ -260,21 +259,7 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
 
   return (
     <div className="flex-col space-y-2 ">
-      <div>
-        {processedData && (
-          <div className="relative mt-4 w-full">
-            <AggregateReturnsChart
-              returnsData={processedData.returns}
-              title={`${title} Cumulative Returns and Relative Strength Comparison`}
-              returnType="cumulative"
-              colorMap={{
-                RSP: resolvedTheme === "light" ? "#404040" : "#e5e7eb",
-              }}
-              tickerNames={tickerNames}
-            />
-          </div>
-        )}
-      </div>
+
       {sortedData.length > 0 && (
         <div className="relative">
           <BorderBeam />
@@ -286,14 +271,26 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
           />
         </div>
       )}
-      <Card>
-        <CardHeader className="p-3"></CardHeader>
-        <CardContent>
-          {processedData && (
-            <MarketRankGroupAggregateTable data={processedData.marketData} />
-          )}
-        </CardContent>
-      </Card>
+      <div>
+        {processedData && (
+          <div className="relative mt-4 w-full">
+            <AggregateReturnsChart
+              returnsData={processedData.returns}
+              title={`${title} Cumulative Returns Comparison`}
+              returnType="cumulative"
+              colorMap={{
+                RSP: resolvedTheme === "light" ? "#404040" : "#e5e7eb",
+              }}
+              tickerNames={tickerNames}
+            />
+          </div>
+        )}
+      </div>
+
+      {processedData && (
+        <MarketRankGroupAggregateTable data={processedData.marketData} title={title} />
+      )}
+
     </div>
   );
 };
