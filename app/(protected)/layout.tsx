@@ -1,5 +1,6 @@
 import { isAuthorized } from "@/actions/data/user/is-authorized";
 import AppSidebar from "@/components/layout/app-sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
@@ -18,7 +19,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="py-2">
-      <AppSidebar>{children}</AppSidebar>
+      <SidebarProvider>
+        <AppSidebar>{children}</AppSidebar>
+      </SidebarProvider>
     </div>
   );
 }

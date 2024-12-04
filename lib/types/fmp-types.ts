@@ -375,7 +375,7 @@ export const EarningsDateSchema = z.object({
   symbol: z.string(),
   eps: z.nullable(z.number()),
   epsEstimated: z.nullable(z.number()),
-  time: z.enum(["bmo", "amc"]),
+  time: z.enum(["bmo", "amc", "--"]),
   revenue: z.nullable(z.number()),
   revenueEstimated: z.nullable(z.number()),
   updatedFromDate: z.string(),
@@ -395,7 +395,7 @@ export function isFMPEarningsDate(data: any): data is FMPEarningsDate {
     typeof data.symbol === "string" &&
     (typeof data.eps === "number" || data.eps === null) &&
     (typeof data.epsEstimated === "number" || data.epsEstimated === null) &&
-    ["bmo", "amc"].includes(data.time) &&
+    ["bmo", "amc", "--"].includes(data.time) &&
     (typeof data.revenue === "number" || data.revenue === null) &&
     (typeof data.revenueEstimated === "number" ||
       data.revenueEstimated === null) &&

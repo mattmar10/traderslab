@@ -2,7 +2,7 @@ import { CustomizableChartMALine } from "@/components/customizable-price-chart";
 import ErrorCard from "@/components/error-card";
 import Loading from "@/components/loading";
 import { ChartSettings } from "@/components/settings/chart-settings";
-import { Candle, QuoteElementSchema } from "@/lib/types/basic-types";
+import { QuoteElementSchema } from "@/lib/types/basic-types";
 import {
   FMPEarningsCalendar,
   FMPEarningsCalendarSchema,
@@ -32,307 +32,321 @@ export interface ScreenerMiniChartWrapperProps {
 }
 
 const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> =
-  React.memo(({ item, chartSettings, theme, startDate }) => {
-    const ticker = item.quote.symbol;
-    const barsKey = useMemo(
-      () => `/api/bars/${ticker}?fromDateString=${formatDateToEST(startDate)}`,
-      [ticker, startDate]
-    );
+  React.memo(
+    ({ item, chartSettings, theme, startDate }) => {
+      const ticker = item.quote.symbol;
+      const barsKey = useMemo(
+        () =>
+          `/api/bars/${ticker}?fromDateString=${formatDateToEST(startDate)}`,
+        [ticker, startDate]
+      );
 
-    const quoteKey = useMemo(() => `/api/quote/${ticker}`, [ticker]);
+      const quoteKey = useMemo(() => `/api/quote/${ticker}`, [ticker]);
 
-    const earningsKey = useMemo(() => `/api/earnings/${ticker}`, [ticker]);
+      const earningsKey = useMemo(() => `/api/earnings/${ticker}`, [ticker]);
 
-    const getBars = async () => {
-      const bars = await fetch(barsKey);
-      const parsed = FMPHistoricalResultsSchema.safeParse(await bars.json());
-      if (!parsed.success) {
-        throw Error("Unable to fetch bars");
-      } else {
-        return parsed.data.historical.map((h) => {
-          const candle: Candle = {
-            date: new Date(h.date).getTime(),
-            dateStr: h.date,
-            open: h.open,
-            high: h.high,
-            low: h.low,
-            close: h.close,
-            volume: h.volume,
-          };
-          return candle;
-        });
-      }
-    };
+      const getData = useMemo(
+        () => async () => {
+          const startTime = performance.now();
+          const times: Record<string, number> = {};
+          const [barsRes, quoteRes, earningsRes] = await Promise.all([
+            fetch(barsKey).then((r) => {
+              times.bars = performance.now() - startTime;
+              return r;
+            }),
+            fetch(quoteKey).then((r) => {
+              times.quote = performance.now() - startTime;
+              return r;
+            }),
+            fetch(earningsKey).then((r) => {
+              times.earnings = performance.now() - startTime;
+              return r;
+            }),
+          ]);
 
-    const {
-      data: barsData,
-      error: barsError,
-      isLoading: barsIsLoading,
-    } = useQuery({
-      queryKey: [barsKey, ticker],
-      queryFn: getBars,
-      refetchOnWindowFocus: false,
-      refetchInterval: 120000,
-      staleTime: 120000,
-    });
+          times.fetchTotal = performance.now() - startTime;
 
-    const getQuoteApi = async () => {
-      const res = await fetch(quoteKey);
-      const parsed = QuoteElementSchema.safeParse(await res.json());
-      if (!parsed.success) {
-        return "Unable to parse quote results";
-      } else {
-        return parsed.data;
-      }
-    };
+          const [barsJson, quoteJson, earningsJson] = await Promise.all([
+            barsRes.json(),
+            quoteRes.json(),
+            earningsRes.json(),
+          ]);
 
-    const {
-      data: quoteData,
-      error: quoteError,
-      isLoading: quoteIsLoading,
-    } = useQuery({
-      queryKey: [quoteKey, ticker],
-      queryFn: getQuoteApi,
-      refetchInterval: 30000,
-      staleTime: 30000, // Add staleTime to prevent unnecessary refetches
-    });
+          times.parseTotal = performance.now() - startTime;
+          console.table(times);
 
-    const getEarningsApi = async () => {
-      const response = await fetch(earningsKey);
-      const data = await response.json();
-      const parsed = FMPEarningsCalendarSchema.safeParse(data);
-      if (!parsed.success) {
-        throw Error("Unable to fetch quote");
-      }
-      return parsed.data;
-    };
+          // console.log('Parsed JSON:', { barsJson, quoteJson, earningsJson });
 
-    const { data: earningsData, isLoading: earningsLoading } = useQuery({
-      queryKey: [earningsKey, ticker],
-      queryFn: getEarningsApi,
-      refetchOnWindowFocus: false,
-      refetchInterval: 3600000,
-      staleTime: 3600000,
-    });
+          const barsData = FMPHistoricalResultsSchema.safeParse(barsJson);
+          const quoteData = QuoteElementSchema.safeParse(quoteJson);
+          const earningsData =
+            FMPEarningsCalendarSchema.safeParse(earningsJson);
 
-    const filterAndSortEarningsDates = (
-      earningsCalendar: FMPEarningsCalendar
-    ) => {
-      const currentDate = new Date();
-
-      const filteredSortedDates = earningsCalendar
-        .filter((item) => {
-          const dateObj = new Date(item.date);
-          if (item.time === "amc") {
-            dateObj.setDate(dateObj.getDate() + 1);
-          }
-          return (
-            dateObj.getTime() > startDate.getTime() &&
-            dateObj.getTime() <= currentDate.getTime()
-          );
-        })
-        .sort((a, b) => {
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          if (a.time === "amc") dateA.setDate(dateA.getDate() + 1);
-          if (b.time === "amc") dateB.setDate(dateB.getDate() + 1);
-          return dateA.getTime() - dateB.getTime();
-        });
-
-      return filteredSortedDates;
-    };
-
-    if (barsIsLoading || quoteIsLoading || earningsLoading) {
-      return <Loading />;
-    }
-
-    if (
-      barsError ||
-      !barsData ||
-      isFMPDataLoadingError(earningsData) ||
-      quoteError ||
-      !quoteData ||
-      isFMPDataLoadingError(quoteData)
-    ) {
-      return <ErrorCard errorMessage={`Unable to load data for ${ticker}`} />;
-    }
-
-    const sortedTickerData = barsData.sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
-
-    const filteredEarnings = earningsData
-      ? filterAndSortEarningsDates(earningsData)
-      : [];
-
-    const adjustedDates = filteredEarnings.map((e) => {
-      const dateObj = new Date(e.date);
-      if (e.time === "amc") {
-        dateObj.setDate(dateObj.getDate() + 1);
-      }
-      return dateObj.toISOString().split("T")[0];
-    });
-
-    const filteredCandles = barsData.filter(
-      (d) => d.date >= startDate.getTime()
-    );
-
-    if (
-      quoteData &&
-      quoteData.open &&
-      !isFMPDataLoadingError(quoteData) &&
-      filteredCandles.length > 0
-    ) {
-      // Add length check
-      try {
-        const lastCandle = filteredCandles[filteredCandles.length - 1];
-
-        // Update the last candle with formatted values
-        Object.assign(lastCandle, {
-          close: Number(quoteData.price.toFixed(2)),
-          open: Number(quoteData.open.toFixed(2)),
-          high: Number(quoteData.dayHigh.toFixed(2)),
-          low: Number(quoteData.dayLow.toFixed(2)),
-        });
-
-        // Optional: Verify the high/low make sense
-        lastCandle.high = Math.max(lastCandle.high, lastCandle.close);
-        lastCandle.low = Math.min(lastCandle.low, lastCandle.close);
-      } catch (error) {
-        console.error("Error updating last candle with quote data:", error);
-      }
-    }
-
-    if (
-      quoteData &&
-      quoteData.open &&
-      !isFMPDataLoadingError(quoteData) &&
-      filteredCandles.length > 0
-    ) {
-      // Add length check
-      try {
-        const lastCandle = filteredCandles[filteredCandles.length - 1];
-
-        // Update the last candle with formatted values
-        Object.assign(lastCandle, {
-          close: Number(quoteData.price.toFixed(2)),
-          open: Number(quoteData.open.toFixed(2)),
-          high: Number(quoteData.dayHigh.toFixed(2)),
-          low: Number(quoteData.dayLow.toFixed(2)),
-        });
-
-        // Optional: Verify the high/low make sense
-        lastCandle.high = Math.max(lastCandle.high, lastCandle.close);
-        lastCandle.low = Math.min(lastCandle.low, lastCandle.close);
-      } catch (error) {
-        console.error("Error updating last candle with quote data:", error);
-      }
-    }
-
-    const priceMovingAverages: CustomizableChartMALine[] =
-      chartSettings.priceMovingAverages
-        .map((ma) => {
-          const timeseries =
-            ma.type === "SMA"
-              ? calculateSMA(sortedTickerData, ma.period)
-              : calculateEMA(sortedTickerData, ma.period);
-
-          if (isMovingAverageError(timeseries)) {
-            console.error(`Error calculating ${ma.type} ${ma.period}`);
-            return null;
+          //console.log('Zod parsed:', { barsData, quoteData, earningsData });
+          if (
+            !barsData.success ||
+            !quoteData.success ||
+            !earningsData.success
+          ) {
+            console.error("Parse failures:", {
+              bars: barsData.success ? "ok" : barsData.error,
+              quote: quoteData.success ? "ok" : quoteData.error,
+              earnings: earningsData.success ? "ok" : earningsData.error,
+            });
+            throw Error("Unable to fetch data");
           }
 
           return {
-            period: ma.period,
-            type: ma.type,
-            color: ma.color,
-            timeseries: timeseries.timeseries.filter(
+            bars: barsData.data.historical.map((h) => ({
+              date: new Date(h.date).getTime(),
+              dateStr: h.date,
+              open: h.open,
+              high: h.high,
+              low: h.low,
+              close: h.close,
+              volume: h.volume,
+            })),
+            quote: quoteData.data,
+            earnings: earningsData.data,
+          };
+        },
+        [barsKey, quoteKey, earningsKey]
+      );
+
+      const { data, error, isLoading } = useQuery({
+        queryKey: [ticker, "chartData"],
+        queryFn: getData,
+        refetchInterval: 30000, // Use the shortest interval needed (quote interval)
+        staleTime: 30000,
+      });
+
+      const filterAndSortEarningsDates = (
+        earningsCalendar: FMPEarningsCalendar
+      ) => {
+        const currentDate = new Date();
+
+        const filteredSortedDates = earningsCalendar
+          .filter((item) => {
+            const dateObj = new Date(item.date);
+            if (item.time === "amc") {
+              dateObj.setDate(dateObj.getDate() + 1);
+            }
+            return (
+              dateObj.getTime() > startDate.getTime() &&
+              dateObj.getTime() <= currentDate.getTime()
+            );
+          })
+          .sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            if (a.time === "amc") dateA.setDate(dateA.getDate() + 1);
+            if (b.time === "amc") dateB.setDate(dateB.getDate() + 1);
+            return dateA.getTime() - dateB.getTime();
+          });
+
+        return filteredSortedDates;
+      };
+
+      if (isLoading) {
+        return <Loading />;
+      }
+
+      if (error || !data) {
+        return (
+          <ErrorCard
+            errorMessage={`Unable to load data this timefor ${ticker}`}
+          />
+        );
+      }
+
+      const sortedTickerData = data.bars.sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
+
+      const filteredEarnings = data.earnings
+        ? filterAndSortEarningsDates(data.earnings)
+        : [];
+
+      const adjustedDates = filteredEarnings.map((e) => {
+        const dateObj = new Date(e.date);
+        if (e.time === "amc") {
+          dateObj.setDate(dateObj.getDate() + 1);
+        }
+        return dateObj.toISOString().split("T")[0];
+      });
+
+      const filteredCandles = sortedTickerData.filter(
+        (d) => d.date >= startDate.getTime()
+      );
+
+      if (
+        data.quote &&
+        data.quote.open &&
+        !isFMPDataLoadingError(data.quote) &&
+        filteredCandles.length > 0
+      ) {
+        // Add length check
+        try {
+          const lastCandle = filteredCandles[filteredCandles.length - 1];
+
+          // Update the last candle with formatted values
+          Object.assign(lastCandle, {
+            close: Number(data.quote.price.toFixed(2)),
+            open: Number(data.quote.open.toFixed(2)),
+            high: Number(data.quote.dayHigh.toFixed(2)),
+            low: Number(data.quote.dayLow.toFixed(2)),
+          });
+
+          // Optional: Verify the high/low make sense
+          lastCandle.high = Math.max(lastCandle.high, lastCandle.close);
+          lastCandle.low = Math.min(lastCandle.low, lastCandle.close);
+        } catch (error) {
+          console.error("Error updating last candle with quote data:", error);
+        }
+      }
+
+      if (
+        data.quote &&
+        data.quote.open &&
+        !isFMPDataLoadingError(data.quote) &&
+        filteredCandles.length > 0
+      ) {
+        // Add length check
+        try {
+          const lastCandle = filteredCandles[filteredCandles.length - 1];
+
+          // Update the last candle with formatted values
+          Object.assign(lastCandle, {
+            close: Number(data.quote.price.toFixed(2)),
+            open: Number(data.quote.open.toFixed(2)),
+            high: Number(data.quote.dayHigh.toFixed(2)),
+            low: Number(data.quote.dayLow.toFixed(2)),
+          });
+
+          // Optional: Verify the high/low make sense
+          lastCandle.high = Math.max(lastCandle.high, lastCandle.close);
+          lastCandle.low = Math.min(lastCandle.low, lastCandle.close);
+        } catch (error) {
+          console.error("Error updating last candle with quote data:", error);
+        }
+      }
+
+      const priceMovingAverages: CustomizableChartMALine[] =
+        chartSettings.priceMovingAverages
+          .map((ma) => {
+            const timeseries =
+              ma.type === "SMA"
+                ? calculateSMA(sortedTickerData, ma.period)
+                : calculateEMA(sortedTickerData, ma.period);
+
+            if (isMovingAverageError(timeseries)) {
+              console.error(`Error calculating ${ma.type} ${ma.period}`);
+              return null;
+            }
+
+            return {
+              period: ma.period,
+              type: ma.type,
+              color: ma.color,
+              timeseries: timeseries.timeseries.filter(
+                (t) => new Date(t.time).getTime() > startDate.getTime()
+              ),
+            };
+          })
+          .filter((ma): ma is CustomizableChartMALine => ma !== null);
+
+      let volumeMovingAverage: CustomizableChartMALine | undefined;
+      if (chartSettings.volumeMA.enabled) {
+        const volumeMA =
+          chartSettings.volumeMA.type === "SMA"
+            ? calculateSMA(
+                sortedTickerData,
+                chartSettings.volumeMA.period,
+                (c) => c.volume
+              )
+            : calculateEMA(
+                sortedTickerData,
+                chartSettings.volumeMA.period,
+                (c) => c.volume
+              );
+
+        if (!isMovingAverageError(volumeMA)) {
+          volumeMovingAverage = {
+            period: chartSettings.volumeMA.period,
+            type: chartSettings.volumeMA.type,
+            color: chartSettings.volumeMA.color,
+            timeseries: volumeMA.timeseries.filter(
               (t) => new Date(t.time).getTime() > startDate.getTime()
             ),
           };
-        })
-        .filter((ma): ma is CustomizableChartMALine => ma !== null);
-
-    let volumeMovingAverage: CustomizableChartMALine | undefined;
-    if (chartSettings.volumeMA.enabled) {
-      const volumeMA =
-        chartSettings.volumeMA.type === "SMA"
-          ? calculateSMA(
-              sortedTickerData,
-              chartSettings.volumeMA.period,
-              (c) => c.volume
-            )
-          : calculateEMA(
-              sortedTickerData,
-              chartSettings.volumeMA.period,
-              (c) => c.volume
-            );
-
-      if (!isMovingAverageError(volumeMA)) {
-        volumeMovingAverage = {
-          period: chartSettings.volumeMA.period,
-          type: chartSettings.volumeMA.type,
-          color: chartSettings.volumeMA.color,
-          timeseries: volumeMA.timeseries.filter(
-            (t) => new Date(t.time).getTime() > startDate.getTime()
-          ),
-        };
+        }
       }
-    }
-    const volAdjustedScores: NameValuePair[] = [
-      {
-        name: "1M",
-        value: item.relativeStrength.volAdjustedRelativeStrengthStats.oneMonth,
-      },
-      {
-        name: "3M",
-        value:
-          item.relativeStrength.volAdjustedRelativeStrengthStats.threeMonth,
-      },
-      {
-        name: "6M",
-        value: item.relativeStrength.volAdjustedRelativeStrengthStats.sixMonth,
-      },
-      {
-        name: "1Y",
-        value: item.relativeStrength.volAdjustedRelativeStrengthStats.oneYear,
-      },
-    ];
+      const volAdjustedScores: NameValuePair[] = [
+        {
+          name: "1M",
+          value:
+            item.relativeStrength.volAdjustedRelativeStrengthStats.oneMonth,
+        },
+        {
+          name: "3M",
+          value:
+            item.relativeStrength.volAdjustedRelativeStrengthStats.threeMonth,
+        },
+        {
+          name: "6M",
+          value:
+            item.relativeStrength.volAdjustedRelativeStrengthStats.sixMonth,
+        },
+        {
+          name: "1Y",
+          value: item.relativeStrength.volAdjustedRelativeStrengthStats.oneYear,
+        },
+      ];
 
-    return (
-      <div>
-        <div className="flex items-start justify-between pt-2 pb-2">
-          <div>
-            <span className="font-semibold">{ticker} </span>
-            {item.profile.companyName}
-            <div className="flex space-x-1 text-sm text-foreground/50">
-              <div>{item.profile.sector}</div>
-              <div>•</div>
-              <div>{item.profile.industry}</div>
+      return (
+        <div>
+          <div className="flex items-start justify-between pt-2 pb-2">
+            <div>
+              <span className="font-semibold">{ticker} </span>
+              {item.profile.companyName}
+              <div className="flex space-x-1 text-sm text-foreground/50">
+                <div>{item.profile.sector}</div>
+                <div>•</div>
+                <div>{item.profile.industry}</div>
+              </div>
+            </div>
+
+            <div className=" text-sm">
+              <CompactStrengthIndicator
+                scores={volAdjustedScores}
+                theme={theme}
+              />
             </div>
           </div>
-
-          <div className=" text-sm">
-            <CompactStrengthIndicator
-              scores={volAdjustedScores}
-              theme={theme}
-            />
-          </div>
+          <ScreenerMiniChart
+            className="h-[30rem]"
+            candles={sortedTickerData}
+            priceMovingAverages={priceMovingAverages}
+            volumeMovingAverage={volumeMovingAverage}
+            showVolume={true}
+            ticker={ticker}
+            earningsDates={adjustedDates}
+            chartSettings={chartSettings}
+            theme={theme}
+          />
         </div>
-        <ScreenerMiniChart
-          className="h-[30rem]"
-          candles={sortedTickerData}
-          priceMovingAverages={priceMovingAverages}
-          volumeMovingAverage={volumeMovingAverage}
-          showVolume={true}
-          ticker={ticker}
-          earningsDates={adjustedDates}
-          chartSettings={chartSettings}
-          theme={theme}
-        />
-      </div>
-    );
-  });
+      );
+    },
+    (prevProps, nextProps) => {
+      return (
+        prevProps.item.quote.symbol === nextProps.item.quote.symbol &&
+        prevProps.theme === nextProps.theme &&
+        prevProps.startDate.getTime() === nextProps.startDate.getTime() &&
+        JSON.stringify(prevProps.chartSettings) ===
+          JSON.stringify(nextProps.chartSettings)
+      );
+    }
+  );
 ScreenerMiniChartWrapper.displayName = "ScreenerMiniChartWrapper";
 
 export default ScreenerMiniChartWrapper;

@@ -13,7 +13,7 @@ import {
   ScreenerSortableKeys,
   ScreenerSortConfig,
 } from "@/lib/types/screener-types";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { allColumns, Column, defaultColumns } from "./screener-table-columns";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useInView } from "react-intersection-observer";
@@ -67,11 +67,13 @@ const defaultSortConfig: ScreenerSortConfig = {
 interface ScreenerResultsWrapperProps {
   initialData: ScreenerResults;
   countryCodes: Record<string, string>;
+  chartStartDate: Date;
 }
 
 const ScreenerResultsWrapper = ({
   initialData,
   countryCodes,
+  chartStartDate,
 }: ScreenerResultsWrapperProps) => {
   const isLargeScreen = !useIsMobile();
   const queryClient = useQueryClient();
@@ -99,19 +101,6 @@ const ScreenerResultsWrapper = ({
 
   const { theme } = useTheme();
   const resolvedTheme = (theme as "light" | "dark") || "light";
-
-  const startDate = useMemo(() => {
-    const currentDate = new Date();
-    return new Date(
-      currentDate.getFullYear() - 2,
-      currentDate.getMonth(),
-      currentDate.getDate(),
-      0, // Use fixed values for time to prevent unnecessary changes
-      0,
-      0,
-      0
-    );
-  }, []);
 
   useEffect(() => {
     const loadPersistedData = () => {
@@ -347,7 +336,7 @@ const ScreenerResultsWrapper = ({
                       item={item}
                       chartSettings={persistedState.chartSettings}
                       theme={resolvedTheme}
-                      startDate={startDate}
+                      startDate={chartStartDate}
                     />
                   </CardContent>
                 </Card>
