@@ -19,11 +19,21 @@ const ScreenerResultsContainter: React.FC = async () => {
   if (isRight(data)) {
     const initialData: ScreenerResults = data.value;
 
+    const currentDate = new Date();
+    const chartStartDate = new Date(
+      currentDate.getFullYear() - 2,
+      currentDate.getMonth(),
+      currentDate.getDate(),
+      0,
+      0,
+      0,
+      0
+    );
+
     return (
       <ScreenerResultsWrapper
         initialData={initialData}
-        countryCodes={countryCodes}
-      />
+        countryCodes={countryCodes} chartStartDate={chartStartDate} />
     );
   } else {
     return (

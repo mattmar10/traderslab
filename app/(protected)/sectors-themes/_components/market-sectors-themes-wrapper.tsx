@@ -266,7 +266,7 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
 
           <RankedMarketDataGrid
             theme={resolvedTheme}
-            rankedData={sortedData.slice(0, 10)}
+            rankedData={sortedData.slice(0, 12)}
             title={title}
           />
         </div>

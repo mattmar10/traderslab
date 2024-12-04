@@ -156,6 +156,8 @@ const EtfReturnsRadarChart: React.FC<EtfRetursRadarChartProps> = ({
           <RadarChart
             data={rankingData}
             margin={{ top: 0, right: 30, bottom: 0, left: 30 }}
+            cx="48%"
+            cy="50%"
           >
             <PolarGrid />
             <PolarAngleAxis
@@ -167,7 +169,6 @@ const EtfReturnsRadarChart: React.FC<EtfRetursRadarChartProps> = ({
               content={renderLegendContent}
               verticalAlign="bottom"
               align="center"
-              wrapperStyle={{ bottom: "-5px" }}
             />
             <Radar
               name="RS"

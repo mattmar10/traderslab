@@ -43,77 +43,79 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> =
 
     const earningsKey = useMemo(() => `/api/earnings/${ticker}`, [ticker]);
 
-    const getBars = async () => {
-      const bars = await fetch(barsKey);
-      const parsed = FMPHistoricalResultsSchema.safeParse(await bars.json());
-      if (!parsed.success) {
-        throw Error("Unable to fetch bars");
-      } else {
-        return parsed.data.historical.map((h) => {
-          const candle: Candle = {
-            date: new Date(h.date).getTime(),
-            dateStr: h.date,
-            open: h.open,
-            high: h.high,
-            low: h.low,
-            close: h.close,
-            volume: h.volume,
-          };
-          return candle;
+
+    const getData = useMemo(() => async () => {
+
+      const startTime = performance.now();
+      const times: Record<string, number> = {};
+      const [barsRes, quoteRes, earningsRes] = await Promise.all([
+        fetch(barsKey).then(r => {
+          times.bars = performance.now() - startTime;
+          return r;
+        }),
+        fetch(quoteKey).then(r => {
+          times.quote = performance.now() - startTime;
+          return r;
+        }),
+        fetch(earningsKey).then(r => {
+          times.earnings = performance.now() - startTime;
+          return r;
+        })
+      ]);
+
+      times.fetchTotal = performance.now() - startTime;
+
+      const [barsJson, quoteJson, earningsJson] = await Promise.all([
+        barsRes.json(),
+        quoteRes.json(),
+        earningsRes.json()
+      ]);
+
+      times.parseTotal = performance.now() - startTime;
+      console.table(times);
+
+      // console.log('Parsed JSON:', { barsJson, quoteJson, earningsJson });
+
+      const barsData = FMPHistoricalResultsSchema.safeParse(barsJson);
+      const quoteData = QuoteElementSchema.safeParse(quoteJson);
+      const earningsData = FMPEarningsCalendarSchema.safeParse(earningsJson);
+
+      //console.log('Zod parsed:', { barsData, quoteData, earningsData });
+      if (!barsData.success || !quoteData.success || !earningsData.success) {
+        console.error('Parse failures:', {
+          bars: barsData.success ? 'ok' : barsData.error,
+          quote: quoteData.success ? 'ok' : quoteData.error,
+          earnings: earningsData.success ? 'ok' : earningsData.error
         });
+        throw Error("Unable to fetch data");
       }
-    };
+
+      return {
+        bars: barsData.data.historical.map((h) => ({
+          date: new Date(h.date).getTime(),
+          dateStr: h.date,
+          open: h.open,
+          high: h.high,
+          low: h.low,
+          close: h.close,
+          volume: h.volume,
+        })),
+        quote: quoteData.data,
+        earnings: earningsData.data
+      };
+    }, [barsKey, quoteKey, earningsKey]);
 
     const {
-      data: barsData,
-      error: barsError,
-      isLoading: barsIsLoading,
+      data,
+      error,
+      isLoading
     } = useQuery({
-      queryKey: [barsKey, ticker],
-      queryFn: getBars,
-      refetchOnWindowFocus: false,
-      refetchInterval: 120000,
-      staleTime: 120000,
+      queryKey: [ticker, "chartData"],
+      queryFn: getData,
+      refetchInterval: 30000, // Use the shortest interval needed (quote interval)
+      staleTime: 30000,
     });
 
-    const getQuoteApi = async () => {
-      const res = await fetch(quoteKey);
-      const parsed = QuoteElementSchema.safeParse(await res.json());
-      if (!parsed.success) {
-        return "Unable to parse quote results";
-      } else {
-        return parsed.data;
-      }
-    };
-
-    const {
-      data: quoteData,
-      error: quoteError,
-      isLoading: quoteIsLoading,
-    } = useQuery({
-      queryKey: [quoteKey, ticker],
-      queryFn: getQuoteApi,
-      refetchInterval: 30000,
-      staleTime: 30000, // Add staleTime to prevent unnecessary refetches
-    });
-
-    const getEarningsApi = async () => {
-      const response = await fetch(earningsKey);
-      const data = await response.json();
-      const parsed = FMPEarningsCalendarSchema.safeParse(data);
-      if (!parsed.success) {
-        throw Error("Unable to fetch quote");
-      }
-      return parsed.data;
-    };
-
-    const { data: earningsData, isLoading: earningsLoading } = useQuery({
-      queryKey: [earningsKey, ticker],
-      queryFn: getEarningsApi,
-      refetchOnWindowFocus: false,
-      refetchInterval: 3600000,
-      staleTime: 3600000,
-    });
 
     const filterAndSortEarningsDates = (
       earningsCalendar: FMPEarningsCalendar
@@ -142,27 +144,23 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> =
       return filteredSortedDates;
     };
 
-    if (barsIsLoading || quoteIsLoading || earningsLoading) {
+    if (isLoading) {
       return <Loading />;
     }
 
     if (
-      barsError ||
-      !barsData ||
-      isFMPDataLoadingError(earningsData) ||
-      quoteError ||
-      !quoteData ||
-      isFMPDataLoadingError(quoteData)
+      error ||
+      !data
     ) {
-      return <ErrorCard errorMessage={`Unable to load data for ${ticker}`} />;
+      return <ErrorCard errorMessage={`Unable to load data this timefor ${ticker}`} />;
     }
 
-    const sortedTickerData = barsData.sort(
+    const sortedTickerData = data.bars.sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
 
-    const filteredEarnings = earningsData
-      ? filterAndSortEarningsDates(earningsData)
+    const filteredEarnings = data.earnings
+      ? filterAndSortEarningsDates(data.earnings)
       : [];
 
     const adjustedDates = filteredEarnings.map((e) => {
@@ -173,14 +171,14 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> =
       return dateObj.toISOString().split("T")[0];
     });
 
-    const filteredCandles = barsData.filter(
+    const filteredCandles = sortedTickerData.filter(
       (d) => d.date >= startDate.getTime()
     );
 
     if (
-      quoteData &&
-      quoteData.open &&
-      !isFMPDataLoadingError(quoteData) &&
+      data.quote &&
+      data.quote.open &&
+      !isFMPDataLoadingError(data.quote) &&
       filteredCandles.length > 0
     ) {
       // Add length check
@@ -189,10 +187,10 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> =
 
         // Update the last candle with formatted values
         Object.assign(lastCandle, {
-          close: Number(quoteData.price.toFixed(2)),
-          open: Number(quoteData.open.toFixed(2)),
-          high: Number(quoteData.dayHigh.toFixed(2)),
-          low: Number(quoteData.dayLow.toFixed(2)),
+          close: Number(data.quote.price.toFixed(2)),
+          open: Number(data.quote.open.toFixed(2)),
+          high: Number(data.quote.dayHigh.toFixed(2)),
+          low: Number(data.quote.dayLow.toFixed(2)),
         });
 
         // Optional: Verify the high/low make sense
@@ -204,9 +202,9 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> =
     }
 
     if (
-      quoteData &&
-      quoteData.open &&
-      !isFMPDataLoadingError(quoteData) &&
+      data.quote &&
+      data.quote.open &&
+      !isFMPDataLoadingError(data.quote) &&
       filteredCandles.length > 0
     ) {
       // Add length check
@@ -215,10 +213,10 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> =
 
         // Update the last candle with formatted values
         Object.assign(lastCandle, {
-          close: Number(quoteData.price.toFixed(2)),
-          open: Number(quoteData.open.toFixed(2)),
-          high: Number(quoteData.dayHigh.toFixed(2)),
-          low: Number(quoteData.dayLow.toFixed(2)),
+          close: Number(data.quote.price.toFixed(2)),
+          open: Number(data.quote.open.toFixed(2)),
+          high: Number(data.quote.dayHigh.toFixed(2)),
+          low: Number(data.quote.dayLow.toFixed(2)),
         });
 
         // Optional: Verify the high/low make sense
@@ -258,15 +256,15 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> =
       const volumeMA =
         chartSettings.volumeMA.type === "SMA"
           ? calculateSMA(
-              sortedTickerData,
-              chartSettings.volumeMA.period,
-              (c) => c.volume
-            )
+            sortedTickerData,
+            chartSettings.volumeMA.period,
+            (c) => c.volume
+          )
           : calculateEMA(
-              sortedTickerData,
-              chartSettings.volumeMA.period,
-              (c) => c.volume
-            );
+            sortedTickerData,
+            chartSettings.volumeMA.period,
+            (c) => c.volume
+          );
 
       if (!isMovingAverageError(volumeMA)) {
         volumeMovingAverage = {
@@ -332,7 +330,15 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> =
         />
       </div>
     );
-  });
+  },
+    (prevProps, nextProps) => {
+      return (
+        prevProps.item.quote.symbol === nextProps.item.quote.symbol &&
+        prevProps.theme === nextProps.theme &&
+        prevProps.startDate.getTime() === nextProps.startDate.getTime() &&
+        JSON.stringify(prevProps.chartSettings) === JSON.stringify(nextProps.chartSettings)
+      );
+    });
 ScreenerMiniChartWrapper.displayName = "ScreenerMiniChartWrapper";
 
 export default ScreenerMiniChartWrapper;

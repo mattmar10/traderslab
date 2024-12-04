@@ -103,21 +103,17 @@ export const navItems: NavItem[] = [
   },
   {
     title: "Screener",
-    url: "#", // Placeholder as there is no direct link for the parent
     icon: "radar",
     isActive: true,
-
+    url: "/screener/stocks",
+    items: [],
+  },
+  {
+    title: "Sectors and Themes",
+    url: "/sectors-themes", // Placeholder as there is no direct link for the parent
+    icon: "industry",
+    isActive: true,
     items: [
-      {
-        title: "Sectors and Themes",
-        url: "/sectors-themes",
-        icon: "userPen",
-      },
-      {
-        title: "Stocks",
-        url: "/screener/stocks",
-        icon: "radar",
-      },
     ],
   },
   {
@@ -126,6 +122,7 @@ export const navItems: NavItem[] = [
     icon: "userPen",
     isActive: true,
   },
+
 ];
 
 export default function AppSidebar({

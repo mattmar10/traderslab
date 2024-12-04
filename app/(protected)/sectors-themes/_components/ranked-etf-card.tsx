@@ -13,6 +13,9 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { isRight } from "@/lib/utils";
 import EtfReturnsRadarChart from "./etf-returns-radar-chart";
 import Link from "next/link";
+import ChartSwitcher from "./etf-chart-switcher";
+import EtfReturnsBarChart from "./etf-returns-barchart";
+import EtfChartSwitcher from "./etf-chart-switcher";
 
 interface RankedEtfCardProps {
     rank: number;
@@ -73,7 +76,7 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, allEtfs, theme
                     <div className="text-lg font-semibold text-foreground">#{rank + 1}</div>
                 </div>
             </CardHeader>
-            <CardContent className=" pb-0 pt-0">
+            <CardContent className=" pt-0 px-4">
                 <div className="">
                     <div className="text-base font-medium">Leaders</div>
                     {leadersIsLoading && (
@@ -158,9 +161,7 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({ rank, etf, allEtfs, theme
                             )}
                         </div>
                     )}
-                    <div className="">
-                        <EtfReturnsRadarChart etf={etf} all={allEtfs} />
-                    </div>
+                    <EtfChartSwitcher etf={etf} allEtfs={allEtfs} />
                 </div>
             </CardContent>
         </Card>

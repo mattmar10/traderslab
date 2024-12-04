@@ -1,6 +1,7 @@
 import {
   AlertTriangle,
   ArrowRight,
+  Building,
   ChartNoAxesCombined,
   ChevronLeft,
   ChevronRight,
@@ -28,6 +29,7 @@ import {
   UserX2Icon,
   X,
 } from "lucide-react";
+
 
 type IconProps = React.HTMLAttributes<SVGElement>;
 
@@ -57,6 +59,7 @@ export const Icons = {
   user: User,
   arrowRight: ArrowRight,
   help: HelpCircle,
+  industry: Building,
   pizza: Pizza,
   sun: SunMedium,
   moon: Moon,

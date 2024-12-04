@@ -67,11 +67,13 @@ const defaultSortConfig: ScreenerSortConfig = {
 interface ScreenerResultsWrapperProps {
   initialData: ScreenerResults;
   countryCodes: Record<string, string>;
+  chartStartDate: Date
 }
 
 const ScreenerResultsWrapper = ({
   initialData,
   countryCodes,
+  chartStartDate
 }: ScreenerResultsWrapperProps) => {
   const isLargeScreen = !useIsMobile();
   const queryClient = useQueryClient();
@@ -99,19 +101,6 @@ const ScreenerResultsWrapper = ({
 
   const { theme } = useTheme();
   const resolvedTheme = (theme as "light" | "dark") || "light";
-
-  const startDate = useMemo(() => {
-    const currentDate = new Date();
-    return new Date(
-      currentDate.getFullYear() - 2,
-      currentDate.getMonth(),
-      currentDate.getDate(),
-      0, // Use fixed values for time to prevent unnecessary changes
-      0,
-      0,
-      0
-    );
-  }, []);
 
   useEffect(() => {
     const loadPersistedData = () => {
@@ -347,7 +336,7 @@ const ScreenerResultsWrapper = ({
                       item={item}
                       chartSettings={persistedState.chartSettings}
                       theme={resolvedTheme}
-                      startDate={startDate}
+                      startDate={chartStartDate}
                     />
                   </CardContent>
                 </Card>
@@ -468,11 +457,10 @@ const ScreenerResultsWrapper = ({
             <div className="flex items-center space-x-2 pl-4 pb-2 sm:mt-0 pt-6">
               <div className="flex items-center space-x-4">
                 <span
-                  className={` ${
-                    state.displayAs === "charts"
+                  className={` ${state.displayAs === "charts"
                       ? "text-foreground"
                       : "text-foreground/50"
-                  }`}
+                    }`}
                 >
                   CHARTS
                 </span>
@@ -483,11 +471,10 @@ const ScreenerResultsWrapper = ({
                   className="transform scale-125" // Scale up the switch
                 />
                 <span
-                  className={` ${
-                    state.displayAs === "table"
+                  className={` ${state.displayAs === "table"
                       ? "text-foreground "
                       : "text-foreground/50"
-                  }`}
+                    }`}
                 >
                   TABLE
                 </span>
