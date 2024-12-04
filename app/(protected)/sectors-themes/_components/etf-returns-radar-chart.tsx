@@ -152,11 +152,11 @@ const EtfReturnsRadarChart: React.FC<EtfRetursRadarChartProps> = ({
   return (
     <div className="w-full">
       <div className="h-[280px]">
-        <ResponsiveContainer width="100%" height="90%">
+        <ResponsiveContainer width="100%" height="100%">
           <RadarChart
             data={rankingData}
             margin={{ top: 0, right: 30, bottom: 0, left: 30 }}
-            cx="48%"
+            cx="46%"
             cy="50%"
           >
             <PolarGrid />

@@ -33,8 +33,8 @@ const calculateReturns = (candles: Candle[]): ReturnsData[] => {
       index === 0
         ? 0
         : ((candle.close - candles[index - 1].close) /
-          candles[index - 1].close) *
-        100;
+            candles[index - 1].close) *
+          100;
 
     // Calculate cumulative return from the first day
     const cumulativeReturn =
@@ -259,14 +259,13 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
 
   return (
     <div className="flex-col space-y-2 ">
-
       {sortedData.length > 0 && (
         <div className="relative">
           <BorderBeam />
 
           <RankedMarketDataGrid
             theme={resolvedTheme}
-            rankedData={sortedData.slice(0, 12)}
+            rankedData={sortedData.slice(0, 10)}
             title={title}
           />
         </div>
@@ -288,9 +287,11 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
       </div>
 
       {processedData && (
-        <MarketRankGroupAggregateTable data={processedData.marketData} title={title} />
+        <MarketRankGroupAggregateTable
+          data={processedData.marketData}
+          title={title}
+        />
       )}
-
     </div>
   );
 };

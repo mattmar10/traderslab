@@ -25,9 +25,9 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarProvider,
   SidebarRail,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   ChevronRight,
@@ -45,6 +45,12 @@ import { UserNav } from "./user-nav";
 import { useUser } from "@clerk/nextjs";
 import SearchInput from "../search-input";
 import { useTheme } from "next-themes";
+import { Roboto_Slab } from "next/font/google";
+
+const robotoSlab = Roboto_Slab({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
+});
 
 export const company = {
   name: "Acme Inc",
@@ -113,8 +119,7 @@ export const navItems: NavItem[] = [
     url: "/sectors-themes", // Placeholder as there is no direct link for the parent
     icon: "industry",
     isActive: true,
-    items: [
-    ],
+    items: [],
   },
   {
     title: "Settings",
@@ -122,7 +127,6 @@ export const navItems: NavItem[] = [
     icon: "userPen",
     isActive: true,
   },
-
 ];
 
 export default function AppSidebar({
@@ -135,7 +139,6 @@ export default function AppSidebar({
   const pathname = usePathname();
   const { resolvedTheme } = useTheme();
 
-  // Only render after first client-side mount
   React.useEffect(() => {
     setMounted(true);
   }, []);
@@ -149,18 +152,28 @@ export default function AppSidebar({
       ? "/tl-light-theme-nav-logo.png"
       : "/tl-dark-theme-nav-logo.png";
 
+  const { open } = useSidebar();
+
   return (
-    <SidebarProvider>
-      <Sidebar collapsible="icon">
+    <>
+      <Sidebar collapsible="icon" className="your-sidebar-class">
         <SidebarHeader>
           <Link href={"/market-overview"}>
-            <div className="px-3 py-3">
-              <img
-                src={logoSrc}
-                alt="TradersLab Logo"
-                className="w-auto h-10  duration-300"
-              />
-            </div>
+            {!open ? (
+              <div
+                className={`${robotoSlab.className} font-semibold w-8 h-8 bg-traderslabblue text-white flex items-center justify-center rounded-full`}
+              >
+                TL
+              </div>
+            ) : (
+              <div className="px-3 py-3 flex items-center justify-center">
+                <img
+                  src={logoSrc}
+                  alt="TradersLab Logo"
+                  className="w-auto h-10 duration-300"
+                />
+              </div>
+            )}
           </Link>
         </SidebarHeader>
         <SidebarContent className="overflow-x-hidden">
@@ -285,6 +298,6 @@ export default function AppSidebar({
 
         {children}
       </SidebarInset>
-    </SidebarProvider>
+    </>
   );
 }
