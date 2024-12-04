@@ -13,7 +13,7 @@ import {
   ScreenerSortableKeys,
   ScreenerSortConfig,
 } from "@/lib/types/screener-types";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { allColumns, Column, defaultColumns } from "./screener-table-columns";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useInView } from "react-intersection-observer";
@@ -67,13 +67,13 @@ const defaultSortConfig: ScreenerSortConfig = {
 interface ScreenerResultsWrapperProps {
   initialData: ScreenerResults;
   countryCodes: Record<string, string>;
-  chartStartDate: Date
+  chartStartDate: Date;
 }
 
 const ScreenerResultsWrapper = ({
   initialData,
   countryCodes,
-  chartStartDate
+  chartStartDate,
 }: ScreenerResultsWrapperProps) => {
   const isLargeScreen = !useIsMobile();
   const queryClient = useQueryClient();
@@ -457,10 +457,11 @@ const ScreenerResultsWrapper = ({
             <div className="flex items-center space-x-2 pl-4 pb-2 sm:mt-0 pt-6">
               <div className="flex items-center space-x-4">
                 <span
-                  className={` ${state.displayAs === "charts"
+                  className={` ${
+                    state.displayAs === "charts"
                       ? "text-foreground"
                       : "text-foreground/50"
-                    }`}
+                  }`}
                 >
                   CHARTS
                 </span>
@@ -471,10 +472,11 @@ const ScreenerResultsWrapper = ({
                   className="transform scale-125" // Scale up the switch
                 />
                 <span
-                  className={` ${state.displayAs === "table"
+                  className={` ${
+                    state.displayAs === "table"
                       ? "text-foreground "
                       : "text-foreground/50"
-                    }`}
+                  }`}
                 >
                   TABLE
                 </span>

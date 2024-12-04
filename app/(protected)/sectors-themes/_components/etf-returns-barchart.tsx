@@ -1,16 +1,6 @@
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { ChartConfig, ChartTooltip } from "@/components/ui/chart";
 import { EtfMarketData } from "@/lib/types/submarkets-sectors-themes-types";
-import {
-  negativeColor,
-  positiveColor,
-  solarizedBlue,
-  solarizedMagenta,
-} from "@/lib/utils/color-utils";
+import { solarizedBlue, solarizedMagenta } from "@/lib/utils/color-utils";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
 export interface EtfReturnsBarChartProps {

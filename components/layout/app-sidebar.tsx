@@ -138,7 +138,7 @@ export default function AppSidebar({
   const [mounted, setMounted] = React.useState(false);
   const pathname = usePathname();
   const { resolvedTheme } = useTheme();
-
+  const { open } = useSidebar();
   React.useEffect(() => {
     setMounted(true);
   }, []);
@@ -151,8 +151,6 @@ export default function AppSidebar({
     resolvedTheme === "light"
       ? "/tl-light-theme-nav-logo.png"
       : "/tl-dark-theme-nav-logo.png";
-
-  const { open } = useSidebar();
 
   return (
     <>

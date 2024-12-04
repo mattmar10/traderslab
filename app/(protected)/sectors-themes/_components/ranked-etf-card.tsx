@@ -16,9 +16,7 @@ import {
 import { isRight } from "@/lib/utils";
 import EtfReturnsRadarChart from "./etf-returns-radar-chart";
 import Link from "next/link";
-import ChartSwitcher from "./etf-chart-switcher";
 import EtfReturnsBarChart from "./etf-returns-barchart";
-import EtfChartSwitcher from "./etf-chart-switcher";
 
 interface RankedEtfCardProps {
   rank: number;
