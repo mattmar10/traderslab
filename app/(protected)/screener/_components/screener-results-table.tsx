@@ -80,22 +80,20 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
               {columnsToUse.map((column) => (
                 <th
                   key={column.key}
-                  className={`py-1 px-2 ${
-                    column.key === sortConfig.key ? "bg-accent" : ""
-                  }`}
+                  className={`py-1 px-2 ${column.key === sortConfig.key ? "bg-accent" : ""
+                    }`}
                   style={{
                     minWidth: column.minWidth, // Apply minWidth
                     maxWidth: column.maxWidth, // Apply maxWidth
                   }}
                 >
                   <div
-                    className={`pl-1 flex w-full items-center whitespace-nowrap py-2 ${
-                      column.alignment === "left"
+                    className={`pl-1 flex w-full items-center whitespace-nowrap py-2 ${column.alignment === "left"
                         ? "justify-start"
                         : column.alignment === "right"
-                        ? "justify-end"
-                        : "justify-center"
-                    }`}
+                          ? "justify-end"
+                          : "justify-center"
+                      }`}
                   >
                     <span className={`text-${column.alignment}`}>
                       {column.label} {getHeaderClass(column.key)}
@@ -342,11 +340,10 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
                           );
                           break;
                         case "nextEarnings":
-                          value = `${
-                            item.quote.earningsAnnouncement
+                          value = `${item.quote.earningsAnnouncement
                               ? formatEarnings(item.quote.earningsAnnouncement)
                               : ""
-                          }`;
+                            }`;
                           break;
 
                         case "relativeVolume":
@@ -385,9 +382,8 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
                       return (
                         <td
                           key={column.key}
-                          className={`${fontClassName} py-2 text-${
-                            column.alignment
-                          } px-2 ${isName ? "font-semibold" : ""}`} // Apply alignment from Column
+                          className={`${fontClassName} py-2 text-${column.alignment
+                            } px-2 ${isName ? "font-semibold" : ""}`} // Apply alignment from Column
                           style={{
                             ...style,
                             minWidth: column.minWidth, // Apply minWidth
@@ -403,7 +399,8 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
                 <HoverCardContent className="w-[50vw] p-4 " sideOffset={0}>
                   <div className="px-2">
                     <ScreenerMiniChartWrapper
-                      item={item}
+                      profile={item.profile}
+                      relativeStrengthResults={item.relativeStrength}
                       chartSettings={chartSettings}
                       theme={theme}
                       startDate={startDate}

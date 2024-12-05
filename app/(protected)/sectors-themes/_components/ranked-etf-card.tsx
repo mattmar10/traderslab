@@ -1,18 +1,11 @@
-"use client";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { EtfMarketData } from "@/lib/types/submarkets-sectors-themes-types";
 import { useQuery } from "@tanstack/react-query";
-import {
-  getLeadingStocksForEtf,
-  getSettingUpStocksForEtf,
-} from "@/actions/screener/actions";
+import { getLeadingStocksForEtf, getSettingUpStocksForEtf } from "@/actions/screener/actions";
 import { ChartSettings } from "@/components/settings/chart-settings";
 import ScreenerMiniChartWrapper from "../../screener/_components/screener-result-minichart";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { isRight } from "@/lib/utils";
 import EtfReturnsRadarChart from "./etf-returns-radar-chart";
 import Link from "next/link";
@@ -73,128 +66,96 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({
   const twoYearsAgo = new Date(
     currentDate.getFullYear() - 2,
     currentDate.getMonth(),
-    currentDate.getDate(),
-    0,
-    0,
-    0,
-    0
+    currentDate.getDate()
   );
 
+  const renderStockList = (holdings: any[], isLoading: boolean, error: any) => {
+    if (isLoading) {
+      return <div className="h-4 p-1 bg-muted animate-pulse rounded w-full" />;
+    }
+    if (error) {
+      return <div className="text-sm text-destructive">Error loading data</div>;
+    }
+    if (!holdings || holdings.length === 0) {
+      return <span className="text-muted-foreground">N/A</span>;
+    }
+
+    return holdings.slice(0, 5).map((holding, index) => (
+      <span key={`${holding.asset}-${index}`} className="inline">
+        <HoverCard>
+          <HoverCardTrigger>
+            <Link href={`/symbol/${holding.asset}`}>
+              <span className="text-foreground/70 hover:text-foreground cursor-pointer">
+                ${holding.asset}
+              </span>
+            </Link>
+          </HoverCardTrigger>
+          <HoverCardContent className="w-[52rem] p-4">
+            <ScreenerMiniChartWrapper
+              profile={holding.profile}
+              relativeStrengthResults={holding.relativeStrength}
+              chartSettings={chartSettings}
+              theme={theme}
+              startDate={twoYearsAgo}
+            />
+          </HoverCardContent>
+        </HoverCard>
+        {index < Math.min(holdings.length - 1, 4) && (
+          <span className="text-muted-foreground">, </span>
+        )}
+      </span>
+    ));
+  };
+
   return (
-    <Card className="h-full">
-      <CardHeader className="p-4">
-        <div className="flex items-center justify-between border-b pb-2">
+    <Card className="h-full bg-card">
+      <CardHeader className="p-4 pb-2">
+        <div className="flex items-center justify-between border-b border-border/40 pb-3">
           <div className="flex-1 min-w-0">
-            <div className="font-semibold truncate" title={etf.name}>
+            <div className="font-bold text-lg tracking-tight truncate" title={etf.name}>
               {etf.name}
             </div>
           </div>
-          <div className="text-lg font-semibold text-foreground flex-shrink-0 pl-4">
+          <Badge variant="secondary" className="text-lg px-3 py-1 ml-4">
             #{rank + 1}
-          </div>
+          </Badge>
         </div>
       </CardHeader>
-      <CardContent className=" pb-2 pt-0 px-4">
-        <div className="">
-          <div className="text-base font-medium">Leaders</div>
-          {leadersIsLoading && (
-            <div className="h-4 p-1 bg-muted animate-pulse rounded w-full" />
-          )}
-          {leadersError && (
-            <div className="text-sm text-red-500">Error loading leaders</div>
-          )}
-          {leadersData && isRight(leadersData) && (
-            <div className="text-sm">
-              {!leadersData?.value.holdings ||
-              leadersData.value.holdings.length === 0 ? (
-                <span className="text-muted-foreground">N/A</span>
-              ) : (
-                leadersData.value.holdings.slice(0, 5).map((holding, index) => (
-                  <span key={`${holding.asset}-${index}`} className="inline">
-                    <HoverCard>
-                      <HoverCardTrigger>
-                        <span className="text-foreground/70 hover:text-foreground cursor-pointer">
-                          <Link href={`/symbol/${holding.asset}`}>
-                            ${holding.asset}
-                          </Link>
-                        </span>
-                      </HoverCardTrigger>
-                      <HoverCardContent className="w-[52rem] p-4">
-                        <div className="space-y-2">
-                          <ScreenerMiniChartWrapper
-                            item={holding}
-                            chartSettings={chartSettings}
-                            theme={theme}
-                            startDate={twoYearsAgo}
-                          />
-                        </div>
-                      </HoverCardContent>
-                    </HoverCard>
-                    {index <
-                      Math.min(leadersData.value.holdings.length - 1, 4) && (
-                      <span className="text-muted-foreground">, </span>
-                    )}
-                  </span>
-                ))
-              )}
+      <CardContent className="space-y-6 pb-4 pt-2 px-4">
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-base font-semibold mb-2">Leaders</h3>
+            <div className="text-sm px-3 py-2 bg-accent/70 rounded-md">
+              {leadersData && isRight(leadersData)
+                ? renderStockList(
+                  leadersData.value.holdings,
+                  leadersIsLoading,
+                  leadersError
+                )
+                : null}
             </div>
-          )}
-
-          <div className="text-base font-medium mt-3">Setting Up</div>
-          {settingUpIsLoading && (
-            <div className="h-4 p-1 bg-muted animate-pulse rounded w-full" />
-          )}
-          {settingUpError && (
-            <div className="text-sm text-red-500">
-              Error loading setting up stocks
-            </div>
-          )}
-          {settingUpData && isRight(settingUpData) && (
-            <div className="text-sm">
-              {!settingUpData?.value.holdings ||
-              settingUpData.value.holdings.length === 0 ? (
-                <span className="text-muted-foreground">N/A</span>
-              ) : (
-                settingUpData.value.holdings
-                  .slice(0, 5)
-                  .map((holding, index) => (
-                    <span key={`${holding.asset}-${index}`} className="inline">
-                      <HoverCard>
-                        <HoverCardTrigger>
-                          <span className="text-foreground/70 hover:text-foreground cursor-pointer">
-                            <Link href={`/symbol/${holding.asset}`}>
-                              ${holding.asset}
-                            </Link>
-                          </span>
-                        </HoverCardTrigger>
-                        <HoverCardContent className="w-[52rem] p-4">
-                          <div className="space-y-2">
-                            <ScreenerMiniChartWrapper
-                              item={holding}
-                              chartSettings={chartSettings}
-                              theme={theme}
-                              startDate={twoYearsAgo}
-                            />
-                          </div>
-                        </HoverCardContent>
-                      </HoverCard>
-                      {index <
-                        Math.min(
-                          settingUpData.value.holdings.length - 1,
-                          4
-                        ) && <span className="text-muted-foreground">, </span>}
-                    </span>
-                  ))
-              )}
-            </div>
-          )}
+          </div>
 
           <div>
-            <EtfReturnsRadarChart etf={etf} all={allEtfs} />
+            <h3 className="text-base font-semibold mb-2">Setting Up</h3>
+            <div className="text-sm px-3 py-2 bg-accent/70 rounded-md">
+              {settingUpData && isRight(settingUpData)
+                ? renderStockList(
+                  settingUpData.value.holdings,
+                  settingUpIsLoading,
+                  settingUpError
+                )
+                : null}
+            </div>
           </div>
-          <div className="mt-8">
-            <EtfReturnsBarChart etf={etf} />
-          </div>
+        </div>
+
+        <div>
+          <EtfReturnsRadarChart etf={etf} all={allEtfs} />
+        </div>
+
+        <div>
+          <EtfReturnsBarChart etf={etf} />
         </div>
       </CardContent>
     </Card>
