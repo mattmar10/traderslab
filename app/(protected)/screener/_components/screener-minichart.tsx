@@ -441,7 +441,7 @@ const ScreenerMiniChart: React.FC<ScreenerMiniChartProps> = ({
             to: candles.length,
         });
         chartRef.current.timeScale().applyOptions({
-            rightOffset: 5,
+            rightOffset: 10,
         });
 
         //  chartRef.current.timeScale().scrollToRealTime();
