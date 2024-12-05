@@ -10,9 +10,13 @@ import { isRight } from "@/lib/utils";
 import EtfReturnsRadarChart from "./etf-returns-radar-chart";
 import Link from "next/link";
 import EtfReturnsBarChart from "./etf-returns-barchart";
+import { FullFMPProfile } from "@/lib/types/fmp-types";
+import { ChartSplineIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface RankedEtfCardProps {
   rank: number;
+  profile: FullFMPProfile;
   etf: EtfMarketData;
   allEtfs: EtfMarketData[];
   theme: "light" | "dark";
@@ -21,6 +25,7 @@ interface RankedEtfCardProps {
 
 const RankedEtfCard: React.FC<RankedEtfCardProps> = ({
   rank,
+  profile,
   etf,
   allEtfs,
   theme,
@@ -116,12 +121,36 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({
               {etf.name}
             </div>
           </div>
-          <Badge variant="secondary" className="text-lg px-3 py-1 ml-4">
-            #{rank + 1}
-          </Badge>
+          <div className="flex space-x-2 items-center">
+            <HoverCard>
+              <HoverCardTrigger>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 flex items-center justify-center text-foreground/60 hover:text-foreground"
+                >
+                  <ChartSplineIcon />
+                </Button>
+              </HoverCardTrigger>
+              <HoverCardContent className="w-[52rem] p-4">
+                <ScreenerMiniChartWrapper
+                  profile={profile}
+                  chartSettings={chartSettings}
+                  theme={theme}
+                  startDate={twoYearsAgo}
+                />
+              </HoverCardContent>
+            </HoverCard>
+            <Badge
+              variant="secondary"
+              className="text-sm font-medium px-3 py-1.5 h-8 flex items-center ml-4"
+            >
+              #{rank + 1}
+            </Badge>
+          </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-6 pb-4 pt-2 px-4">
+      <CardContent className="space-y-2 pb-2 pt-2 px-4">
         <div className="space-y-6">
           <div>
             <h3 className="text-base font-semibold mb-2">Leaders</h3>

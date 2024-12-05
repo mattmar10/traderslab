@@ -52,7 +52,7 @@ const EtfReturnsBarChart: React.FC<EtfReturnsBarChartProps> = ({ etf }) => {
   } satisfies ChartConfig;
 
   return (
-    <div className="h-[280px] py-4 4xl:px-12">
+    <div className="h-[230px] py-4 4xl:px-12">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={chartData}
@@ -60,8 +60,8 @@ const EtfReturnsBarChart: React.FC<EtfReturnsBarChartProps> = ({ etf }) => {
           margin={{
             left: 20, // Reduced left margin
             right: 50, // Increased right margin for better balance
-            top: 30, // Reduced top margin
-            bottom: 30, // Reduced bottom margin
+            top: 25, // Reduced top margin
+            bottom: 10, // Reduced bottom margin
           }}
           className="h-full w-full"
         >

@@ -6,9 +6,16 @@ import {
   defaultChartSettings,
 } from "@/components/settings/chart-settings";
 import { useState } from "react";
+import { FullFMPProfile } from "@/lib/types/fmp-types";
+
+
+export interface RankedEtfDataPoint {
+  etfData: EtfMarketData,
+  profile: FullFMPProfile
+}
 
 export interface RankedEtfDataGridProps {
-  rankedData: EtfMarketData[];
+  rankedData: RankedEtfDataPoint[];
   title: string;
   theme: "light" | "dark";
 }
@@ -30,12 +37,13 @@ const RankedMarketDataGrid: React.FC<RankedEtfDataGridProps> = ({
         <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 3xl:grid-cols-5 gap-2">
           {rankedData.map((etf, index) => (
             <RankedEtfCard
-              key={etf.ticker}
+              key={etf.profile.symbol}
+              profile={etf.profile}
               rank={index}
-              etf={etf}
+              etf={etf.etfData}
               chartSettings={chartSettings}
               theme={theme}
-              allEtfs={rankedData}
+              allEtfs={rankedData.map(e => e.etfData)}
             />
           ))}
         </div>

@@ -10,11 +10,11 @@ import { useMemo } from "react";
 import { Candle } from "@/lib/types/basic-types";
 import AggregateReturnsChart from "./aggregate-returns-chart";
 import { useTheme } from "next-themes";
-import { FMPHistoricalResultsSchema } from "@/lib/types/fmp-types";
+import { FMPHistoricalResultsSchema, FullFMPProfile } from "@/lib/types/fmp-types";
 import { formatDateToEST } from "@/lib/utils/epoch-utils";
 import Loading from "@/components/loading";
 import { rankMarketData } from "../utils";
-import RankedMarketDataGrid from "./ranked-etf-data-grid";
+import RankedMarketDataGrid, { RankedEtfDataPoint } from "./ranked-etf-data-grid";
 import { adrPercent, isADRPercentError } from "@/lib/indicators/adr-percent";
 import { BorderBeam } from "@/components/magicui/border-beam";
 
@@ -33,8 +33,8 @@ const calculateReturns = (candles: Candle[]): ReturnsData[] => {
       index === 0
         ? 0
         : ((candle.close - candles[index - 1].close) /
-            candles[index - 1].close) *
-          100;
+          candles[index - 1].close) *
+        100;
 
     // Calculate cumulative return from the first day
     const cumulativeReturn =
@@ -138,11 +138,13 @@ const calculateMarketData = (
 export interface MarketSectorsThemesWrapperProps {
   title: string;
   data: EtfMarketData[];
+  profiles: FullFMPProfile[]
 }
 
 const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
   title,
   data,
+  profiles
 }) => {
   const { theme } = useTheme();
   const resolvedTheme = (theme as "light" | "dark") || "light";
@@ -257,6 +259,20 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
     );
   }
 
+  const topTen = sortedData.slice(0, 10)
+
+  const topTenData = topTen.map(t => {
+
+    const profile = profiles.find(p => p.symbol === t.ticker)
+
+    const point: RankedEtfDataPoint = {
+      etfData: t,
+      profile: profile!
+    }
+
+    return point
+  })
+
   return (
     <div className="flex-col space-y-2 ">
       {sortedData.length > 0 && (
@@ -265,7 +281,7 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
 
           <RankedMarketDataGrid
             theme={resolvedTheme}
-            rankedData={sortedData.slice(0, 10)}
+            rankedData={topTenData}
             title={title}
           />
         </div>

@@ -8,6 +8,7 @@ import {
   FMPEarningsCalendarSchema,
   FMPHistoricalResultsSchema,
   FMPSymbolProfile,
+  FullFMPProfile,
   isFMPDataLoadingError,
 } from "@/lib/types/fmp-types";
 import { formatDateToEST } from "@/lib/utils/epoch-utils";
@@ -26,7 +27,7 @@ import CompactStrengthIndicator, {
 import { RelativeStrengthResults } from "@/lib/types/relative-strength-types";
 
 export interface ScreenerMiniChartWrapperProps {
-  profile: FMPSymbolProfile;
+  profile: FMPSymbolProfile | FullFMPProfile;
   relativeStrengthResults?: RelativeStrengthResults;
   chartSettings: ChartSettings;
   theme: "light" | "dark";
