@@ -183,6 +183,38 @@ export async function getFullProfile(
   }
 }
 
+export async function getFullProfiles(
+  tickers: string[]
+): Promise<FullFMPProfile[]> {
+  if (!process.env.FINANCIAL_MODELING_PREP_API || !process.env.FMP_API_KEY) {
+    return Promise.reject("FMP URL and key must be specified");
+  }
+  const tickersPart = tickers.join(",")
+  const url = `${process.env.FINANCIAL_MODELING_PREP_API}/profile/${tickersPart}?apikey=${process.env.FMP_API_KEY}`;
+  try {
+    const response = await fetch(url, { next: { revalidate: 500 } });
+
+    if (!response.ok) {
+      const message = `Error fetching profiles`;
+      console.error(message);
+      console.error(JSON.stringify(response));
+      return Promise.reject("Error fetching profiles");
+    }
+
+    const data = await response.json();
+
+    const parsed = FullFMPFullProfileArraySchema.safeParse(data);
+    if (parsed.success) {
+      return parsed.data;
+    } else {
+      return Promise.reject("Unable to parse profiles");
+    }
+  } catch (error) {
+    const dataError: FMPDataLoadingError = `Unable to fetch profiles`;
+    return Promise.reject(dataError);
+  }
+}
+
 export async function getQuotesFromFMP(tickers: string[]): Promise<Quote[]> {
   if (!process.env.FINANCIAL_MODELING_PREP_API || !process.env.FMP_API_KEY) {
     return Promise.reject("FMP URL and key must be specified");
