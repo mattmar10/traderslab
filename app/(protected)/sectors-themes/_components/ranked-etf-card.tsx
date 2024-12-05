@@ -118,7 +118,7 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({
         <div className="flex items-center justify-between border-b border-border/40 pb-3">
           <div className="flex-1 min-w-0">
             <div className="font-bold text-lg tracking-tight truncate" title={etf.name}>
-              {etf.name}
+              <Link href={`/sectors-themes/${etf.ticker}`}>{etf.name}</Link>
             </div>
           </div>
           <div className="flex space-x-2 items-center">

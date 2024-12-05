@@ -12,7 +12,6 @@ export async function POST(
         );
     }
 
-
     const url = `${process.env.TRADERS_LAB_API}/market-performance/etf/${params.ticker}`;
 
     try {

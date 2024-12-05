@@ -339,7 +339,7 @@ export const MarketRankGroupAggregateTable: React.FC<
 
                           return (
                             <LinkedTableRow
-                              href={`/market-performance/${item.ticker}`}
+                              href={`/sectors-themes/${item.ticker}`}
                               className={` text-right border-b border-foreground/20 hover:bg-foreground/5`}
                               key={`${item.ticker}-theme`}
                             >
