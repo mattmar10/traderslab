@@ -7,6 +7,7 @@ import {
   FMPEarningsCalendar,
   FMPEarningsCalendarSchema,
   FMPHistoricalResultsSchema,
+  FMPSymbolProfile,
   isFMPDataLoadingError,
 } from "@/lib/types/fmp-types";
 import { formatDateToEST } from "@/lib/utils/epoch-utils";
@@ -19,13 +20,14 @@ import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { useMemo } from "react";
 import ScreenerMiniChart from "./screener-minichart";
-import { SymbolWithStatsWithRank } from "@/lib/types/screener-types";
 import CompactStrengthIndicator, {
   NameValuePair,
 } from "./compact-rs-indicator";
+import { RelativeStrengthResults } from "@/lib/types/relative-strength-types";
 
 export interface ScreenerMiniChartWrapperProps {
-  item: SymbolWithStatsWithRank;
+  profile: FMPSymbolProfile;
+  relativeStrengthResults?: RelativeStrengthResults;
   chartSettings: ChartSettings;
   theme: "light" | "dark";
   startDate: Date;
@@ -33,8 +35,8 @@ export interface ScreenerMiniChartWrapperProps {
 
 const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> =
   React.memo(
-    ({ item, chartSettings, theme, startDate }) => {
-      const ticker = item.quote.symbol;
+    ({ profile, relativeStrengthResults, chartSettings, theme, startDate }) => {
+      const ticker = profile.symbol;
       const barsKey = useMemo(
         () =>
           `/api/bars/${ticker}?fromDateString=${formatDateToEST(startDate)}`,
@@ -260,15 +262,15 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> =
         const volumeMA =
           chartSettings.volumeMA.type === "SMA"
             ? calculateSMA(
-                sortedTickerData,
-                chartSettings.volumeMA.period,
-                (c) => c.volume
-              )
+              sortedTickerData,
+              chartSettings.volumeMA.period,
+              (c) => c.volume
+            )
             : calculateEMA(
-                sortedTickerData,
-                chartSettings.volumeMA.period,
-                (c) => c.volume
-              );
+              sortedTickerData,
+              chartSettings.volumeMA.period,
+              (c) => c.volume
+            );
 
         if (!isMovingAverageError(volumeMA)) {
           volumeMovingAverage = {
@@ -281,25 +283,25 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> =
           };
         }
       }
-      const volAdjustedScores: NameValuePair[] = [
+      const volAdjustedScores: NameValuePair[] = !relativeStrengthResults ? [] : [
         {
           name: "1M",
           value:
-            item.relativeStrength.volAdjustedRelativeStrengthStats.oneMonth,
+            relativeStrengthResults.volAdjustedRelativeStrengthStats.oneMonth,
         },
         {
           name: "3M",
           value:
-            item.relativeStrength.volAdjustedRelativeStrengthStats.threeMonth,
+            relativeStrengthResults.volAdjustedRelativeStrengthStats.threeMonth,
         },
         {
           name: "6M",
           value:
-            item.relativeStrength.volAdjustedRelativeStrengthStats.sixMonth,
+            relativeStrengthResults.volAdjustedRelativeStrengthStats.sixMonth,
         },
         {
           name: "1Y",
-          value: item.relativeStrength.volAdjustedRelativeStrengthStats.oneYear,
+          value: relativeStrengthResults.volAdjustedRelativeStrengthStats.oneYear,
         },
       ];
 
@@ -308,11 +310,11 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> =
           <div className="flex items-start justify-between pt-2 pb-2">
             <div>
               <span className="font-semibold">{ticker} </span>
-              {item.profile.companyName}
+              {profile.companyName}
               <div className="flex space-x-1 text-sm text-foreground/50">
-                <div>{item.profile.sector}</div>
+                <div>{profile.sector}</div>
                 <div>•</div>
-                <div>{item.profile.industry}</div>
+                <div>{profile.industry}</div>
               </div>
             </div>
 
@@ -339,11 +341,11 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> =
     },
     (prevProps, nextProps) => {
       return (
-        prevProps.item.quote.symbol === nextProps.item.quote.symbol &&
+        prevProps.profile.symbol === nextProps.profile.symbol &&
         prevProps.theme === nextProps.theme &&
         prevProps.startDate.getTime() === nextProps.startDate.getTime() &&
         JSON.stringify(prevProps.chartSettings) ===
-          JSON.stringify(nextProps.chartSettings)
+        JSON.stringify(nextProps.chartSettings)
       );
     }
   );

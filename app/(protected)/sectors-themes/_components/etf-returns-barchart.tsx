@@ -1,6 +1,6 @@
 import { ChartConfig, ChartTooltip } from "@/components/ui/chart";
 import { EtfMarketData } from "@/lib/types/submarkets-sectors-themes-types";
-import { solarizedBlue, solarizedMagenta } from "@/lib/utils/color-utils";
+import { solarizedMagenta, solarizedViolet } from "@/lib/utils/color-utils";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
 export interface EtfReturnsBarChartProps {
@@ -12,32 +12,32 @@ const EtfReturnsBarChart: React.FC<EtfReturnsBarChartProps> = ({ etf }) => {
     {
       period: "daily",
       value: etf.percentDailyChange,
-      fill: etf.percentDailyChange >= 0 ? solarizedBlue : solarizedMagenta,
+      fill: etf.percentDailyChange >= 0 ? solarizedViolet : solarizedMagenta,
     },
     {
       period: "weekly",
       value: etf.percentWeeklyChange,
-      fill: etf.percentWeeklyChange >= 0 ? solarizedBlue : solarizedMagenta,
+      fill: etf.percentWeeklyChange >= 0 ? solarizedViolet : solarizedMagenta,
     },
     {
       period: "monthly",
       value: etf.percentMonthlyChange,
-      fill: etf.percentMonthlyChange >= 0 ? solarizedBlue : solarizedMagenta,
+      fill: etf.percentMonthlyChange >= 0 ? solarizedViolet : solarizedMagenta,
     },
     {
       period: "threeMonth",
       value: etf.percentThreeMonthChange,
-      fill: etf.percentThreeMonthChange >= 0 ? solarizedBlue : solarizedMagenta,
+      fill: etf.percentThreeMonthChange >= 0 ? solarizedViolet : solarizedMagenta,
     },
     {
       period: "sixMonth",
       value: etf.percentSixMonthChange,
-      fill: etf.percentSixMonthChange >= 0 ? solarizedBlue : solarizedMagenta,
+      fill: etf.percentSixMonthChange >= 0 ? solarizedViolet : solarizedMagenta,
     },
     {
       period: "oneYear",
       value: etf.percent1YearChange,
-      fill: etf.percent1YearChange >= 0 ? solarizedBlue : solarizedMagenta,
+      fill: etf.percent1YearChange >= 0 ? solarizedViolet : solarizedMagenta,
     },
   ];
 
@@ -60,8 +60,8 @@ const EtfReturnsBarChart: React.FC<EtfReturnsBarChartProps> = ({ etf }) => {
           margin={{
             left: 20, // Reduced left margin
             right: 50, // Increased right margin for better balance
-            top: 10, // Reduced top margin
-            bottom: 10, // Reduced bottom margin
+            top: 30, // Reduced top margin
+            bottom: 30, // Reduced bottom margin
           }}
           className="h-full w-full"
         >
@@ -89,17 +89,17 @@ const EtfReturnsBarChart: React.FC<EtfReturnsBarChartProps> = ({ etf }) => {
               if (!active || !payload?.length) return null;
               const data = payload[0].payload;
               return (
-                <div className="rounded-lg bg-background border p-2 shadow-sm">
+                <div className="rounded-lg bg-background border p-2 shadow-sm w-28 tabular-nums flex space-x-2">
                   <div className="font-medium text-sm">
                     {
                       chartConfig[data.period as keyof typeof chartConfig]
                         ?.label
-                    }
+                    }:
                   </div>
                   <div
-                    className={`text-sm ${
-                      data.value >= 0 ? "text-uptrend" : "text-destructive"
-                    }`}
+                    className={`text-sm 
+                      }`}
+                    style={{ color: data.value >= 0 ? solarizedViolet : solarizedMagenta }}
                   >
                     {data.value.toFixed(2)}%
                   </div>
@@ -107,7 +107,7 @@ const EtfReturnsBarChart: React.FC<EtfReturnsBarChartProps> = ({ etf }) => {
               );
             }}
           />
-          <Bar dataKey="value" fill="#000000" radius={0} />
+          <Bar dataKey="value" fill="#000000" radius={0} barSize={13} opacity={.7} />
         </BarChart>
       </ResponsiveContainer>
     </div>
