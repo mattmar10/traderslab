@@ -230,13 +230,22 @@ export const defaultColumns: Column[] = [
   },
 ];
 
+export const defaultEtfColumns: Column[] = [
+  {
+    key: "weightPercentage",
+    label: "% Weight",
+    alignment: "right",
+    minWidth: "2rem",
+    maxWidth: "2rem",
+  }, ...defaultColumns]
+
 export const mobileColumns: Column[] = [
   {
     key: "rsRank",
     label: "RS Rank",
     alignment: "center",
-    minWidth: "2.5rem",
-    maxWidth: "2.5rem",
+    minWidth: "2rem",
+    maxWidth: "2rem",
   },
   {
     key: "profile.symbol",

@@ -1,4 +1,4 @@
-import { getFullProfile } from "@/actions/market-data/actions";
+import { getEtfHoldings, getFullProfile } from "@/actions/market-data/actions";
 import ErrorCard from "@/components/error-card";
 import { isFMPDataLoadingError } from "@/lib/types/fmp-types"
 import { Lato } from "next/font/google";
@@ -6,6 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ClientOverviewPriceChart from "@/components/price-chart/client-overview-price-chart";
 import SettingUp from "./setting-up";
 import Leading from "./leading";
+import EtfHoldings from "./etf-holdings";
+import { getScreenerResultsForEtf } from "@/actions/screener/actions";
+import { isLeft } from "@/lib/utils";
 
 
 const lato = Lato({
@@ -21,9 +24,9 @@ export interface EtfContainerProps {
 
 const EtfContainer: React.FC<EtfContainerProps> = async ({ ticker }) => {
 
-    const data = await getFullProfile(ticker);
+    const [profile, holdings, screenerResults] = await Promise.all([getFullProfile(ticker), getEtfHoldings(ticker), getScreenerResultsForEtf(ticker)]);
 
-    if (isFMPDataLoadingError(data)) {
+    if (isFMPDataLoadingError(profile)) {
         return (
             <div>
                 <ErrorCard errorMessage={`Unable to load data for ${ticker}`} />
@@ -31,12 +34,21 @@ const EtfContainer: React.FC<EtfContainerProps> = async ({ ticker }) => {
         );
     }
 
+
+    if (isLeft(holdings)) {
+        return <ErrorCard errorMessage={`Unable to load holdings of ${ticker}`} />
+    }
+
+    if (isLeft(screenerResults)) {
+        return <ErrorCard errorMessage={`Unable to load screener results of ${ticker}`} />
+    }
+
     return (
         <>
             <div className="mb-4 flex flex-col space-y-4">
                 <div className="flex items-center justify-between">
                     <h2 className={`text-2xl font-bold tracking-tight ${lato.className}`}>
-                        {data[0].companyName}
+                        {profile[0].companyName}
                     </h2>
                 </div>
 
@@ -44,7 +56,7 @@ const EtfContainer: React.FC<EtfContainerProps> = async ({ ticker }) => {
                     <ClientOverviewPriceChart ticker={ticker} />
                 </div>
                 <div className="text-foreground p-3 rounded-lg bg-secondary text-sm">
-                    {data[0].description}
+                    {profile[0].description}
                 </div>
             </div>
 
@@ -57,7 +69,9 @@ const EtfContainer: React.FC<EtfContainerProps> = async ({ ticker }) => {
                 </TabsList>
 
                 <TabsContent value="holdings">
-                    <div>holdings</div>
+                    <div>
+                        <EtfHoldings profile={profile[0]} holdings={holdings.value} screenerResults={screenerResults.value} />
+                    </div>
                 </TabsContent>
 
                 <TabsContent value="leading">

@@ -79,6 +79,6 @@ export function isRight<L, R>(input: Either<L, R>): input is Right<R> {
   return input.tag === "right";
 }
 
-export function isLeft<L, R>(input: Either<L, R>): input is Right<R> {
+export function isLeft<L, R>(input: Either<L, R>): input is Left<L> {
   return input.tag === "left";
 }

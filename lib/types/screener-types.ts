@@ -179,6 +179,11 @@ export type EtfHoldingWithStatsWithRank = z.infer<
   typeof EtfHoldingWithStatsWithRankSchema
 >;
 
+export type EtfHoldingWithStatsWithRankWithWeight = EtfHoldingWithStatsWithRank & {
+  weightPercentage: number,
+  sharesNumber: number
+}
+
 export const ScreenerRangesSchema = z.object({
   countries: z.array(z.string()),
   priceRange: z.tuple([z.number(), z.number()]),
@@ -251,5 +256,13 @@ export type ScreenerSortableKeys =
 
 export interface ScreenerSortConfig {
   key: ScreenerSortableKeys;
+  direction: "asc" | "desc";
+}
+
+export type EtfScreenerSortableKeys = ScreenerSortableKeys | "weightPercentage"
+
+
+export interface EtfScreenerSortConfig {
+  key: EtfScreenerSortableKeys;
   direction: "asc" | "desc";
 }
