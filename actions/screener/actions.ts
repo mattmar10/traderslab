@@ -1,8 +1,9 @@
 "use server"
+import { SortableKeys } from "@/app/(protected)/sectors-themes/_components/market-rank-group-aggregate-table";
 import { filterGroups } from "@/drizzle/schema";
 import { getDatabaseInstance } from "@/lib/db";
 import { FMPDataLoadingError } from "@/lib/types/fmp-types";
-import { EtfScreenerResults, EtfScreenerResultsSchema, FilterGroup, ScreenerResults, ScreenerResultsSchema } from "@/lib/types/screener-types";
+import { EtfScreenerResults, EtfScreenerResultsSchema, FilterGroup, ScreenerResults, ScreenerResultsSchema, ScreenerSortableKeys } from "@/lib/types/screener-types";
 import { Either, Right, Left } from "@/lib/utils";
 import { eq } from "drizzle-orm";
 
@@ -126,6 +127,44 @@ async function getScreenerResultsForEtfFromFGId(etf: string, fgId: string): Prom
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ page: 1, pageSize: 25, filterGroup: filterGroup, sortAttribute: 'rsRank', sortDirection: 'asc' }),
+        });
+
+        if (!response.ok) {
+            return Left(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const parsed = EtfScreenerResultsSchema.safeParse(data);
+
+        if (parsed.success) {
+            return Right(parsed.data);
+        } else {
+            throw new Error("Schema validation failed: unable to parse data");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        return Left("Unable to fetch Leading Stocks");
+    }
+}
+
+export async function getScreenerResultsForEtf(
+    etf: string,
+    page: number = 1,
+    pageSize: number = 1000,
+    sortAttribute: ScreenerSortableKeys = "rsRank",
+    sortDirection: "asc" | "desc" = "asc"): Promise<Either<FMPDataLoadingError, EtfScreenerResults>> {
+    const db = await getDatabaseInstance();
+
+
+    const url = `${process.env.TRADERS_LAB_API}/market-performance/etf/${etf}`;
+
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ page: page, pageSize: pageSize, filterGroup: {}, sortAttribute: sortAttribute, sortDirection: sortDirection }),
         });
 
         if (!response.ok) {

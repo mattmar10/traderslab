@@ -18,8 +18,6 @@ const EtfBreakdownPage = ({ params }: {
     return (
         <PageContainer scrollable={false}>
             <div className="space-y-4 mt-2">
-
-
                 <ErrorBoundary>
                     <Suspense fallback={<Skeleton />}>
                         <EtfContainer ticker={params.etfSymbol} />
