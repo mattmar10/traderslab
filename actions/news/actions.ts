@@ -1,4 +1,4 @@
-import { FMPDataLoadingError, IncomeStatement, IncomeStatementSchema } from "@/lib/types/fmp-types";
+import { FMPDataLoadingError, IncomeStatement, IncomeStatementSchema, StockGrade, StockGradesArraySchema } from "@/lib/types/fmp-types";
 import { FmpGeneralNewsList, FmpGeneralNewsListSchema, FmpStockNewsList, FmpStockNewsListSchema } from "@/lib/types/news-types";
 import { formatDateToEST } from "@/lib/utils/epoch-utils";
 
@@ -96,8 +96,6 @@ export async function getNewsForSymbol(ticker: string): Promise<FmpStockNewsList
         const data = await response.json();
         const parsed = FmpStockNewsListSchema.safeParse(data);
 
-        console.log(parsed.error)
-
         if (parsed.success) {
             return parsed.data;
         } else {
@@ -139,6 +137,44 @@ export async function getIncomeStatementForSymbol(ticker: string, period: "annua
 
     } catch (error) {
         const dataError: FMPDataLoadingError = `Unable to fetch income statement data`;
+        return dataError;
+    }
+}
+
+export async function getUpgradesAndDowngrades(): Promise<StockGrade[] | FMPDataLoadingError> {
+    if (!process.env.FINANCIAL_MODELING_PREP_API_V4 || !process.env.FMP_API_KEY) {
+        return "FMP URL v4 and key must be specified";
+    }
+    const url = `${process.env.FINANCIAL_MODELING_PREP_API_V4}/upgrades-downgrades-rss-feed?page=0&apikey=${process.env.FMP_API_KEY}`;
+
+    try {
+        const response = await fetch(url, { next: { revalidate: 0 } });
+
+        if (!response.ok) {
+            const message = `Error fetching stock news`;
+            console.error(message);
+            console.error(JSON.stringify(response));
+            return message;
+        }
+
+        const data = await response.json();
+
+        // Process each item individually to filter out invalid ones
+        const validItems: StockGrade[] = [];
+        for (const item of data) {
+            const parsedItem = StockGradesArraySchema.element.safeParse(item);
+            if (parsedItem.success) {
+                validItems.push(parsedItem.data);
+            } else {
+                console.warn(`Invalid item ignored: ${JSON.stringify(item)}`);
+            }
+        }
+
+        return validItems;
+
+    } catch (error) {
+        console.error("Error fetching or parsing stock grades:", error);
+        const dataError: FMPDataLoadingError = `Unable to fetch news`;
         return dataError;
     }
 }

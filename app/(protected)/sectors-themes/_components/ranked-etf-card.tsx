@@ -13,6 +13,7 @@ import EtfReturnsBarChart from "./etf-returns-barchart";
 import { FullFMPProfile } from "@/lib/types/fmp-types";
 import { ChartSplineIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useMemo } from "react";
 
 interface RankedEtfCardProps {
   rank: number;
@@ -67,12 +68,14 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({
     refetchInterval: 120000,
   });
 
-  const currentDate = new Date();
-  const twoYearsAgo = new Date(
-    currentDate.getFullYear() - 2,
-    currentDate.getMonth(),
-    currentDate.getDate()
-  );
+  const twoYearsAgo = useMemo(() => {
+    const currentDate = new Date();
+    return new Date(
+      currentDate.getFullYear() - 2,
+      currentDate.getMonth(),
+      currentDate.getDate()
+    );
+  }, []);
 
   const renderStockList = (holdings: any[], isLoading: boolean, error: any) => {
     if (isLoading) {

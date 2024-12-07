@@ -64,19 +64,21 @@ const OverviewReturns: React.FC = () => {
           color: "text-gray-700",
         },
       }}
-      className=" h-[45vh] 4xl:h-[40vh] w-full"
+      className="h-full w-full"
     >
-      <ResponsiveContainer width="100%">
+      <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={chartData}
-          margin={{ top: 30, right: 20, bottom: 10, left: 5 }}
+          margin={{ top: 20, right: 0, bottom: 20, left: 5 }}
         >
           <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" />
           <XAxis dataKey="time" ticks={ticks} />
           <YAxis
+            orientation="left"
             domain={["auto", "auto"]}
             tickFormatter={(value) => `${value.toFixed(1)}%`}
           />
+
           <ReferenceLine y={0} stroke="#999" strokeWidth={1.5} />
 
           <ChartTooltip
@@ -85,11 +87,8 @@ const OverviewReturns: React.FC = () => {
                 className="w-[180px]"
                 labelFormatter={(label) => `Time: ${label}`}
                 formatter={(value, name) => {
-                  // Get chart configuration for this data series
                   const config = marketConfigs.find((m) => m.name === name);
-                  const color = config ? config.color : "#000"; // Fallback color if not found
-
-                  // Return formatted JSX for tooltip
+                  const color = config ? config.color : "#000";
                   return [
                     <div
                       className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
@@ -112,7 +111,16 @@ const OverviewReturns: React.FC = () => {
             cursor={{ stroke: "rgba(0, 0, 0, 0.2)" }}
           />
 
-          <Legend />
+          <Legend
+            verticalAlign="bottom"
+            align="center"
+            height={36}
+            wrapperStyle={{
+              bottom: 0,
+              paddingTop: '0px',
+              marginBottom: '-5px'
+            }}
+          />
 
           {marketConfigs.map((market) => (
             <Line
@@ -129,6 +137,7 @@ const OverviewReturns: React.FC = () => {
         </LineChart>
       </ResponsiveContainer>
     </ChartContainer>
+
   );
 };
 

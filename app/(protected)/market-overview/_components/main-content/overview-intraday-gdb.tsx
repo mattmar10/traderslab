@@ -130,12 +130,12 @@ const OverviewIntradayGDB: React.FC = () => {
           color: "text-gray-700",
         },
       }}
-      className=" h-[41vh] 4xl:h-[40vh] w-full mt-4"
+      className=" h-full w-full"
     >
-      <ResponsiveContainer width="100%">
+      <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={chartData}
-          margin={{ top: 20, right: 10, left: 10, bottom: 5 }}
+          margin={{ top: 20, right: 0, bottom: 20, left: 5 }}
         >
           <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" />
           <ReferenceLine y={0} stroke="#999" strokeWidth={1.5} />
@@ -175,8 +175,17 @@ const OverviewIntradayGDB: React.FC = () => {
             }
             cursor={true}
           />
-          <Legend />
 
+          <Legend
+            verticalAlign="bottom"
+            align="center"
+            height={36}
+            wrapperStyle={{
+              bottom: 0,
+              paddingTop: '0px',
+              marginBottom: '-5px'
+            }}
+          />
           {Object.entries(chartConfig).map(([key, config]) => (
             <Line
               key={key}

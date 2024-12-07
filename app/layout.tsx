@@ -7,6 +7,7 @@ import { IoIosHelpCircleOutline } from "react-icons/io";
 import { ThemeProvider } from "next-themes";
 import ReactQueryProvider from "./providers/Providers";
 import { Toaster } from "@/components/ui/toaster";
+import { ChartSettingsProvider } from "./context/chart-settigns-context";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -108,14 +109,16 @@ export default function RootLayout({
         >
           <ClerkProvider>
             <ReactQueryProvider>
-              <ThemeProvider
-                attribute="class"
-                defaultTheme="light"
-                enableSystem={false}
-                disableTransitionOnChange
-              >
-                {children}
-              </ThemeProvider>
+              <ChartSettingsProvider>
+                <ThemeProvider
+                  attribute="class"
+                  defaultTheme="light"
+                  enableSystem={false}
+                  disableTransitionOnChange
+                >
+                  {children}
+                </ThemeProvider>
+              </ChartSettingsProvider>
             </ReactQueryProvider>
           </ClerkProvider>
         </body>

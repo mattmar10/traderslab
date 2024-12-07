@@ -29,6 +29,12 @@ import { getSettingUpStocks } from "@/actions/screener/actions";
 import Link from "next/link";
 import { FMPDataLoadingError } from "@/lib/types/fmp-types";
 import { Either, isRight } from "@/lib/utils";
+import { useTheme } from "next-themes";
+import { useMemo } from "react";
+import ScreenerMiniChartWrapper from "@/app/(protected)/screener/_components/screener-result-minichart";
+import { useChartSettings } from "@/app/context/chart-settigns-context";
+import { HoverCard, HoverCardContent } from "@/components/ui/hover-card";
+import { HoverCardTrigger } from "@radix-ui/react-hover-card";
 
 export interface SettingUpStocksCardProps {
   stocks: Either<FMPDataLoadingError, ScreenerResults>;
@@ -37,6 +43,19 @@ export interface SettingUpStocksCardProps {
 const SettingUpStocksCard: React.FC<SettingUpStocksCardProps> = ({
   stocks,
 }) => {
+  const twoYearsAgo = useMemo(() => {
+    const currentDate = new Date();
+    return new Date(
+      currentDate.getFullYear() - 2,
+      currentDate.getMonth(),
+      currentDate.getDate()
+    );
+  }, []);
+
+  const { theme } = useTheme();
+  const resolvedTheme = (theme as "light" | "dark") || "light";
+  const { chartSettings } = useChartSettings();
+
   const { data, error, isLoading, refetch } = useQuery({
     queryKey: [`setting-up-stocks`],
     queryFn: async () => {
@@ -88,30 +107,43 @@ const SettingUpStocksCard: React.FC<SettingUpStocksCardProps> = ({
               </TableHeader>
               <TableBody>
                 {data.value.stocks.map((stock: SymbolWithStatsWithRank) => (
-                  <TableRow key={`${stock.profile.symbol}-setting-up`}>
-                    <Link
-                      href={`/symbol/${stock.profile.symbol}`}
-                      className="contents"
-                    >
-                      <TableCell className="font-medium">
-                        {stock.profile.symbol}
-                      </TableCell>
-                      <TableCell className="truncate max-w-[150px]">
-                        <span title={stock.profile.companyName || ""}>
-                          {stock.profile.companyName}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {stock.quote.price}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {stock.quote.change.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {stock.quote.changesPercentage.toFixed(2)}%
-                      </TableCell>
-                    </Link>
-                  </TableRow>
+                  <HoverCard key={`${stock.profile.symbol}-leading`}>
+                    <HoverCardTrigger asChild>
+                      <TableRow>
+                        <Link
+                          href={`/symbol/${stock.profile.symbol}`}
+                          className="contents"
+                        >
+                          <TableCell className="font-medium">
+                            {stock.profile.symbol}
+                          </TableCell>
+                          <TableCell className="truncate max-w-[150px]">
+                            <span title={stock.profile.companyName || ""}>
+                              {stock.profile.companyName}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {stock.quote.price}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {stock.quote.change.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {stock.quote.changesPercentage.toFixed(2)}%
+                          </TableCell>
+                        </Link>
+                      </TableRow>
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-[52rem] p-4 bg-popover z-20 shadow-lg rounded-md">
+                      <ScreenerMiniChartWrapper
+                        profile={stock.profile}
+                        relativeStrengthResults={stock.relativeStrength}
+                        chartSettings={chartSettings}
+                        theme={resolvedTheme}
+                        startDate={twoYearsAgo}
+                      />
+                    </HoverCardContent>
+                  </HoverCard>
                 ))}
               </TableBody>
             </Table>

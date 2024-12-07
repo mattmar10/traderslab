@@ -5,11 +5,12 @@ import MarketOverViewCards from "./_components/market-overview-cards";
 import MarketOverviewMonitor from "./_components/market-overview-monitor";
 
 import HotStocksServer from "./_components/hotstocks/hotstocks";
-import SectorHeatmapServer from "./_components/sector-heatmap/sector-heatmap";
 import { LeadingStocksServer } from "./_components/leading-stocks/leading-stocks";
 import { SettingUpStocksServer } from "./_components/setting-up-stocks/setting-up-stocks";
 import HeadlinesServer from "./_components/headlines/headlines";
 import EconomicCalendarServer from "./_components/calendar/economic-calendar";
+import { UpgradesDownGradesServer } from "./_components/upgrades-downgrades/upgrades-downgrades";
+import EarningsCalendarServer from "./_components/calendar/earnings-calendar";
 
 const lato = Lato({
   subsets: ["latin"],
@@ -31,8 +32,8 @@ const HomePage: React.FC = () => {
           <div className="col-span-1 3xl:col-span-6">
             <MarketOverviewMonitor />
           </div>
-          <div className="col-span-1 3xl:col-span-2">
-            <SectorHeatmapServer />
+          <div className="col-span-2 w-full ">
+            <HeadlinesServer />
           </div>
         </div>
         <div className="grid grid-cols-1 gap-4 3xl:grid-cols-9">
@@ -47,13 +48,17 @@ const HomePage: React.FC = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 gap-4 3xl:grid-cols-9">
-          <div className="col-span-1 3xl:col-span-6 ">
-            <HeadlinesServer />
+          <div className="col-span-1 3xl:col-span-3 ">
+            <UpgradesDownGradesServer />
           </div>
           <div className="col-span-1 3xl:col-span-3 ">
             <EconomicCalendarServer />
           </div>
+          <div className="col-span-1 3xl:col-span-3 ">
+            <EarningsCalendarServer />
+          </div>
         </div>
+
       </div>
     </PageContainer>
   );

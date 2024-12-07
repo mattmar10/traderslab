@@ -482,3 +482,33 @@ export const IncomeStatementSchema = z.array(IncomeStatementDataSchema);
 
 export type IncomeStatementData = z.infer<typeof IncomeStatementDataSchema>;
 export type IncomeStatement = z.infer<typeof IncomeStatementSchema>;
+
+export const StockGradeSchema = z.object({
+  symbol: z.string(),
+  publishedDate: z.string(),
+  newsURL: z.string().url(),
+  newsTitle: z.string(),
+  newsBaseURL: z.string(),
+  newsPublisher: z.string(),
+  newGrade: z.string(),
+  previousGrade: z.string().nullable(),
+  gradingCompany: z.string(),
+  action: z.enum([
+    'upgrade',
+    'downgrade',
+    'buy',
+    'hold',
+    'sell',
+    'outperform',
+    'underperform',
+    'positive',
+    'negative',
+    'equal-weight',
+    'underweight',
+    'overweight'
+  ]),
+  priceWhenPosted: z.number()
+});
+
+export type StockGrade = z.infer<typeof StockGradeSchema>;
+export const StockGradesArraySchema = z.array(StockGradeSchema);
