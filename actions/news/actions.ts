@@ -96,8 +96,6 @@ export async function getNewsForSymbol(ticker: string): Promise<FmpStockNewsList
         const data = await response.json();
         const parsed = FmpStockNewsListSchema.safeParse(data);
 
-        console.log(parsed.error)
-
         if (parsed.success) {
             return parsed.data;
         } else {

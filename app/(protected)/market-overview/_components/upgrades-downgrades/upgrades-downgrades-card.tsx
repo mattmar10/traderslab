@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StockGrade } from "@/lib/types/fmp-types";
-import { ArrowDownCircle, ArrowUpCircle, GlobeIcon, MinusCircle } from "lucide-react";
+import { ArrowDownCircle, ArrowUpCircle, MinusCircle } from "lucide-react";
 import { HiMiniArrowsUpDown } from "react-icons/hi2";
 import Link from 'next/link';
 export interface UpgradesAndDowngradesProps {
@@ -44,8 +44,6 @@ const UpgradesAndDowngrades: React.FC<UpgradesAndDowngradesProps> = ({ grades })
 
         const normalizeGrade = (grade: string) => grade.toLowerCase().trim();
 
-        console.log(grade)
-
         if (grade.previousGrade &&
             normalizeGrade(grade.previousGrade) === normalizeGrade(grade.newGrade)) {
             return 'maintain';
@@ -77,10 +75,6 @@ const UpgradesAndDowngrades: React.FC<UpgradesAndDowngradesProps> = ({ grades })
     const upgrades = filteredGrades.filter(item => categorizeGrade(item) === 'upgrade');
     const downgrades = filteredGrades.filter(item => categorizeGrade(item) === 'downgrade');
 
-    const getActionColor = (item: StockGrade) => {
-        const category = categorizeGrade(item);
-        return category === 'upgrade' ? 'text-uptrend' : 'text-red-500';
-    };
 
     const renderGradeChange = (item: StockGrade) => {
         const category = categorizeGrade(item);
@@ -95,7 +89,7 @@ const UpgradesAndDowngrades: React.FC<UpgradesAndDowngradesProps> = ({ grades })
         <ScrollArea className="h-full w-full max-h-[450px] overflow-auto">
             <div className="space-y-4">
                 {items.map((item, index) => (
-                    <Link href={`/symbol/${item.symbol}`}>
+                    <Link href={`/symbol/${item.symbol}`} key={`grade-${item.symbol}`}>
                         <div
                             key={`${item.symbol}-${item.publishedDate}-${index}`}
                             className="flex items-start space-x-4 p-2 rounded-lg hover:bg-gray-100 transition-colors"

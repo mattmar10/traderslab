@@ -39,7 +39,6 @@ const MarketBreadthPopoverContainer: React.FC<OffCanvasContainerPros> = ({
   const { theme } = useTheme();
   const [chartSettings, setChartSettings] =
     useState<ChartSettings>(defaultChartSettings);
-  const [isDataLoaded, setIsDataLoaded] = useState(false);
   useEffect(() => {
     const loadData = () => {
       const savedSettings = localStorage.getItem("chartSettings");
@@ -48,7 +47,6 @@ const MarketBreadthPopoverContainer: React.FC<OffCanvasContainerPros> = ({
       } else {
         setChartSettings(defaultChartSettings);
       }
-      setIsDataLoaded(true);
     };
 
     loadData();
@@ -57,8 +55,6 @@ const MarketBreadthPopoverContainer: React.FC<OffCanvasContainerPros> = ({
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  console.log(chartSettings, isDataLoaded);
 
   const startDate = new Date(fromDate);
   const key = `/api/bars/${ticker}?fromDateString=${fromDate}&toDateString=${endDate}`;

@@ -18,7 +18,11 @@ async function Headlines() {
         return <div>Unable to load data</div>;
     }
 
-    return <HeadlinesCard generalNews={generalNews} stockNews={stockNews} />
+    return (
+        <div className="h-[52rem]">
+            <HeadlinesCard generalNews={generalNews} stockNews={stockNews} />
+        </div>
+    )
 }
 
 function LoadingState() {

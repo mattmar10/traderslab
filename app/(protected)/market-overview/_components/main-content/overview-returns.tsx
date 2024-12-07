@@ -64,19 +64,21 @@ const OverviewReturns: React.FC = () => {
           color: "text-gray-700",
         },
       }}
-      className="h-full"
+      className="h-full w-full"
     >
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={chartData}
-          margin={{ top: 20, right: 20, bottom: 30, left: 5 }}
+          margin={{ top: 20, right: 0, bottom: 20, left: 5 }}
         >
           <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" />
           <XAxis dataKey="time" ticks={ticks} />
           <YAxis
+            orientation="left"
             domain={["auto", "auto"]}
             tickFormatter={(value) => `${value.toFixed(1)}%`}
           />
+
           <ReferenceLine y={0} stroke="#999" strokeWidth={1.5} />
 
           <ChartTooltip
@@ -109,17 +111,16 @@ const OverviewReturns: React.FC = () => {
             cursor={{ stroke: "rgba(0, 0, 0, 0.2)" }}
           />
 
-
           <Legend
             verticalAlign="bottom"
             align="center"
-            height={20} // Explicitly set height
+            height={36}
             wrapperStyle={{
               bottom: 0,
-              paddingTop: '20px'
+              paddingTop: '0px',
+              marginBottom: '-5px'
             }}
           />
-
 
           {marketConfigs.map((market) => (
             <Line
@@ -136,6 +137,7 @@ const OverviewReturns: React.FC = () => {
         </LineChart>
       </ResponsiveContainer>
     </ChartContainer>
+
   );
 };
 

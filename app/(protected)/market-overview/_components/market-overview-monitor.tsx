@@ -19,7 +19,7 @@ async function MainContent() {
   }
 
   return (
-    <div className="h-[52rem]">
+    <div className="h-[52rem] ">
       <OverviewMainContent />
     </div>
   )

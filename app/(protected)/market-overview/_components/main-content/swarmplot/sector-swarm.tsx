@@ -106,8 +106,8 @@ const SectorSwarmplot: React.FC<SectorSwarmplotResponse> = ({
   );
 
   return (
-    <>
-      <div className="flex items-center justify-end space-x-2 mb-4">
+    <div className="flex flex-col h-full w-full">
+      <div className="flex-none flex items-center justify-end space-x-2 mb-4">
         <Label htmlFor="market-select" className="whitespace-nowrap mr-2">
           Market:
         </Label>
@@ -122,73 +122,75 @@ const SectorSwarmplot: React.FC<SectorSwarmplotResponse> = ({
           </Button>
         ))}
       </div>
-      <ChartContainer
-        config={{
-          stocks: {
-            label: "Stocks",
-            color: "text-gray-700",
-          },
-        }}
-        className=" mt-2 w-full"
-      >
-        <ResponsiveContainer width="100%" height={"100%"} >
-          <ScatterChart
-            margin={{
-              top: 10,
-              right: 20,
-              bottom: 0,
-              left: window.innerWidth < 768 ? 60 : 80,
-            }}
-          >
-            <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" />
-            <ReferenceLine x={0} stroke="#999" strokeWidth={1.5} />
-            <XAxis
-              type="number"
-              dataKey="return"
-              name="Return"
-              unit="%"
-              ticks={returnTicks}
-              interval={0}
-              domain={[-minMax, minMax]}
-              stroke="#555"
-              tickFormatter={(value) => value.toFixed(0)}
-              fontSize={12}
-            />
-            <YAxis
-              type="number"
-              dataKey="sector"
-              name="Sector"
-              ticks={Array.from(sectorsOrderMap.values())}
-              domain={[0, 60]}
-              stroke="#555"
-              tick={({ x, y, payload }) => (
-                <CustomYAxisLabel x={x} y={y} payload={payload} />
-              )}
-              tickMargin={16}
-            />
-            <ZAxis
-              type="number"
-              dataKey="volume"
-              range={[50, window.innerWidth < 768 ? 1000 : 2000]}
-              name="Volume"
-              unit="M"
-            />
-            <ChartTooltip
-              cursor={{ strokeDasharray: "3 3" }}
-              content={<CustomTooltip />}
-            />
-            <Scatter name="Stocks" data={mapped} fillOpacity={0.6}>
-              {mapped.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={entry.return >= 0 ? positiveColor : negativeColor}
-                />
-              ))}
-            </Scatter>
-          </ScatterChart>
-        </ResponsiveContainer>
-      </ChartContainer>
-    </>
+      <div className="flex-1 min-h-0 w-full">
+        <ChartContainer
+          config={{
+            stocks: {
+              label: "Stocks",
+              color: "text-gray-700",
+            },
+          }}
+          className="h-full w-full"
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <ScatterChart
+              margin={{
+                top: 10,
+                right: 20,
+                bottom: 20,
+                left: window.innerWidth < 768 ? 60 : 80,
+              }}
+            >
+              <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" />
+              <ReferenceLine x={0} stroke="#999" strokeWidth={1.5} />
+              <XAxis
+                type="number"
+                dataKey="return"
+                name="Return"
+                unit="%"
+                ticks={returnTicks}
+                interval={0}
+                domain={[-minMax, minMax]}
+                stroke="#555"
+                tickFormatter={(value) => value.toFixed(0)}
+                fontSize={12}
+              />
+              <YAxis
+                type="number"
+                dataKey="sector"
+                name="Sector"
+                ticks={Array.from(sectorsOrderMap.values())}
+                domain={[0, 60]}
+                stroke="#555"
+                tick={({ x, y, payload }) => (
+                  <CustomYAxisLabel x={x} y={y} payload={payload} />
+                )}
+                tickMargin={16}
+              />
+              <ZAxis
+                type="number"
+                dataKey="volume"
+                range={[50, window.innerWidth < 768 ? 1000 : 2000]}
+                name="Volume"
+                unit="M"
+              />
+              <ChartTooltip
+                cursor={{ strokeDasharray: "3 3" }}
+                content={<CustomTooltip />}
+              />
+              <Scatter name="Stocks" data={mapped} fillOpacity={0.6}>
+                {mapped.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={entry.return >= 0 ? positiveColor : negativeColor}
+                  />
+                ))}
+              </Scatter>
+            </ScatterChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </div>
+    </div>
   );
 };
 

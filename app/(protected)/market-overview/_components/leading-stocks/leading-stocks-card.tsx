@@ -39,6 +39,16 @@ export interface LeadingStocksCardProps {
 }
 
 const LeadingStocksCard: React.FC<LeadingStocksCardProps> = ({ stocks }) => {
+
+  const twoYearsAgo = useMemo(() => {
+    const currentDate = new Date();
+    return new Date(
+      currentDate.getFullYear() - 2,
+      currentDate.getMonth(),
+      currentDate.getDate()
+    );
+  }, []);
+
   const { theme } = useTheme();
   const resolvedTheme = (theme as "light" | "dark") || "light";
   const { chartSettings } = useChartSettings();
@@ -64,15 +74,6 @@ const LeadingStocksCard: React.FC<LeadingStocksCardProps> = ({ stocks }) => {
   if (error || !data) {
     return <ErrorCard errorMessage={"Unable to load leaders"} />;
   }
-
-  const twoYearsAgo = useMemo(() => {
-    const currentDate = new Date();
-    return new Date(
-      currentDate.getFullYear() - 2,
-      currentDate.getMonth(),
-      currentDate.getDate()
-    );
-  }, []);
 
 
   return (

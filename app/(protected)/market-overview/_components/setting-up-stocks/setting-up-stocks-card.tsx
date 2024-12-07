@@ -43,6 +43,15 @@ export interface SettingUpStocksCardProps {
 const SettingUpStocksCard: React.FC<SettingUpStocksCardProps> = ({
   stocks,
 }) => {
+  const twoYearsAgo = useMemo(() => {
+    const currentDate = new Date();
+    return new Date(
+      currentDate.getFullYear() - 2,
+      currentDate.getMonth(),
+      currentDate.getDate()
+    );
+  }, []);
+
   const { theme } = useTheme();
   const resolvedTheme = (theme as "light" | "dark") || "light";
   const { chartSettings } = useChartSettings();
@@ -69,16 +78,6 @@ const SettingUpStocksCard: React.FC<SettingUpStocksCardProps> = ({
   if (error || !data) {
     return <ErrorState refetch={refetch} />;
   }
-
-  const twoYearsAgo = useMemo(() => {
-    const currentDate = new Date();
-    return new Date(
-      currentDate.getFullYear() - 2,
-      currentDate.getMonth(),
-      currentDate.getDate()
-    );
-  }, []);
-
 
   return (
     <Card className="h-full min-h-[300px] max-h-[30vh] flex flex-col">
