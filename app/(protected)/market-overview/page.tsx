@@ -9,8 +9,8 @@ import { LeadingStocksServer } from "./_components/leading-stocks/leading-stocks
 import { SettingUpStocksServer } from "./_components/setting-up-stocks/setting-up-stocks";
 import HeadlinesServer from "./_components/headlines/headlines";
 import EconomicCalendarServer from "./_components/calendar/economic-calendar";
-import { UpgradesDownGradesServer } from "./_components/upgrades-downgrades/upgrades-downgrades";
 import EarningsCalendarServer from "./_components/calendar/earnings-calendar";
+import { UpgradesDownGradesServer } from "./_components/upgrades-downgrades/upgrades-downgrades";
 
 const lato = Lato({
   subsets: ["latin"],
