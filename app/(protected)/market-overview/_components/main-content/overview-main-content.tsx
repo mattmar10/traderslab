@@ -11,6 +11,7 @@ import { useState } from "react";
 import OverviewReturns from "./overview-returns";
 import SectorSwarmplot from "./swarmplot/sector-swarm";
 import OverviewIntradayGDB from "./overview-intraday-gdb";
+import { BorderBeam } from "@/components/magicui/border-beam";
 
 const OverviewMainContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<
@@ -18,7 +19,7 @@ const OverviewMainContent: React.FC = () => {
   >("returns");
 
   return (
-    <Card className="w-full relative h-[60vh] 4xl:h-[50vh]">
+    <Card className="w-full relative h-full">
       <CardHeader className="flex-none flex flex-row items-center justify-between px-4 lg:px-6 pb-4">
         <div className="flex-shrink">
           <CardTitle className="text-lg lg:text-xl">At A Glance</CardTitle>
@@ -26,8 +27,8 @@ const OverviewMainContent: React.FC = () => {
             {activeTab === "sectorPerformance"
               ? "Compare the return distribution across sectors"
               : activeTab === "returns"
-              ? "Compare the returns across the major markets using representatitive ETFs/Indexes"
-              : "Compare intraday global daily breadth across the major markets"}
+                ? "Compare the returns across the major markets using representatitive ETFs/Indexes"
+                : "Compare intraday global daily breadth across the major markets"}
           </CardDescription>
         </div>
       </CardHeader>
@@ -49,17 +50,19 @@ const OverviewMainContent: React.FC = () => {
             <TabsTrigger value="intradayGDB">Intraday GDB</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="sectorPerformance">
-            {activeTab === "sectorPerformance" && (
-              <SectorSwarmplot market={"sp500"} />
-            )}
-          </TabsContent>
-          <TabsContent value="returns">
-            {activeTab === "returns" && <OverviewReturns />}
-          </TabsContent>
-          <TabsContent value="intradayGDB">
-            {activeTab === "intradayGDB" && <OverviewIntradayGDB />}
-          </TabsContent>
+          <div className="h-[50rem] overflow-y-auto">
+            <TabsContent value="sectorPerformance">
+              {activeTab === "sectorPerformance" && (
+                <SectorSwarmplot market={"sp500"} />
+              )}
+            </TabsContent>
+            <TabsContent value="returns">
+              {activeTab === "returns" && <OverviewReturns />}
+            </TabsContent>
+            <TabsContent value="intradayGDB">
+              {activeTab === "intradayGDB" && <OverviewIntradayGDB />}
+            </TabsContent>
+          </div>
         </Tabs>
       </div>
     </Card>

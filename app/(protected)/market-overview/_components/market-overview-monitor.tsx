@@ -18,12 +18,16 @@ async function MainContent() {
     return <div>Unable to load data</div>;
   }
 
-  return <OverviewMainContent />;
+  return (
+    <div className="h-[52rem]">
+      <OverviewMainContent />
+    </div>
+  )
 }
 
 function LoadingState() {
   return (
-    <Card className="w-full h-[40vh]">
+    <Card className="w-full h-[55rem]">
       <CardHeader className="flex flex-row items-center justify-between pb-3">
         <div>
           <CardTitle>Sector Performance Distribution</CardTitle>

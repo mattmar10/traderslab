@@ -27,7 +27,7 @@ const EarningsCalendarCard: React.FC<EarningsCalendarProps> = ({
   earnings = [],
 }: EarningsCalendarProps) => {
   return (
-    <Card className="w-full h-[385px]">
+    <Card className="h-[600px] flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex flex-col space-y-1">
           <CardTitle className="text-xl">Earnings Calendar</CardTitle>
@@ -35,8 +35,8 @@ const EarningsCalendarCard: React.FC<EarningsCalendarProps> = ({
         </div>
         <CalendarIcon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[300px] w-full">
+      <CardContent className="flex-1 overflow-hidden">
+        <ScrollArea className="w-full h-full">
           {earnings.length > 0 ? (
             <Table>
               <TableHeader className="sticky top-0 bg-background z-10">

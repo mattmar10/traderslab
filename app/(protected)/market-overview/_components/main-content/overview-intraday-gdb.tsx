@@ -130,7 +130,7 @@ const OverviewIntradayGDB: React.FC = () => {
           color: "text-gray-700",
         },
       }}
-      className=" h-[41vh] 4xl:h-[40vh] w-full mt-4"
+      className=" h-full w-full mt-4"
     >
       <ResponsiveContainer width="100%">
         <LineChart

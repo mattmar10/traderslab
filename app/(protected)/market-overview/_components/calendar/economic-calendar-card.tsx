@@ -38,7 +38,7 @@ export default function EconomicCalendarCard({
   );
 
   return (
-    <Card className="h-full min-h-[300px] max-h-[30vh] flex flex-col">
+    <Card className="h-[600px] flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex flex-col space-y-1">
           <CardTitle className="text-xl">Economic Calendar</CardTitle>
@@ -47,6 +47,7 @@ export default function EconomicCalendarCard({
         <CalendarIcon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent className="flex-1  overflow-hidden">
+
         <div className="flex space-x-4 mt-1 mb-2">
           <div className="flex items-center space-x-2">
             <Switch

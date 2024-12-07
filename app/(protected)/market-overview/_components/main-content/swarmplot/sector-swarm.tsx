@@ -129,14 +129,14 @@ const SectorSwarmplot: React.FC<SectorSwarmplotResponse> = ({
             color: "text-gray-700",
           },
         }}
-        className="h-[42vh] 4xl:h-[38vh] mt-2 w-full"
+        className=" mt-2 w-full"
       >
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height={"100%"} >
           <ScatterChart
             margin={{
               top: 10,
               right: 20,
-              bottom: 20,
+              bottom: 0,
               left: window.innerWidth < 768 ? 60 : 80,
             }}
           >
