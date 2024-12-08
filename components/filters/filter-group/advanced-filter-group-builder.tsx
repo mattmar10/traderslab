@@ -133,6 +133,7 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
       const key = filterKey as keyof FilterCriteria;
       const value = filterValue;
 
+
       return (
         <FilterSelect
           key={`${index}-${key}`}
@@ -221,6 +222,7 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
             </div>
           ) : (
             filterGroup.filters.map((filter, index) =>
+
               "operator" in filter ? (
                 <FilterGroupEditor
                   key={index}
@@ -279,6 +281,7 @@ function defaultValueForFilter(
     case "oneYearReturnPercentRange":
     case "volumeRange":
     case "relativeVolumeRange":
+    case "percentBRange":
     case "rsRankRange":
       return ranges[filterKey]; // Default range values
     case "movingAvgFilters":
@@ -478,6 +481,15 @@ export const filterKeyConfig: Record<
   },
   minimumDaysBeforeEarnings: {
     header: "Days Before Earnings",
+    type: "custom",
+  },
+  percentBRange: {
+    header: "Bollinger %B",
+    type: "slider",
+    steps: 0.01,
+  },
+  relativeVolatilityMetricFilter: {
+    header: "Relative Volatility Metric",
     type: "custom",
   },
 };

@@ -133,7 +133,7 @@ export async function getProfile(ticker: string): Promise<SymbolProfile> {
     return Promise.reject("TRADERS_LAB_API must be specified");
   }
   const url = `${process.env.TRADERS_LAB_API}/symbol/${ticker}/profile`;
-  console.log(url);
+
   try {
     const response = await fetch(url, { next: { revalidate: 0 } });
 
@@ -160,7 +160,6 @@ export async function getFullProfile(
     return Promise.reject("FMP URL and key must be specified");
   }
   const url = `${process.env.FINANCIAL_MODELING_PREP_API}/profile/${ticker}?apikey=${process.env.FMP_API_KEY}`;
-  console.log(url);
   try {
     const response = await fetch(url, { next: { revalidate: 0 } });
 

@@ -2,6 +2,7 @@
 import { FilterCriteria, ScreenerRanges } from "@/lib/types/screener-types";
 import { SliderRangeFilter } from "./slider-filter";
 import { Checkbox } from "@/components/ui/checkbox";
+import RelativeVolatiltyMetricFilter from "./relative-volatility-metric-filter";
 
 interface VolatilityFilterProps {
   filters: FilterCriteria;
@@ -65,6 +66,35 @@ const VolatilityFilters: React.FC<VolatilityFilterProps> = ({
         className="py-2"
         inputWidth="6rem"
       />
+      <SliderRangeFilter
+        minValue={ranges.percentBRange[0]}
+        maxValue={ranges.percentBRange[1]}
+        initialMinValue={
+          filters.percentBRange
+            ? filters.percentBRange[0]
+            : ranges.percentBRange[0]
+        }
+        initialMaxValue={
+          filters.percentBRange
+            ? filters.percentBRange[1]
+            : ranges.percentBRange[1]
+        }
+        steps={.01}
+        onValueChange={(value) =>
+          handleFilterChange("percentBRange", value)
+        }
+        header={"Bollinger %B"}
+        className="py-2"
+        inputWidth="6rem"
+      />
+      <div className="mt-6">
+        <div className="font-semibold mb-3">Relative Volatility Metric</div>
+        <RelativeVolatiltyMetricFilter
+          filterValue={filters.relativeVolatilityMetricFilter}
+          handleFilterChange={handleFilterChange}
+        />
+      </div>
+
       <div className="mt-6">
         <div className="font-semibold mb-3">Volatility Patterns</div>
         <div className="flex space-x-4">
