@@ -97,6 +97,28 @@ const VolumeFilters: React.FC<VolumeFiltersProps> = ({
                 inputWidth="6rem"
             />
 
+            <SliderRangeFilter
+                minValue={ranges.relativeVolumeRange[0]}
+                maxValue={ranges.relativeVolumeRange[1]}
+                initialMinValue={
+                    filters.relativeVolumeRange
+                        ? filters.relativeVolumeRange[0]
+                        : ranges.relativeVolumeRange[0]
+                }
+                initialMaxValue={
+                    filters.relativeVolumeRange
+                        ? filters.relativeVolumeRange[1]
+                        : ranges.relativeVolumeRange[1]
+                }
+                steps={1}
+                onValueChange={(value) =>
+                    handleFilterChange("relativeVolumeRange", value)
+                }
+                header={"Relative Volume"}
+                className="py-2"
+                inputWidth="6rem"
+            />
+
             <div className="mt-6">
                 <div className="font-semibold mb-3">Volume Patterns</div>
                 <div className="flex items-center space-x-4">

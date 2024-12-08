@@ -30,6 +30,7 @@ import { SliderRangeFilter } from "../slider-filter";
 import { ChevronDown, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { filterKeyConfig } from "./advanced-filter-group-builder";
+import RelativeVolatiltyMetricFilter from "../relative-volatility-metric-filter";
 
 interface FilterSelectProps {
   filterKey: keyof FilterCriteria;
@@ -117,6 +118,26 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
         <AdrPercentFromMovingAvgFilter
           filters={filterValue}
           onFiltersChange={onFilterValueChange}
+        />
+      );
+    }
+
+    if (filterKey === "relativeVolatilityMetricFilter") {
+
+      const handleRelativeVolatilityMetricFilterChange = (key: keyof FilterCriteria, value: any) => {
+        onFilterValueChange({
+          period: value.period,
+          shortEma: value.shortEma,
+          longEma: value.longEma,
+          range: value.range,
+        });
+      };
+
+
+
+      return (
+        <RelativeVolatiltyMetricFilter
+          filters={filterValue} handleFilterChange={handleRelativeVolatilityMetricFilterChange}
         />
       );
     }
@@ -539,6 +560,13 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
               <DropdownMenuSubContent>
                 <DropdownMenuItem
                   onSelect={() =>
+                    onFilterTypeChange("relativeVolatilityMetricFilter")
+                  }
+                >
+                  Relative Volatility Metric
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() =>
                     onFilterTypeChange("volatilityContractionScoreRange")
                   }
                 >
@@ -550,6 +578,13 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
                   }
                 >
                   Daily Hist. Volatility
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() =>
+                    onFilterTypeChange("percentBRange")
+                  }
+                >
+                  Bollinger %B
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onSelect={() => onFilterTypeChange("insideDay")}

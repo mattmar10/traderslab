@@ -86,6 +86,15 @@ export const FilterCriteriaSchema = z.object({
     .tuple([z.number(), z.number()])
     .optional(),
   minimumDaysBeforeEarnings: z.number().optional(),
+  relativeVolatilityMetricFilter: z
+    .object({
+      period: z.number().optional(),
+      shortEma: z.number().optional(),
+      longEma: z.number().optional(),
+      range: z.tuple([z.number(), z.number()]).optional(),
+    })
+    .optional(),
+  percentBRange: z.tuple([z.number(), z.number()]).optional(),
 });
 export type FilterCriteria = z.infer<typeof FilterCriteriaSchema>;
 
@@ -208,6 +217,7 @@ export const ScreenerRangesSchema = z.object({
   trendMomentumRange: z.tuple([z.number(), z.number()]),
   volatilityAdjustedTrendMomentumRange: z.tuple([z.number(), z.number()]),
   dailyRangeHistoricalVolatilityRange: z.tuple([z.number(), z.number()]),
+  percentBRange: z.tuple([z.number(), z.number()]),
 });
 
 export type ScreenerRanges = z.infer<typeof ScreenerRangesSchema>;
