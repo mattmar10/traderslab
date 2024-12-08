@@ -79,7 +79,7 @@ const VolatilityFilters: React.FC<VolatilityFilterProps> = ({
             ? filters.percentBRange[1]
             : ranges.percentBRange[1]
         }
-        steps={1}
+        steps={.01}
         onValueChange={(value) =>
           handleFilterChange("percentBRange", value)
         }

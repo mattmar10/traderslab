@@ -2,29 +2,30 @@ import { ScreenerRanges } from "@/lib/types/screener-types";
 
 export type RangeKeys =
   | keyof Pick<
-      ScreenerRanges,
-      | "priceRange"
-      | "volumeRange"
-      | "marketCapRange"
-      | "adrPercentRange"
-      | "rsRankRange"
-      | "relativeVolumeRange"
-      | "oneDayAbsoluteChangeRange"
-      | "oneDayReturnPercentRange"
-      | "oneWeekReturnPercentRange"
-      | "oneMonthReturnPercentRange"
-      | "threeMonthReturnPercentRange"
-      | "sixMonthReturnPercentRange"
-      | "oneYearReturnPercentRange"
-      | "fiftyTwoWeekHighPercentageRange"
-      | "fiftyTwoWeekLowPercentageRange"
-      | "twentyVolumeSMARange"
-      | "dailyLiquidityRange"
-      | "volatilityContractionScoreRange"
-      | "dailyRangeHistoricalVolatilityRange"
-      | "trendMomentumRange"
-      | "volatilityAdjustedTrendMomentumRange"
-    >
+    ScreenerRanges,
+    | "percentBRange"
+    | "priceRange"
+    | "volumeRange"
+    | "marketCapRange"
+    | "adrPercentRange"
+    | "rsRankRange"
+    | "relativeVolumeRange"
+    | "oneDayAbsoluteChangeRange"
+    | "oneDayReturnPercentRange"
+    | "oneWeekReturnPercentRange"
+    | "oneMonthReturnPercentRange"
+    | "threeMonthReturnPercentRange"
+    | "sixMonthReturnPercentRange"
+    | "oneYearReturnPercentRange"
+    | "fiftyTwoWeekHighPercentageRange"
+    | "fiftyTwoWeekLowPercentageRange"
+    | "twentyVolumeSMARange"
+    | "dailyLiquidityRange"
+    | "volatilityContractionScoreRange"
+    | "dailyRangeHistoricalVolatilityRange"
+    | "trendMomentumRange"
+    | "volatilityAdjustedTrendMomentumRange"
+  >
   | "dailyClosingRangePercentRange";
 
 export function isRangeKey(key: string): key is RangeKeys {
@@ -51,5 +52,6 @@ export function isRangeKey(key: string): key is RangeKeys {
     "dailyRangeHistoricalVolatilityRange",
     "trendMomentumRange",
     "volatilityAdjustedTrendMomentumRange",
+    "percentBRange"
   ].includes(key);
 }
