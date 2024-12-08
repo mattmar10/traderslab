@@ -90,7 +90,7 @@ const VolatilityFilters: React.FC<VolatilityFilterProps> = ({
       <div className="mt-6">
         <div className="font-semibold mb-3">Relative Volatility Metric</div>
         <RelativeVolatiltyMetricFilter
-          filters={filters}
+          filterValue={filters.relativeVolatilityMetricFilter}
           handleFilterChange={handleFilterChange}
         />
       </div>

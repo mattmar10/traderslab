@@ -133,11 +133,9 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
         });
       };
 
-
-
       return (
         <RelativeVolatiltyMetricFilter
-          filters={filterValue} handleFilterChange={handleRelativeVolatilityMetricFilterChange}
+          filterValue={filterValue} handleFilterChange={handleRelativeVolatilityMetricFilterChange}
         />
       );
     }

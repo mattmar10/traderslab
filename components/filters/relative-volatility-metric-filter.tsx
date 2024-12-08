@@ -4,28 +4,30 @@ import { useState, useEffect } from "react";
 import { SliderRangeFilter } from "./slider-filter";
 import { FilterCriteria } from "@/lib/types/screener-types";
 
+type RelativeVolatilityMetricFilterType = FilterCriteria["relativeVolatilityMetricFilter"];
+
 export interface RelativeVolatilityMetricFilterProps {
-    filters: FilterCriteria;
+    filterValue: RelativeVolatilityMetricFilterType;
     handleFilterChange: (key: keyof FilterCriteria, value: any) => void;
 }
 
 const INPUT_WIDTH = "7.5rem";
 
 const RelativeVolatiltyMetricFilter: React.FC<RelativeVolatilityMetricFilterProps> = ({
-    filters,
+    filterValue,
     handleFilterChange,
 }) => {
     const [period, setPeriod] = useState<number | undefined>(
-        filters.relativeVolatilityMetricFilter?.period ?? 15
+        filterValue?.period ?? 15
     );
     const [shortEma, setShortEma] = useState<number | undefined>(
-        filters.relativeVolatilityMetricFilter?.shortEma ?? 3
+        filterValue?.shortEma ?? 3
     );
     const [longEma, setLongEma] = useState<number | undefined>(
-        filters.relativeVolatilityMetricFilter?.longEma ?? 15
+        filterValue?.longEma ?? 15
     );
     const [range, setRange] = useState<[number, number] | undefined>(
-        filters.relativeVolatilityMetricFilter?.range ?? [0, 100]
+        filterValue?.range ?? [0, 100]
     );
 
     // Function to update the parent with the new filter

@@ -36,7 +36,6 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
   isNested = false,
   onRemoveGroup,
 }) => {
-  console.log(filterGroup)
   const [isExpanded, setIsExpanded] = useState(true);
 
   useEffect(() => {
