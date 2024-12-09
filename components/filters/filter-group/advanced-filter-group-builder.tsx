@@ -13,7 +13,11 @@ import { Trash2, ChevronRight, ChevronDown } from "lucide-react";
 
 import FilterSelect from "./filter-select";
 import { ExpandableDropDownOption } from "../custom-multi-select";
-import { FilterCriteria, FilterGroup, ScreenerRanges } from "@/lib/types/screener-types";
+import {
+  FilterCriteria,
+  FilterGroup,
+  ScreenerRanges,
+} from "@/lib/types/screener-types";
 
 interface FilterGroupEditorProps {
   filterGroup: FilterGroup;
@@ -105,19 +109,16 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
     const newFilters = [...filterGroup.filters];
 
     if (filterKey) {
-      // Removing a specific filter criterion from a FilterCriteria
       const criteria = newFilters[groupIndex] as FilterCriteria;
       delete criteria[filterKey];
 
+      // Remove the entire filter if it's empty
       if (Object.keys(criteria).length === 0) {
         newFilters.splice(groupIndex, 1);
       } else {
-        newFilters[groupIndex] = criteria;
+        newFilters[groupIndex] = { ...criteria }; // Create new object to avoid mutation
       }
-
-      newFilters[groupIndex] = criteria;
     } else {
-      // Removing the entire filter group or criteria
       newFilters.splice(groupIndex, 1);
     }
 
@@ -132,7 +133,6 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
     return Object.entries(filter).map(([filterKey, filterValue]) => {
       const key = filterKey as keyof FilterCriteria;
       const value = filterValue;
-
 
       return (
         <FilterSelect
@@ -159,8 +159,9 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
   };
   return (
     <div
-      className={`border-l-2 border-foreground/20 pl-4 py-4 my-2 ${isNested ? "ml-4" : ""
-        }`}
+      className={`border-l-2 border-foreground/20 pl-4 py-4 my-2 ${
+        isNested ? "ml-4" : ""
+      }`}
     >
       <div className="flex items-center space-x-4 mb-4">
         <div className="text-sm font-semibold text-foreground/40">
@@ -222,7 +223,6 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
             </div>
           ) : (
             filterGroup.filters.map((filter, index) =>
-
               "operator" in filter ? (
                 <FilterGroupEditor
                   key={index}
