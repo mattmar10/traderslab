@@ -17,57 +17,48 @@ const RelativeVolatiltyMetricFilter: React.FC<RelativeVolatilityMetricFilterProp
     filterValue,
     handleFilterChange,
 }) => {
-    const [period, setPeriod] = useState<number | undefined>(
-        filterValue?.period ?? 15
+
+    const [shortLookback, setShortEma] = useState<number | undefined>(
+        filterValue?.shortLookback ?? 3
     );
-    const [shortEma, setShortEma] = useState<number | undefined>(
-        filterValue?.shortEma ?? 3
-    );
-    const [longEma, setLongEma] = useState<number | undefined>(
-        filterValue?.longEma ?? 15
+    const [longLookback, setLongEma] = useState<number | undefined>(
+        filterValue?.longLookback ?? 15
     );
     const [range, setRange] = useState<[number, number] | undefined>(
         filterValue?.range ?? [0, 100]
     );
 
     const [validationErrors, setValidationErrors] = useState({
-        period: false,
         shortEma: false,
         longEma: false,
     });
 
     // Validate the fields
     const validate = () => {
-        const periodValid =
-            period !== undefined &&
-            Number.isInteger(period) &&
-            period >= (longEma ?? 0);
 
         const shortEmaValid =
-            shortEma !== undefined && Number.isInteger(shortEma) && shortEma > 0;
+            shortLookback !== undefined && Number.isInteger(shortLookback) && shortLookback > 0;
 
         const longEmaValid =
-            longEma !== undefined &&
-            Number.isInteger(longEma) &&
-            longEma > 0 &&
-            (shortEma === undefined || longEma > shortEma);
+            longLookback !== undefined &&
+            Number.isInteger(longLookback) &&
+            longLookback > 0 &&
+            (shortLookback === undefined || longLookback > shortLookback);
 
         setValidationErrors({
-            period: !periodValid,
             shortEma: !shortEmaValid,
             longEma: !longEmaValid,
         });
 
-        return periodValid && shortEmaValid && longEmaValid;
+        return shortEmaValid && longEmaValid;
     };
 
     // Update the parent with the new filter
     const handleChange = () => {
         if (validate()) {
             handleFilterChange("relativeVolatilityMetricFilter", {
-                period,
-                shortEma,
-                longEma,
+                shortLookback: shortLookback,
+                longLookback: longLookback,
                 range,
             });
         }
@@ -76,7 +67,7 @@ const RelativeVolatiltyMetricFilter: React.FC<RelativeVolatilityMetricFilterProp
     // Revalidate whenever the fields change
     useEffect(() => {
         handleChange();
-    }, [period, shortEma, longEma, range]);
+    }, [shortLookback, longLookback, range]);
 
     // Helper function to sanitize input to integers only
     const handleIntegerInput = (
@@ -93,24 +84,7 @@ const RelativeVolatiltyMetricFilter: React.FC<RelativeVolatilityMetricFilterProp
 
     return (
         <div className="flex items-start space-x-4 w-full">
-            <div className="flex flex-col">
-                <label className="text-sm mb-3 font-semibold text-foreground/70">
-                    Lookback Period
-                </label>
-                <Input
-                    type="number"
-                    value={period ?? ""}
-                    onChange={(e) => handleIntegerInput(e.target.value, setPeriod)}
-                    placeholder="Default: 15"
-                    style={{ width: INPUT_WIDTH }}
-                    className={validationErrors.period ? "border-red-500" : ""}
-                />
-                {validationErrors.period && (
-                    <span className="text-xs text-red-500 mt-1">
-                        Must be an integer ≥ Long EMA
-                    </span>
-                )}
-            </div>
+
 
             <div className="flex flex-col">
                 <label className="text-sm mb-3 font-semibold text-foreground/70">
@@ -118,7 +92,7 @@ const RelativeVolatiltyMetricFilter: React.FC<RelativeVolatilityMetricFilterProp
                 </label>
                 <Input
                     type="number"
-                    value={shortEma ?? ""}
+                    value={shortLookback ?? ""}
                     onChange={(e) => handleIntegerInput(e.target.value, setShortEma)}
                     placeholder="Default: 3"
                     style={{ width: INPUT_WIDTH }}
@@ -137,7 +111,7 @@ const RelativeVolatiltyMetricFilter: React.FC<RelativeVolatilityMetricFilterProp
                 </label>
                 <Input
                     type="number"
-                    value={longEma ?? ""}
+                    value={longLookback ?? ""}
                     onChange={(e) => handleIntegerInput(e.target.value, setLongEma)}
                     placeholder="Default: 15"
                     style={{ width: INPUT_WIDTH }}
