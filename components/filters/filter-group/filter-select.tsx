@@ -127,8 +127,8 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
       const handleRelativeVolatilityMetricFilterChange = (key: keyof FilterCriteria, value: any) => {
         onFilterValueChange({
           period: value.period,
-          shortEma: value.shortEma,
-          longEma: value.longEma,
+          shortLookback: value.shortLookback,
+          longLookback: value.longLookback,
           range: value.range,
         });
       };

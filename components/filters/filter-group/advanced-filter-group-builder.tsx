@@ -98,6 +98,7 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
     onFilterGroupChange({ ...filterGroup, filters: newFilters });
   };
 
+
   const removeFilter = (
     groupIndex: number,
     filterKey?: keyof FilterCriteria
@@ -105,24 +106,25 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
     const newFilters = [...filterGroup.filters];
 
     if (filterKey) {
-      // Removing a specific filter criterion from a FilterCriteria
       const criteria = newFilters[groupIndex] as FilterCriteria;
+
+      // Remove the specific filter key
       delete criteria[filterKey];
 
       if (Object.keys(criteria).length === 0) {
+        // Remove the entire group if criteria is empty
         newFilters.splice(groupIndex, 1);
-      } else {
-        newFilters[groupIndex] = criteria;
       }
-
-      newFilters[groupIndex] = criteria;
+      // No need to reassign criteria to newFilters[groupIndex] here
     } else {
-      // Removing the entire filter group or criteria
+      // Remove the entire group if no filterKey is specified
       newFilters.splice(groupIndex, 1);
     }
 
+    // Trigger the update with the modified filters
     onFilterGroupChange({ ...filterGroup, filters: newFilters });
   };
+
 
   const handleNameChange = (name: string) => {
     onFilterGroupChange({ ...filterGroup, name });

@@ -89,8 +89,8 @@ export const FilterCriteriaSchema = z.object({
   relativeVolatilityMetricFilter: z
     .object({
       period: z.number().optional(),
-      shortEma: z.number().optional(),
-      longEma: z.number().optional(),
+      shortLookback: z.number().optional(),
+      longLookback: z.number().optional(),
       range: z.tuple([z.number(), z.number()]).optional(),
     })
     .optional(),
