@@ -3,7 +3,6 @@ import {
   getIntradayChart,
   getQuotesFromFMP,
 } from "@/actions/market-data/actions";
-import { format } from "date-fns";
 
 type ChartDataPoint = {
   time: string;
@@ -102,7 +101,8 @@ const useMarketData = (dateToUse: Date) => {
     marketData.forEach(({ name, data, openPrice }) => {
       if (data && openPrice !== undefined) {
         data.forEach((point) => {
-          const time = format(new Date(point.date), "HH:mm");
+          //  const time = format(new Date(point.date), "HH:mm");
+          const time = point.date
           const returnPercent = ((point.close - openPrice) / openPrice) * 100;
 
           if (!timeMap.has(time)) {

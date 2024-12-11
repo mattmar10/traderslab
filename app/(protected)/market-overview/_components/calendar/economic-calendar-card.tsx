@@ -29,7 +29,7 @@ export interface EconomicCalendarProps {
 export default function EconomicCalendarCard({
   events = [],
 }: EconomicCalendarProps) {
-  const [showMedium, setShowMedium] = useState(true);
+  const [showMedium, setShowMedium] = useState(false);
   const [showHigh, setShowHigh] = useState(true);
 
   const filteredEvents = events.filter(

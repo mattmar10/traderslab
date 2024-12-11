@@ -101,7 +101,7 @@ const UpgradesAndDowngrades: React.FC<UpgradesAndDowngradesProps> = ({ grades })
                                 <div className="flex items-center justify-between">
                                     <p className="font-semibold truncate">{item.symbol}</p>
                                     <p className="text-sm text-foreground/70 font-medium truncate">
-                                        <p className="text-sm text-gray-500">
+                                        <p className="text-sm text-foregrond/60">
                                             {item.previousGrade ? (
                                                 <span>{item.previousGrade} → </span>
                                             ) : (
@@ -109,10 +109,15 @@ const UpgradesAndDowngrades: React.FC<UpgradesAndDowngradesProps> = ({ grades })
                                             )}
                                             <span>{item.newGrade}</span>
                                         </p>
+                                        <p>
+
+                                        </p>
                                     </p>
                                 </div>
-                                <div className='text-sm text-foreground/70'>{item.gradingCompany}</div>
+                                <div className='flex space-x-2'>
+                                    <div className='text-sm text-foreground/70'>{item.gradingCompany}</div>
 
+                                </div>
                             </div>
 
 
