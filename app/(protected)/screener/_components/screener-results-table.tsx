@@ -19,11 +19,20 @@ import {
 } from "@/components/ui/hover-card";
 import { useRouter } from "next/navigation";
 import ScreenerMiniChartWrapper from "./screener-result-minichart";
+import { useEffect, useRef, useState } from "react";
 
 const firaCode = Fira_Code({
   subsets: ["latin"],
   weight: ["300", "400", "500", "700"],
 });
+
+// Track newly added symbols
+interface NewSymbolTracker {
+  [symbol: string]: {
+    timestamp: number;
+    isNew: boolean;
+  };
+}
 
 export interface ScreenerResultsTableProps {
   stocks: SymbolWithStatsWithRank[];
@@ -33,6 +42,8 @@ export interface ScreenerResultsTableProps {
   theme: "light" | "dark";
   chartSettings: ChartSettings;
 }
+
+const HIGHLIGHT_DURATION = 5000; // Duration to highlight new items (5 seconds)
 
 const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
   stocks,
@@ -44,6 +55,63 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
 }) => {
   const router = useRouter();
   const isMobile = useIsMobile();
+  const [newSymbols, setNewSymbols] = useState<NewSymbolTracker>({});
+  const previousStocksRef = useRef<Set<string>>(new Set());
+
+  const previousLengthRef = useRef<number>(0);  // Add this ref to track previous data length
+
+  // Modify the effect that tracks new symbols
+  useEffect(() => {
+    const currentSymbols = new Set(stocks.map(stock => stock.profile.symbol));
+    const prevSymbols = previousStocksRef.current;
+    const now = Date.now();
+
+    // Find symbols that are in current but weren't in previous
+    const newEntries: NewSymbolTracker = {};
+
+    // Only check for new symbols within the previous data length
+    const previousLength = previousLengthRef.current;
+    stocks.slice(0, previousLength).forEach(stock => {
+      const symbol = stock.profile.symbol;
+      if (!prevSymbols.has(symbol)) {
+        // This is a truly new entry within the existing range
+        newEntries[symbol] = {
+          timestamp: now,
+          isNew: true
+        };
+      }
+    });
+
+    // Preserve existing timestamps for symbols that are still new
+    Object.entries(newSymbols).forEach(([symbol, data]) => {
+      if (currentSymbols.has(symbol) && now - data.timestamp < HIGHLIGHT_DURATION) {
+        newEntries[symbol] = data;
+      }
+    });
+
+    setNewSymbols(newEntries);
+    previousStocksRef.current = currentSymbols;
+    previousLengthRef.current = stocks.length;
+  }, [stocks]);
+
+  // Clean up expired highlights
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      setNewSymbols(prev => {
+        const updated = { ...prev };
+        Object.entries(updated).forEach(([symbol, data]) => {
+          if (now - data.timestamp >= HIGHLIGHT_DURATION) {
+            delete updated[symbol];
+          }
+        });
+        return updated;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const getHeaderClass = (key: string) => {
     if (!sortConfig) return "";
     return sortConfig.key === key
@@ -70,29 +138,28 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
 
   return (
     <div className="w-full pt-8 px-4 lg:px-0">
-      <div className="relative overflow-x-auto overflow-y-auto ">
+      <div className="relative overflow-x-auto overflow-y-auto">
         <table className="w-full">
-          <thead className="sticky top-0 z-50 ">
+          <thead className="sticky top-0 z-50">
             <tr
-              className="text-sm "
+              className="text-sm"
               style={{ boxShadow: "0 0px 0.5px 1px gray" }}
             >
               {columnsToUse.map((column) => (
                 <th
                   key={column.key}
-                  className={`py-1 px-2 ${column.key === sortConfig.key ? "bg-accent" : ""
-                    }`}
+                  className={`py-1 px-2 ${column.key === sortConfig.key ? "bg-accent" : ""}`}
                   style={{
-                    minWidth: column.minWidth, // Apply minWidth
-                    maxWidth: column.maxWidth, // Apply maxWidth
+                    minWidth: column.minWidth,
+                    maxWidth: column.maxWidth,
                   }}
                 >
                   <div
                     className={`pl-1 flex w-full items-center whitespace-nowrap py-2 ${column.alignment === "left"
-                        ? "justify-start"
-                        : column.alignment === "right"
-                          ? "justify-end"
-                          : "justify-center"
+                      ? "justify-start"
+                      : column.alignment === "right"
+                        ? "justify-end"
+                        : "justify-center"
                       }`}
                   >
                     <span className={`text-${column.alignment}`}>
@@ -113,7 +180,13 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
                 <HoverCardTrigger asChild>
                   <tr
                     onClick={() => handleClick(item.profile.symbol)}
-                    className="text-sm border-b border-foreground/20 hover:bg-foreground/5 cursor-pointer"
+                    className={`text-sm border-b border-foreground/20 hover:bg-foreground/5  cursor-pointer transition-colors duration-500
+                      ${newSymbols[item.profile.symbol]?.isNew
+                        ? theme === 'dark'
+                          ? 'bg-foreground/5'
+                          : 'bg-foreground/5'
+                        : ''
+                      }`}
                   >
                     {columnsToUse.map((column) => {
                       let value;
@@ -207,15 +280,11 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
                             ),
                           };
                           break;
-
                         case "oneMonthRS":
-                          value = `${item.relativeStrength.relativeStrengthStats.oneMonth.toFixed(
-                            2
-                          )}%`;
+                          value = `${item.relativeStrength.relativeStrengthStats.oneMonth.toFixed(2)}%`;
                           style = {
                             background: calculateColorFromPercentage(
-                              item.relativeStrength.relativeStrengthStats
-                                .oneMonth,
+                              item.relativeStrength.relativeStrengthStats.oneMonth,
                               theme,
                               0,
                               50,
@@ -224,13 +293,10 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
                           };
                           break;
                         case "threeMonthRS":
-                          value = `${item.relativeStrength.relativeStrengthStats.threeMonth.toFixed(
-                            2
-                          )}%`;
+                          value = `${item.relativeStrength.relativeStrengthStats.threeMonth.toFixed(2)}%`;
                           style = {
                             background: calculateColorFromPercentage(
-                              item.relativeStrength.relativeStrengthStats
-                                .threeMonth,
+                              item.relativeStrength.relativeStrengthStats.threeMonth,
                               theme,
                               0,
                               50,
@@ -239,13 +305,10 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
                           };
                           break;
                         case "sixMonthRS":
-                          value = `${item.relativeStrength.relativeStrengthStats.sixMonth.toFixed(
-                            2
-                          )}%`;
+                          value = `${item.relativeStrength.relativeStrengthStats.sixMonth.toFixed(2)}%`;
                           style = {
                             background: calculateColorFromPercentage(
-                              item.relativeStrength.relativeStrengthStats
-                                .sixMonth,
+                              item.relativeStrength.relativeStrengthStats.sixMonth,
                               theme,
                               0,
                               50,
@@ -254,13 +317,10 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
                           };
                           break;
                         case "oneYearRS":
-                          value = `${item.relativeStrength.relativeStrengthStats.oneYear.toFixed(
-                            2
-                          )}%`;
+                          value = `${item.relativeStrength.relativeStrengthStats.oneYear.toFixed(2)}%`;
                           style = {
                             background: calculateColorFromPercentage(
-                              item.relativeStrength.relativeStrengthStats
-                                .oneYear,
+                              item.relativeStrength.relativeStrengthStats.oneYear,
                               theme,
                               0,
                               50,
@@ -268,15 +328,11 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
                             ),
                           };
                           break;
-
                         case "compositeRS":
-                          value = `${item.relativeStrength.relativeStrengthStats.composite.toFixed(
-                            2
-                          )}%`;
+                          value = `${item.relativeStrength.relativeStrengthStats.composite.toFixed(2)}%`;
                           style = {
                             background: calculateColorFromPercentage(
-                              item.relativeStrength.relativeStrengthStats
-                                .composite,
+                              item.relativeStrength.relativeStrengthStats.composite,
                               theme,
                               0,
                               50,
@@ -284,24 +340,17 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
                             ),
                           };
                           break;
-
                         case "percentFromFiftyTwoWeekLow":
-                          value = `${item.percentFromFiftyTwoWeekLow.toFixed(
-                            2
-                          )}%`;
+                          value = `${item.percentFromFiftyTwoWeekLow.toFixed(2)}%`;
                           customContent = (
                             <div className="relative border-l border-foreground py-1">
                               <div
-                                className="absolute left-0 top-0 bottom-0 bg-foreground/5 "
+                                className="absolute left-0 top-0 bottom-0 bg-foreground/5"
                                 style={{
                                   width: `${Math.max(
                                     5,
                                     Math.min(
-                                      Math.log1p(
-                                        Math.abs(
-                                          item.percentFromFiftyTwoWeekLow
-                                        )
-                                      ) * 10,
+                                      Math.log1p(Math.abs(item.percentFromFiftyTwoWeekLow)) * 10,
                                       100
                                     )
                                   )}%`,
@@ -312,9 +361,7 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
                           );
                           break;
                         case "percentFromFiftyTwoWeekHigh":
-                          value = `${item.percentFromFiftyTwoWeekHigh.toFixed(
-                            2
-                          )}%`;
+                          value = `${item.percentFromFiftyTwoWeekHigh.toFixed(2)}%`;
                           customContent = (
                             <div className="relative border-r border-foreground py-1">
                               <div
@@ -323,33 +370,24 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
                                   width: `${Math.max(
                                     5,
                                     Math.min(
-                                      Math.log1p(
-                                        Math.abs(
-                                          item.percentFromFiftyTwoWeekHigh
-                                        )
-                                      ) * 10,
+                                      Math.log1p(Math.abs(item.percentFromFiftyTwoWeekHigh)) * 10,
                                       100
                                     )
                                   )}%`,
                                 }}
                               ></div>
-                              <span className="relative z-10 pr-2">
-                                {value}
-                              </span>
+                              <span className="relative z-10 pr-2">{value}</span>
                             </div>
                           );
                           break;
                         case "nextEarnings":
-                          value = `${item.quote.earningsAnnouncement
-                              ? formatEarnings(item.quote.earningsAnnouncement)
-                              : ""
-                            }`;
+                          value = item.quote.earningsAnnouncement
+                            ? formatEarnings(item.quote.earningsAnnouncement)
+                            : "";
                           break;
-
                         case "relativeVolume":
                           value = `${item.relativeVolume.toFixed(2)}`;
                           break;
-
                         case "breakoutIntensityScore":
                           value = `${item.breakoutIntensityScore.toFixed(2)}`;
                           style = {
@@ -362,32 +400,28 @@ const ScreenerResultsTable: React.FC<ScreenerResultsTableProps> = ({
                             ),
                           };
                           break;
-                        // Add other cases as needed
                         default:
                           value = "";
                       }
 
                       const isName = column.key === "profile.companyName";
-
-                      const nonNumberic =
+                      const nonNumeric =
                         column.key === "profile.companyName" ||
                         column.key === "sector" ||
                         column.key === "industry" ||
                         column.key === "profile.symbol";
 
-                      const fontClassName = !nonNumberic
-                        ? firaCode.className
-                        : "";
+                      const fontClassName = !nonNumeric ? firaCode.className : "";
 
                       return (
                         <td
                           key={column.key}
-                          className={`${fontClassName} py-2 text-${column.alignment
-                            } px-2 ${isName ? "font-semibold" : ""}`} // Apply alignment from Column
+                          className={`${fontClassName} py-2 text-${column.alignment} px-2 ${isName ? "font-semibold" : ""
+                            }`}
                           style={{
                             ...style,
-                            minWidth: column.minWidth, // Apply minWidth
-                            maxWidth: column.maxWidth, // Apply maxWidth
+                            minWidth: column.minWidth,
+                            maxWidth: column.maxWidth,
                           }}
                         >
                           {customContent || value}

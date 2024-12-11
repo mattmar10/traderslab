@@ -163,7 +163,7 @@ const SearchInput = () => {
 
       {/* Centered Popover */}
       {searchTerm && (
-        <div className="fixed inset-x-0 z-50 flex justify-center" style={{ top: "4rem" }}>
+        <div className="fixed inset-x-0 flex justify-center" style={{ top: "4rem", zIndex: 75 }}>
           <div
             className="w-full max-w-[60vw] rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none"
           >
