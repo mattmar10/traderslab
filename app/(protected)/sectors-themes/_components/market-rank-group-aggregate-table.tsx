@@ -26,6 +26,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Table } from "lucide-react";
 import { calculateMarketPTScore, calculateMarketScore } from "../utils";
+import { Switch } from "@/components/ui/switch";
+import ClientOverviewPriceChart from "@/components/price-chart/client-overview-price-chart";
 
 export type SortableKeys =
   | "rank"
@@ -77,8 +79,13 @@ export const MarketRankGroupAggregateTable: React.FC<
   MarketRankGroupAggregateTableProps
 > = ({ data, title }) => {
   const [isOpen, setIsOpen] = useState(true);
+  const [displayAs, setDisplayAs] = useState<"table" | "charts">("table");
   const { theme } = useTheme();
   const themeColor = theme === "light" ? "light" : "dark";
+
+  const handleDisplayAsToggle = () => {
+    setDisplayAs(prev => prev === "table" ? "charts" : "table");
+  };
 
   const [sortConfig, setSortConfig] = useState<{
     key: SortableKeys;
@@ -126,6 +133,300 @@ export const MarketRankGroupAggregateTable: React.FC<
     return sortConfig && sortConfig.key === key ? `bg-foreground/5` : "";
   };
 
+  const renderContent = () => {
+    if (displayAs === "charts") {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          {sortedData.map((item) => (
+            <ClientOverviewPriceChart ticker={item.ticker} key={`cop-${item.ticker}`} />
+          ))}
+        </div>
+      );
+    }
+
+    return (
+      <div className="w-full text-sm pt-2 ">
+
+        <div className="">
+          <div className="border-none">
+            <div className="w-full flex justify-center overflow-x-auto  no-scrollbar">
+              <table className="w-full table-fixed">
+                <thead>
+                  <tr className="border-b border-foreground/70 ">
+                    <th
+                      className={`text-left px-1 py-2 w-[4rem] min-w-[4rem] ${getSortableHeaderClass(
+                        "rank"
+                      )} cursor-pointer`}
+                      onClick={() => requestSort("rank")}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="mr-1">RANK</span>
+                        <span>{getHeaderClass("rank")}</span>
+                      </div>
+                    </th>
+                    <th className="text-left px-1 w-16 min-w-[4rem]">TICKER</th>
+                    <th className="text-left px-1 w-48 min-w-[8rem]">NAME</th>
+                    <th
+                      className={`text-right px-1 w-24 min-w-[5rem] ${getSortableHeaderClass(
+                        "percentDailyChange"
+                      )} cursor-pointer`}
+                      onClick={() => requestSort("percentDailyChange")}
+                    >
+                      <div className="flex justify-end items-center">
+                        <span className="mr-1">DAY</span>
+                        <span>{getHeaderClass("percentDailyChange")}</span>
+                      </div>
+                    </th>
+                    <th
+                      className={`text-right px-1 w-24 min-w-[5rem] ${getSortableHeaderClass(
+                        "percentWeeklyChange"
+                      )} cursor-pointer`}
+                      onClick={() => requestSort("percentWeeklyChange")}
+                    >
+                      <div className="flex justify-end items-center">
+                        <span className="mr-1">WEEK</span>
+                        <span>{getHeaderClass("percentWeeklyChange")}</span>
+                      </div>
+                    </th>
+                    <th
+                      className={`text-right px-1 w-28 min-w-[6rem] ${getSortableHeaderClass(
+                        "percentMonthlyChange"
+                      )} cursor-pointer`}
+                      onClick={() => requestSort("percentMonthlyChange")}
+                    >
+                      <div className="flex justify-end items-center">
+                        <span className="mr-1">1M</span>
+                        <span>{getHeaderClass("percentMonthlyChange")}</span>
+                      </div>
+                    </th>
+                    <th
+                      className={`text-right px-1 w-28 min-w-[6rem] ${getSortableHeaderClass(
+                        "percentThreeMonthChange"
+                      )} cursor-pointer`}
+                      onClick={() => requestSort("percentThreeMonthChange")}
+                    >
+                      <div className="flex justify-end items-center">
+                        <span className="mr-1">3M</span>
+                        <span>{getHeaderClass("percentThreeMonthChange")}</span>
+                      </div>
+                    </th>
+                    <th
+                      className={`text-right px-1 w-28 min-w-[6rem] ${getSortableHeaderClass(
+                        "percentSixMonthChange"
+                      )} cursor-pointer`}
+                      onClick={() => requestSort("percentSixMonthChange")}
+                    >
+                      <div className="flex justify-end items-center">
+                        <span className="mr-1">6M</span>
+                        <span>{getHeaderClass("percentSixMonthChange")}</span>
+                      </div>
+                    </th>
+                    <th
+                      className={`text-right px-1 w-28 min-w-[6rem] ${getSortableHeaderClass(
+                        "percent1YearChange"
+                      )} cursor-pointer`}
+                      onClick={() => requestSort("percent1YearChange")}
+                    >
+                      <div className="flex justify-end items-center">
+                        <span className="mr-1">1Y</span>
+                        <span>{getHeaderClass("percent1YearChange")}</span>
+                      </div>
+                    </th>
+                    <th
+                      className={`text-right px-1 w-44 min-w-[8rem] ${getSortableHeaderClass(
+                        "percentFromFiftyTwoWeekLow"
+                      )} cursor-pointer`}
+                      onClick={() => requestSort("percentFromFiftyTwoWeekLow")}
+                    >
+                      <div className="flex justify-end items-center">
+                        <span className="mr-1">% FROM 52 WK LOW</span>
+                        <span>
+                          {getHeaderClass("percentFromFiftyTwoWeekLow")}
+                        </span>
+                      </div>
+                    </th>
+                    <th
+                      className={`text-right px-1 w-44 min-w-[8rem] ${getSortableHeaderClass(
+                        "percentFromFiftyTwoWeekHigh"
+                      )} cursor-pointer`}
+                      onClick={() => requestSort("percentFromFiftyTwoWeekHigh")}
+                    >
+                      <div className="flex justify-end items-center">
+                        <span className="mr-1">% FROM 52 WK HIGH</span>
+                        <span>
+                          {getHeaderClass("percentFromFiftyTwoWeekHigh")}
+                        </span>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedData.map((item) => {
+                    const rankBg = calculateColorFromPercentageInverted(
+                      item.rank,
+                      1,
+                      data.length / 2,
+                      data.length
+                    );
+
+                    const dailyBG = calculateColorFromPercentage(
+                      item.percentDailyChange,
+                      themeColor,
+                      -4,
+                      0,
+                      4
+                    );
+
+                    const weekChangeBG = calculateColorFromPercentage(
+                      item.percentWeeklyChange,
+                      themeColor,
+                      -10,
+                      0,
+                      10
+                    );
+
+                    const monthChangeBG = calculateColorFromPercentage(
+                      item.percentMonthlyChange,
+                      themeColor,
+                      -10,
+                      0,
+                      10
+                    );
+
+                    const threeMonthChangeBG = calculateColorFromPercentage(
+                      item.percentThreeMonthChange,
+                      themeColor,
+                      -15,
+                      0,
+                      15
+                    );
+
+                    const sixMonthChangeBg = calculateColorFromPercentage(
+                      item.percentSixMonthChange,
+                      themeColor,
+                      -20,
+                      0,
+                      20
+                    );
+
+                    const oneYearChangeBg = calculateColorFromPercentage(
+                      item.percent1YearChange,
+                      themeColor,
+                      -25,
+                      0,
+                      25
+                    );
+
+                    return (
+                      <LinkedTableRow
+                        href={`/sectors-themes/${item.ticker}`}
+                        className={` text-right border-b border-foreground/20 hover:bg-foreground/5`}
+                        key={`${item.ticker}-theme`}
+                      >
+                        <td
+                          className="text-center px-1 py-2"
+                          style={{
+                            background: rankBg,
+                            width: "4rem",
+                          }}
+                        >
+                          {item.rank}
+                        </td>
+                        <td className="text-left px-1 w-16">{item.ticker}</td>
+                        <td className="px-1 text-left w-48 font-semibold truncate">
+                          {item.name}
+                        </td>
+                        <td
+                          className={`${firaCode.className} text-right px-1 w-24`}
+                          style={{ background: dailyBG }}
+                        >
+                          {item.percentDailyChange.toFixed(2)}%
+                        </td>
+                        <td
+                          className={`${firaCode.className} text-right px-2 w-24`}
+                          style={{ background: weekChangeBG }}
+                        >
+                          {item.percentWeeklyChange.toFixed(2)}%
+                        </td>
+                        <td
+                          className={`${firaCode.className} text-right px-2 border-r border-foreground/80 w-28`}
+                          style={{ background: monthChangeBG }}
+                        >
+                          {item.percentMonthlyChange.toFixed(2)}%
+                        </td>
+                        <td
+                          className={`${firaCode.className} text-right px-2 border-r border-foreground/80 w-28`}
+                          style={{ background: threeMonthChangeBG }}
+                        >
+                          {item.percentThreeMonthChange.toFixed(2)}%
+                        </td>
+
+                        <td
+                          className={`${firaCode.className} text-right px-2 border-r border-foreground/80 w-28`}
+                          style={{ background: sixMonthChangeBg }}
+                        >
+                          {item.percentSixMonthChange.toFixed(2)}%
+                        </td>
+                        <td
+                          className={`${firaCode.className} text-right px-2 border-r border-foreground/80 w-28`}
+                          style={{ background: oneYearChangeBg }}
+                        >
+                          {item.percent1YearChange.toFixed(2)}%
+                        </td>
+                        <td
+                          className={`${firaCode.className} text-left px-2 relative border-r border-foreground/80 w-44`}
+                        >
+                          <div
+                            className="absolute left-0 top-0 bottom-0 bg-foreground/5"
+                            style={{
+                              width: `${Math.max(
+                                5,
+                                Math.min(
+                                  Math.log1p(
+                                    Math.abs(item.percentFromFiftyTwoWeekLow)
+                                  ) * 10, // Adjust scaling factor
+                                  100
+                                )
+                              )}%`,
+                            }}
+                          ></div>
+                          <span className="relative z-10">
+                            {item.percentFromFiftyTwoWeekLow.toFixed(2)}%
+                          </span>
+                        </td>
+                        <td
+                          className={`${firaCode.className} text-right px-2 relative w-44`}
+                        >
+                          <div
+                            className="absolute right-0 top-0 bottom-0 bg-foreground/5"
+                            style={{
+                              width: `${Math.max(
+                                5,
+                                Math.min(
+                                  Math.log1p(
+                                    Math.abs(item.percentFromFiftyTwoWeekHigh)
+                                  ) * 10, // Adjust scaling factor
+                                  100
+                                )
+                              )}%`,
+                            }}
+                          ></div>
+                          <span className="relative z-10 pr-2">
+                            {item.percentFromFiftyTwoWeekHigh.toFixed(2)}%
+                          </span>
+                        </td>
+                      </LinkedTableRow>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
 
     <Card className="w-full">
@@ -157,293 +458,31 @@ export const MarketRankGroupAggregateTable: React.FC<
                   />
                 </div>
                 <CardTitle className="font-semibold text-lg">All {title}</CardTitle>
-                <span className="sr-only">Toggle chart</span>
+
               </Button>
+
             </div>
+
 
           </CardHeader>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <CardContent>
+          <CardContent className="pl-8 pt-0">
 
-            <div className="w-full text-sm ">
-              <div className="">
-                <div className="border-none">
-                  <div className="w-full flex justify-center overflow-x-auto  no-scrollbar">
-                    <table className="w-full table-fixed">
-                      <thead>
-                        <tr className="border-b border-foreground/70 ">
-                          <th
-                            className={`text-left px-1 py-2 w-[4rem] min-w-[4rem] ${getSortableHeaderClass(
-                              "rank"
-                            )} cursor-pointer`}
-                            onClick={() => requestSort("rank")}
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className="mr-1">RANK</span>
-                              <span>{getHeaderClass("rank")}</span>
-                            </div>
-                          </th>
-                          <th className="text-left px-1 w-16 min-w-[4rem]">TICKER</th>
-                          <th className="text-left px-1 w-48 min-w-[8rem]">NAME</th>
-                          <th
-                            className={`text-right px-1 w-24 min-w-[5rem] ${getSortableHeaderClass(
-                              "percentDailyChange"
-                            )} cursor-pointer`}
-                            onClick={() => requestSort("percentDailyChange")}
-                          >
-                            <div className="flex justify-end items-center">
-                              <span className="mr-1">DAY</span>
-                              <span>{getHeaderClass("percentDailyChange")}</span>
-                            </div>
-                          </th>
-                          <th
-                            className={`text-right px-1 w-24 min-w-[5rem] ${getSortableHeaderClass(
-                              "percentWeeklyChange"
-                            )} cursor-pointer`}
-                            onClick={() => requestSort("percentWeeklyChange")}
-                          >
-                            <div className="flex justify-end items-center">
-                              <span className="mr-1">WEEK</span>
-                              <span>{getHeaderClass("percentWeeklyChange")}</span>
-                            </div>
-                          </th>
-                          <th
-                            className={`text-right px-1 w-28 min-w-[6rem] ${getSortableHeaderClass(
-                              "percentMonthlyChange"
-                            )} cursor-pointer`}
-                            onClick={() => requestSort("percentMonthlyChange")}
-                          >
-                            <div className="flex justify-end items-center">
-                              <span className="mr-1">1M</span>
-                              <span>{getHeaderClass("percentMonthlyChange")}</span>
-                            </div>
-                          </th>
-                          <th
-                            className={`text-right px-1 w-28 min-w-[6rem] ${getSortableHeaderClass(
-                              "percentThreeMonthChange"
-                            )} cursor-pointer`}
-                            onClick={() => requestSort("percentThreeMonthChange")}
-                          >
-                            <div className="flex justify-end items-center">
-                              <span className="mr-1">3M</span>
-                              <span>{getHeaderClass("percentThreeMonthChange")}</span>
-                            </div>
-                          </th>
-                          <th
-                            className={`text-right px-1 w-28 min-w-[6rem] ${getSortableHeaderClass(
-                              "percentSixMonthChange"
-                            )} cursor-pointer`}
-                            onClick={() => requestSort("percentSixMonthChange")}
-                          >
-                            <div className="flex justify-end items-center">
-                              <span className="mr-1">6M</span>
-                              <span>{getHeaderClass("percentSixMonthChange")}</span>
-                            </div>
-                          </th>
-                          <th
-                            className={`text-right px-1 w-28 min-w-[6rem] ${getSortableHeaderClass(
-                              "percent1YearChange"
-                            )} cursor-pointer`}
-                            onClick={() => requestSort("percent1YearChange")}
-                          >
-                            <div className="flex justify-end items-center">
-                              <span className="mr-1">1Y</span>
-                              <span>{getHeaderClass("percent1YearChange")}</span>
-                            </div>
-                          </th>
-                          <th
-                            className={`text-right px-1 w-44 min-w-[8rem] ${getSortableHeaderClass(
-                              "percentFromFiftyTwoWeekLow"
-                            )} cursor-pointer`}
-                            onClick={() => requestSort("percentFromFiftyTwoWeekLow")}
-                          >
-                            <div className="flex justify-end items-center">
-                              <span className="mr-1">% FROM 52 WK LOW</span>
-                              <span>
-                                {getHeaderClass("percentFromFiftyTwoWeekLow")}
-                              </span>
-                            </div>
-                          </th>
-                          <th
-                            className={`text-right px-1 w-44 min-w-[8rem] ${getSortableHeaderClass(
-                              "percentFromFiftyTwoWeekHigh"
-                            )} cursor-pointer`}
-                            onClick={() => requestSort("percentFromFiftyTwoWeekHigh")}
-                          >
-                            <div className="flex justify-end items-center">
-                              <span className="mr-1">% FROM 52 WK HIGH</span>
-                              <span>
-                                {getHeaderClass("percentFromFiftyTwoWeekHigh")}
-                              </span>
-                            </div>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {sortedData.map((item) => {
-                          const rankBg = calculateColorFromPercentageInverted(
-                            item.rank,
-                            1,
-                            data.length / 2,
-                            data.length
-                          );
-
-                          const dailyBG = calculateColorFromPercentage(
-                            item.percentDailyChange,
-                            themeColor,
-                            -4,
-                            0,
-                            4
-                          );
-
-                          const weekChangeBG = calculateColorFromPercentage(
-                            item.percentWeeklyChange,
-                            themeColor,
-                            -10,
-                            0,
-                            10
-                          );
-
-                          const monthChangeBG = calculateColorFromPercentage(
-                            item.percentMonthlyChange,
-                            themeColor,
-                            -10,
-                            0,
-                            10
-                          );
-
-                          const threeMonthChangeBG = calculateColorFromPercentage(
-                            item.percentThreeMonthChange,
-                            themeColor,
-                            -15,
-                            0,
-                            15
-                          );
-
-                          const sixMonthChangeBg = calculateColorFromPercentage(
-                            item.percentSixMonthChange,
-                            themeColor,
-                            -20,
-                            0,
-                            20
-                          );
-
-                          const oneYearChangeBg = calculateColorFromPercentage(
-                            item.percent1YearChange,
-                            themeColor,
-                            -25,
-                            0,
-                            25
-                          );
-
-                          return (
-                            <LinkedTableRow
-                              href={`/sectors-themes/${item.ticker}`}
-                              className={` text-right border-b border-foreground/20 hover:bg-foreground/5`}
-                              key={`${item.ticker}-theme`}
-                            >
-                              <td
-                                className="text-center px-1 py-2"
-                                style={{
-                                  background: rankBg,
-                                  width: "4rem",
-                                }}
-                              >
-                                {item.rank}
-                              </td>
-                              <td className="text-left px-1 w-16">{item.ticker}</td>
-                              <td className="px-1 text-left w-48 font-semibold truncate">
-                                {item.name}
-                              </td>
-                              <td
-                                className={`${firaCode.className} text-right px-1 w-24`}
-                                style={{ background: dailyBG }}
-                              >
-                                {item.percentDailyChange.toFixed(2)}%
-                              </td>
-                              <td
-                                className={`${firaCode.className} text-right px-2 w-24`}
-                                style={{ background: weekChangeBG }}
-                              >
-                                {item.percentWeeklyChange.toFixed(2)}%
-                              </td>
-                              <td
-                                className={`${firaCode.className} text-right px-2 border-r border-foreground/80 w-28`}
-                                style={{ background: monthChangeBG }}
-                              >
-                                {item.percentMonthlyChange.toFixed(2)}%
-                              </td>
-                              <td
-                                className={`${firaCode.className} text-right px-2 border-r border-foreground/80 w-28`}
-                                style={{ background: threeMonthChangeBG }}
-                              >
-                                {item.percentThreeMonthChange.toFixed(2)}%
-                              </td>
-
-                              <td
-                                className={`${firaCode.className} text-right px-2 border-r border-foreground/80 w-28`}
-                                style={{ background: sixMonthChangeBg }}
-                              >
-                                {item.percentSixMonthChange.toFixed(2)}%
-                              </td>
-                              <td
-                                className={`${firaCode.className} text-right px-2 border-r border-foreground/80 w-28`}
-                                style={{ background: oneYearChangeBg }}
-                              >
-                                {item.percent1YearChange.toFixed(2)}%
-                              </td>
-                              <td
-                                className={`${firaCode.className} text-left px-2 relative border-r border-foreground/80 w-44`}
-                              >
-                                <div
-                                  className="absolute left-0 top-0 bottom-0 bg-foreground/5"
-                                  style={{
-                                    width: `${Math.max(
-                                      5,
-                                      Math.min(
-                                        Math.log1p(
-                                          Math.abs(item.percentFromFiftyTwoWeekLow)
-                                        ) * 10, // Adjust scaling factor
-                                        100
-                                      )
-                                    )}%`,
-                                  }}
-                                ></div>
-                                <span className="relative z-10">
-                                  {item.percentFromFiftyTwoWeekLow.toFixed(2)}%
-                                </span>
-                              </td>
-                              <td
-                                className={`${firaCode.className} text-right px-2 relative w-44`}
-                              >
-                                <div
-                                  className="absolute right-0 top-0 bottom-0 bg-foreground/5"
-                                  style={{
-                                    width: `${Math.max(
-                                      5,
-                                      Math.min(
-                                        Math.log1p(
-                                          Math.abs(item.percentFromFiftyTwoWeekHigh)
-                                        ) * 10, // Adjust scaling factor
-                                        100
-                                      )
-                                    )}%`,
-                                  }}
-                                ></div>
-                                <span className="relative z-10 pr-2">
-                                  {item.percentFromFiftyTwoWeekHigh.toFixed(2)}%
-                                </span>
-                              </td>
-                            </LinkedTableRow>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
+            <div className="flex items-center space-x-2 mb-4">
+              <span className={displayAs === "charts" ? "text-foreground" : "text-foreground/50"}>
+                Charts
+              </span>
+              <Switch
+                checked={displayAs === "table"}
+                onCheckedChange={handleDisplayAsToggle}
+                className="transform scale-125"
+              />
+              <span className={displayAs === "table" ? "text-foreground" : "text-foreground/50"}>
+                Table
+              </span>
             </div>
+            {renderContent()}
           </CardContent>
         </CollapsibleContent>
       </Collapsible>
