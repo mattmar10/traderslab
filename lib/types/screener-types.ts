@@ -95,6 +95,12 @@ export const FilterCriteriaSchema = z.object({
     })
     .optional(),
   percentBRange: z.tuple([z.number(), z.number()]).optional(),
+  adrFromPreviousHigh: z
+    .object({
+      lookback: z.number().optional(),
+      range: z.tuple([z.number(), z.number()]).optional(),
+    })
+    .optional(),
 });
 export type FilterCriteria = z.infer<typeof FilterCriteriaSchema>;
 

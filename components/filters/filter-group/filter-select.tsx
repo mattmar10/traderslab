@@ -31,6 +31,7 @@ import { ChevronDown, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { filterKeyConfig } from "./advanced-filter-group-builder";
 import RelativeVolatiltyMetricFilter from "../relative-volatility-metric-filter";
+import AdrFromPreviousHighFilter from "../adr-from-prior-day-high-filter";
 
 interface FilterSelectProps {
   filterKey: keyof FilterCriteria;
@@ -138,6 +139,20 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
           filterValue={filterValue} handleFilterChange={handleRelativeVolatilityMetricFilterChange}
         />
       );
+    }
+
+    if (filterKey === "adrFromPreviousHigh") {
+
+      const handleAdrFromPriorHighFilterChange = (key: keyof FilterCriteria, value: any) => {
+        onFilterValueChange({
+          lookback: value.lookback,
+          range: value.range,
+        });
+      };
+
+      return (
+        <AdrFromPreviousHighFilter filterValue={filterValue} handleFilterChange={handleAdrFromPriorHighFilterChange} />
+      )
     }
 
     // Handle movingAvgAdvancingFilters with a custom UI
@@ -382,6 +397,11 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
                   onSelect={() => onFilterTypeChange("adrPercentRange")}
                 >
                   ADR %
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => onFilterTypeChange("adrFromPreviousHigh")}
+                >
+                  ADR From Prior High
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onSelect={() =>
