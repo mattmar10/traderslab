@@ -494,4 +494,8 @@ export const filterKeyConfig: Record<
     header: "Relative Volatility Metric",
     type: "custom",
   },
+  adrFromPreviousHigh: {
+    header: "ADR From Prior High",
+    type: "custom"
+  }
 };

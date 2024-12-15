@@ -1,6 +1,7 @@
 import React from "react";
 import { SliderRangeFilter } from "./slider-filter";
 import { FilterCriteria } from "@/lib/types/screener-types";
+import AdrFromPreviousHighFilter from "./adr-from-prior-day-high-filter";
 
 interface TechnicalFiltersProps {
     filters: FilterCriteria;
@@ -53,6 +54,8 @@ const TechnicalFilters: React.FC<TechnicalFiltersProps> = ({
                 className="py-2"
                 inputWidth="6rem"
             />
+
+
 
             <SliderRangeFilter
                 minValue={1}
@@ -119,6 +122,13 @@ const TechnicalFilters: React.FC<TechnicalFiltersProps> = ({
                 className="py-2"
                 inputWidth="6rem"
             />
+            <div className="mt-6">
+                <div className="font-semibold mb-3">ADR From Prior High</div>
+                <AdrFromPreviousHighFilter
+                    filterValue={filters.adrFromPreviousHigh}
+                    handleFilterChange={handleFilterChange}
+                />
+            </div>
         </div>
     );
 };
