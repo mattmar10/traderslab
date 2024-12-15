@@ -184,12 +184,14 @@ const ScreenerResultsWrapper = ({
           filters.filterGroup,
           initialData.ranges
         );
+        filters.filterGroup = filterGroup
       } else {
         const convertedGroup = convertToFilterGroup(filters as FilterCriteria);
         filterGroup = adjustFilterGroupForSave(
           convertedGroup,
           initialData.ranges
         );
+        filters.filterGroup = filterGroup
       }
 
       updatePersistedState("filterGroup", filters);
@@ -459,8 +461,8 @@ const ScreenerResultsWrapper = ({
               <div className="flex items-center space-x-4">
                 <span
                   className={` ${state.displayAs === "charts"
-                      ? "text-foreground"
-                      : "text-foreground/50"
+                    ? "text-foreground"
+                    : "text-foreground/50"
                     }`}
                 >
                   CHARTS
@@ -473,8 +475,8 @@ const ScreenerResultsWrapper = ({
                 />
                 <span
                   className={` ${state.displayAs === "table"
-                      ? "text-foreground "
-                      : "text-foreground/50"
+                    ? "text-foreground "
+                    : "text-foreground/50"
                     }`}
                 >
                   TABLE
