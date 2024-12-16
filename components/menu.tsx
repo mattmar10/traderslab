@@ -157,7 +157,7 @@ export default function NavigationMenuDemo() {
                 </ListItem>
                 <ListItem
                   key={"screener"}
-                  href={"/screener"}
+                  href={"/screener/stocks"}
                   title={"Screener"}
                   className="hover:bg-primary/10"
                 >

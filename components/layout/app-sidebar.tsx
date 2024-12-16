@@ -1,4 +1,5 @@
 "use client";
+import axios from "axios";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Collapsible,
@@ -41,7 +42,6 @@ import * as React from "react";
 import { Icons } from "../icons";
 
 import ThemeToggle from "./ThemeToggle/theme-toggle";
-import { UserNav } from "./user-nav";
 import { useUser } from "@clerk/nextjs";
 import SearchInput from "../search-input";
 import { useTheme } from "next-themes";
@@ -151,6 +151,31 @@ export default function AppSidebar({
     resolvedTheme === "light"
       ? "/tl-light-theme-nav-logo.png"
       : "/tl-dark-theme-nav-logo.png";
+
+
+  const handleBillingPortalRedirect = async () => {
+    try {
+      const { data } = await axios.post(
+        `/api/payments/create-billing-portal-session`,
+        {
+          email: user?.emailAddresses?.[0]?.emailAddress,
+        }
+      );
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error("Failed to create checkout session");
+
+        return;
+      }
+    } catch (error) {
+      console.error("Error during checkout:", error);
+
+      return;
+    }
+  };
+
 
   return (
     <>
@@ -270,8 +295,31 @@ export default function AppSidebar({
                   sideOffset={4}
                 >
                   <DropdownMenuItem>
+                    <Link href={"/user-profile"}>
+                      <div className="block select-none space-y-1 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-left cursor-pointer"
+                      >
+                        <div className="text-sm font-medium leading-none">
+                          Profile Settings
+                        </div>
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <div
+                      className=
+                      "block select-none space-y-1 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-left cursor-pointer"
+                      onClick={handleBillingPortalRedirect}
+                    >
+                      <div className="text-sm font-medium leading-none">
+                        Subscription Settings
+                      </div>
+
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+
                     <LogOut />
-                    Log out
+                    <div className="ml-2">Log Out</div>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -289,7 +337,7 @@ export default function AppSidebar({
             {<SearchInput />}
           </div>
           <div className="hidden md:flex items-center gap-2 px-4">
-            <UserNav />
+
             <ThemeToggle />
           </div>
         </header>
