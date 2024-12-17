@@ -51,8 +51,8 @@ export default function PricingCards() {
       description: "Perfect for small businesses and startups",
       monthlyPrice: 39,
       annualPrice: 429,
-      priceIdAnnual: "price_1Q6HzbCrok1zbJauEHqjrdvN",
-      priceIdMonthly: "price_1Q6HyoCrok1zbJauVCQNhtss",
+      priceIdAnnual: "price_1Q5qUYCrok1zbJaubwWao0qv",
+      priceIdMonthly: "price_1Q5qTcCrok1zbJaukazabSd8",
       features: [
         "Up to 5 users",
         "Basic analytics",
