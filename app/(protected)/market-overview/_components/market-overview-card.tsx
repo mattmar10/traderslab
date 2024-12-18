@@ -88,6 +88,15 @@ const MarketOverviewCard: React.FC<MarketOverviewCardProps> = ({
       : "text-gray-500";
   };
 
+  const getBorderClass = (value: number | null | undefined): string => {
+    if (typeof value !== "number") return "border-foreground/50";
+    return value > 0
+      ? "border-uptrend"
+      : value < 0
+      ? "border-destructive"
+      : "border-accent";
+  };
+
   if (isLoading) {
     return (
       <Card className="w-full max-w-sm">
@@ -120,10 +129,11 @@ const MarketOverviewCard: React.FC<MarketOverviewCardProps> = ({
   const quoteColorClass = getColorClass(quoteReturn);
   const trendColorClass = getTrendColor(trendModel.trendStateModel);
   const isMedianPositive = isPositive(medianReturn);
+  const borderClass = getBorderClass(quoteReturn)
 
   return (
     <Card className="w-full hover:bg-accent/50">
-      <CardContent className="p-4">
+      <CardContent className={`p-4 border-l-2 ${borderClass}`}>
         <div className="flex items-center justify-between mb-3">
           <div>
             <p className="text-sm text-muted-foreground">{description}</p>
@@ -143,7 +153,7 @@ const MarketOverviewCard: React.FC<MarketOverviewCardProps> = ({
           </div>
         </div>
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between ">
             <div className="text-3xl font-bold">{ticker} </div>
             {/*<div className={`flex items-center `}>
               <span className="text-xl font-semibold">

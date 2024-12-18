@@ -16,7 +16,7 @@ import { BorderBeam } from "@/components/magicui/border-beam";
 const OverviewMainContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<
     "sectorPerformance" | "returns" | "intradayGDB"
-  >("returns");
+  >("sectorPerformance");
 
   return (
     <Card className="relative w-full h-full flex flex-col">
@@ -44,11 +44,11 @@ const OverviewMainContent: React.FC = () => {
           }
         >
           <TabsList className="flex space-x-2 max-w-fit flex-none">
-            <TabsTrigger value="returns">Returns</TabsTrigger>
             <TabsTrigger value="sectorPerformance">
               Sector Distribution
             </TabsTrigger>
             <TabsTrigger value="intradayGDB">Intraday GDB</TabsTrigger>
+            <TabsTrigger value="returns">Returns</TabsTrigger>
           </TabsList>
           <div className="flex-1 min-h-0 pt-4 w-full">
             <TabsContent value="sectorPerformance" className="h-full m-0 w-full">

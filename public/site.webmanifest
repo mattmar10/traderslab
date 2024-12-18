@@ -1,0 +1,18 @@
+{
+    "name": "TradersLab",
+    "short_name": "TradersLab",
+    "description": "Level up your trading.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#000000",
+    "icons": [
+      {
+        "src": "apple-icon-152x152.png",
+        "sizes": "152x152",
+        "type": "image/png"
+      }
+    ],
+    "scope": "/",
+    "orientation": "portrait"
+  }
