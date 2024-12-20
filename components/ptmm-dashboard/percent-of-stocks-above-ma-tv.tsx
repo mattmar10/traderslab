@@ -25,7 +25,6 @@ import { PercentAboveMAPoint } from "@/lib/types/market-breadth-types";
 import { negativeColor, positiveColor } from "@/lib/utils/color-utils";
 
 export interface PercentOfStocksAboveMATVLineProps {
-  plotStartDate: Date;
   percentAboveFiveSMA: PercentAboveMAPoint[];
   percentAboveTenEMA: PercentAboveMAPoint[];
   percentAboveTwentyOneEMA: PercentAboveMAPoint[];

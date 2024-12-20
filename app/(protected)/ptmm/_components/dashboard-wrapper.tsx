@@ -118,7 +118,6 @@ const DashboardWrapper: React.FC<DashboardWrapperProps> = ({
           </div>
           <div className="col-span-1">
             <PercentOfStocksAboveMAs
-              plotStartDate={oneYearAgo}
               percentAboveFiveSMA={
                 data.marketBreadthOverview.percentAboveFiveSMA
               }
