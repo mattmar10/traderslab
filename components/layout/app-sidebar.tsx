@@ -37,12 +37,12 @@ import {
   LogOut,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import * as React from "react";
 import { Icons } from "../icons";
 
 import ThemeToggle from "./ThemeToggle/theme-toggle";
-import { useUser } from "@clerk/nextjs";
+import { useClerk, useUser } from "@clerk/nextjs";
 import SearchInput from "../search-input";
 import { useTheme } from "next-themes";
 import { Roboto_Slab } from "next/font/google";
@@ -139,6 +139,14 @@ export default function AppSidebar({
   const pathname = usePathname();
   const { resolvedTheme } = useTheme();
   const { open } = useSidebar();
+
+  const { signOut } = useClerk();
+  const handleSignOut = () => {
+    signOut();
+
+    redirect("/");
+  };
+
   React.useEffect(() => {
     setMounted(true);
   }, []);
@@ -175,6 +183,8 @@ export default function AppSidebar({
       return;
     }
   };
+
+  
 
 
   return (
@@ -316,7 +326,7 @@ export default function AppSidebar({
 
                     </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSignOut}>
 
                     <LogOut />
                     <div className="ml-2">Log Out</div>

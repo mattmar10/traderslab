@@ -35,7 +35,12 @@ const PricingHeader = ({
   </section>
 );
 
-export default function PricingCards() {
+export interface PricingCardProps{
+  annualPriceId: string,
+  monthlyPriceId: string
+}
+
+export default function PricingCards({annualPriceId, monthlyPriceId}: PricingCardProps) {
   const [isAnnual, setIsAnnual] = useState(false);
   const { user } = useUser();
   const [checkoutErrorMsg, setCheckoutErrorMsg] = useState<string>("");
@@ -51,8 +56,8 @@ export default function PricingCards() {
       description: "Perfect for small businesses and startups",
       monthlyPrice: 39,
       annualPrice: 429,
-      priceIdAnnual: "price_1Q5qUYCrok1zbJaubwWao0qv",
-      priceIdMonthly: "price_1Q5qTcCrok1zbJaukazabSd8",
+      priceIdAnnual: annualPriceId, //"price_1Q5qUYCrok1zbJaubwWao0qv",
+      priceIdMonthly: monthlyPriceId, //"price_1Q5qTcCrok1zbJaukazabSd8",
       features: [
         "Up to 5 users",
         "Basic analytics",

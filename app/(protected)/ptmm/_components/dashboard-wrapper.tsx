@@ -69,17 +69,6 @@ const DashboardWrapper: React.FC<DashboardWrapperProps> = ({
   }
 
   const momentumRows = bulidMomentumRows(data);
-  const currentDate = new Date();
-
-  const oneYearAgo = new Date(
-    currentDate.getFullYear() - 1,
-    currentDate.getMonth(),
-    currentDate.getDate(),
-    currentDate.getHours(),
-    currentDate.getMinutes(),
-    currentDate.getSeconds(),
-    currentDate.getMilliseconds()
-  );
 
   return (
     <PageContainer scrollable>
@@ -118,7 +107,6 @@ const DashboardWrapper: React.FC<DashboardWrapperProps> = ({
           </div>
           <div className="col-span-1">
             <PercentOfStocksAboveMAs
-              plotStartDate={oneYearAgo}
               percentAboveFiveSMA={
                 data.marketBreadthOverview.percentAboveFiveSMA
               }
