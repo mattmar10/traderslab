@@ -21,7 +21,7 @@ import ClientOverviewPriceChart from "@/components/price-chart/client-overview-p
 import CombinedHighsLowsMcClellan from "./combined-highs-lows-mcclellan";
 import PercentOfStocksAboveMAs from "@/components/ptmm-dashboard/percent-of-stocks-above-ma-tv";
 import DesktopTrendModelStatus from "./desktop-trend-model-status";
-
+import Image from 'next/image'
 const lato = Lato({
   subsets: ["latin"],
   weight: ["400", "700", "900"],
@@ -77,11 +77,18 @@ const DashboardWrapper: React.FC<DashboardWrapperProps> = ({
           <span className="text-foreground/60">{datasetDescription}</span>
 
           <div className="flex space-x-3">
-            <div>
+            <div className="flex  items-center">
+              <Image
+                src="/tl-transparent.png"
+                alt="TL Logo"
+                width={48}
+                height={48}
+                priority // Optional: Ensures the image is loaded quickly if above the fold
+              />
               <div
                 className={`text-2xl font-bold tracking-tight ${lato.className}`}
               >
-                PTMM Dashboard{" "}
+                TLMM Dashboard{" "}
                 <span className="text-2xl font-semibold">
                   {" "}
                   ({getTickerForDataset(dataset)})
