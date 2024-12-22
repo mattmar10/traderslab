@@ -1,3 +1,4 @@
+"use client"
 import { CustomizableChartMALine } from "@/components/customizable-price-chart";
 import ErrorCard from "@/components/error-card";
 import Loading from "@/components/loading";
@@ -76,7 +77,6 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> =
           ]);
 
           times.parseTotal = performance.now() - startTime;
-          console.table(times);
 
           // console.log('Parsed JSON:', { barsJson, quoteJson, earningsJson });
 
