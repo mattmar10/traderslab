@@ -1,21 +1,20 @@
-import { getFullProfiles, getSubMarketsSectorsThemesData } from "@/actions/market-data/actions";
+import {
+  getFullProfiles,
+  getSubMarketsSectorsThemesData,
+} from "@/actions/market-data/actions";
 import ErrorCard from "@/components/error-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FMPDataLoadingError, FMPHistoricalResultsSchema, isFMPDataLoadingError } from "@/lib/types/fmp-types";
+import {
+  FMPDataLoadingError,
+  FMPHistoricalResultsSchema,
+  isFMPDataLoadingError,
+} from "@/lib/types/fmp-types";
 import MarketSectorsThemesWrapper from "./market-sectors-themes-wrapper";
 import { Candle } from "@/lib/types/basic-types";
 import { fetchWithRetries } from "@/app/api/utils";
 import { dateSringToMillisSinceEpochInET } from "@/lib/utils/epoch-utils";
 
 const MarketsSectorsThemesContainer: React.FC = async () => {
-
-  const now = new Date();
-  const oneYearAgo = new Date(
-    now.getFullYear() - 1,
-    now.getMonth(),
-    now.getDate()
-  );
-
   const data = await getSubMarketsSectorsThemesData();
 
   if (isFMPDataLoadingError(data)) {
@@ -25,25 +24,20 @@ const MarketsSectorsThemesContainer: React.FC = async () => {
       </div>
     );
   } else {
-
-
     const allTickers = [
       "RSP", // Add RSP since it's needed
-      ...data.sectorMarketData.map(s => s.ticker),
-      ...data.subMarketData.map(s => s.ticker),
-      ...data.themeMarketData.map(t => t.ticker)
+      ...data.sectorMarketData.map((s) => s.ticker),
+      ...data.subMarketData.map((s) => s.ticker),
+      ...data.themeMarketData.map((t) => t.ticker),
     ];
 
-
     const [subMarketProfiles, sectorsProfiles, themesProfiles, allPriceData] =
-      await Promise.all(
-        [
-          getFullProfiles(data.subMarketData.map(s => s.ticker)),
-          getFullProfiles(data.sectorMarketData.map(s => s.ticker)),
-          getFullProfiles(data.themeMarketData.map(s => s.ticker)),
-          Promise.all(allTickers.map(t => getPriceBars(t)))
-        ])
-
+      await Promise.all([
+        getFullProfiles(data.subMarketData.map((s) => s.ticker)),
+        getFullProfiles(data.sectorMarketData.map((s) => s.ticker)),
+        getFullProfiles(data.themeMarketData.map((s) => s.ticker)),
+        Promise.all(allTickers.map((t) => getPriceBars(t))),
+      ]);
 
     const priceData: Record<string, Candle[]> = {};
     allTickers.forEach((ticker, index) => {
@@ -57,35 +51,34 @@ const MarketsSectorsThemesContainer: React.FC = async () => {
     });
 
     const themePriceData: Record<string, Candle[]> = {
-      RSP: priceData['RSP'], // Include RSP in each
+      RSP: priceData["RSP"], // Include RSP in each
       ...Object.fromEntries(
         data.themeMarketData
-          .map(t => t.ticker)
-          .filter(ticker => ticker in priceData)
-          .map(ticker => [ticker, priceData[ticker]])
-      )
+          .map((t) => t.ticker)
+          .filter((ticker) => ticker in priceData)
+          .map((ticker) => [ticker, priceData[ticker]])
+      ),
     };
 
     const sectorPriceData: Record<string, Candle[]> = {
-      RSP: priceData['RSP'],
+      RSP: priceData["RSP"],
       ...Object.fromEntries(
         data.sectorMarketData
-          .map(s => s.ticker)
-          .filter(ticker => ticker in priceData)
-          .map(ticker => [ticker, priceData[ticker]])
-      )
+          .map((s) => s.ticker)
+          .filter((ticker) => ticker in priceData)
+          .map((ticker) => [ticker, priceData[ticker]])
+      ),
     };
 
     const marketPriceData: Record<string, Candle[]> = {
-      RSP: priceData['RSP'],
+      RSP: priceData["RSP"],
       ...Object.fromEntries(
         data.subMarketData
-          .map(s => s.ticker)
-          .filter(ticker => ticker in priceData)
-          .map(ticker => [ticker, priceData[ticker]])
-      )
+          .map((s) => s.ticker)
+          .filter((ticker) => ticker in priceData)
+          .map((ticker) => [ticker, priceData[ticker]])
+      ),
     };
-
 
     return (
       <Tabs defaultValue="themes">
@@ -127,7 +120,6 @@ const MarketsSectorsThemesContainer: React.FC = async () => {
 };
 
 export default MarketsSectorsThemesContainer;
-
 
 export async function getPriceBars(
   ticker: string,
@@ -174,6 +166,7 @@ export async function getPriceBars(
       });
     }
   } catch (error) {
+    console.error(error);
     const dataError: FMPDataLoadingError = `Unable to fetch price bars`;
     return dataError;
   }
