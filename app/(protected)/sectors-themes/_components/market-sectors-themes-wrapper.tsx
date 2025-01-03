@@ -138,118 +138,37 @@ const calculateMarketData = (
 export interface MarketSectorsThemesWrapperProps {
   title: string;
   data: EtfMarketData[];
-  profiles: FullFMPProfile[]
+  profiles: FullFMPProfile[];
+  candlesData: Record<string, Candle[]>;
 }
 
 const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
   title,
   data,
-  profiles
+  profiles,
+  candlesData
 }) => {
   const { theme } = useTheme();
   const resolvedTheme = (theme as "light" | "dark") || "light";
 
-  const tickers = useMemo(() => {
-    const uniqueTickers = new Set(["RSP", ...data.map((d) => d.ticker)]);
-    return Array.from(uniqueTickers);
-  }, [data]);
+  const uniqueTickers = new Set(["RSP", ...data.map((d) => d.ticker)]);
 
-  const tickerNames = useMemo(() => {
-    const names: Record<string, string> = {
-      RSP: "S&P 500 Equal Weight",
-    };
 
-    data.forEach((d) => {
-      names[d.ticker] = d.name;
-    });
-
-    return names;
-  }, [data]);
-
-  const getBars = async (barsKey: string) => {
-    const bars = await fetch(barsKey);
-    const parsed = FMPHistoricalResultsSchema.safeParse(await bars.json());
-    if (!parsed.success) {
-      throw Error("Unable to fetch bars");
-    } else {
-      return parsed.data.historical.map((h) => {
-        const candle: Candle = {
-          date: new Date(h.date).getTime(),
-          dateStr: h.date,
-          open: h.open,
-          high: h.high,
-          low: h.low,
-          close: h.close,
-          volume: h.volume,
-        };
-        return candle;
-      });
-    }
+  const names: Record<string, string> = {
+    RSP: "S&P 500 Equal Weight",
   };
 
-  const now = new Date();
-  const oneYearAgo = new Date(
-    now.getFullYear() - 1,
-    now.getMonth(),
-    now.getDate()
-  );
-
-  const tickerQueries = useQueries({
-    queries: tickers.map((ticker) => ({
-      queryKey: ["daily", ticker],
-      queryFn: async (): Promise<Candle[]> => {
-        return await getBars(
-          `/api/bars/${ticker}?fromDateString=${formatDateToEST(oneYearAgo)}`
-        );
-      },
-      staleTime: 1000 * 60 * 5,
-      //cacheTime: 1000 * 60 * 30,
-    })),
+  data.forEach((d) => {
+    names[d.ticker] = d.name;
   });
-  const processedData = useMemo(() => {
-    if (tickerQueries.some((query) => query.isLoading)) {
-      return null;
-    }
 
-    const candlesData: Record<string, Candle[]> = {};
 
-    tickerQueries.forEach((query, index) => {
-      if (query.isSuccess && query.data) {
-        const ticker = tickers[index];
-        const sortedCandles = [...query.data].sort(
-          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-        );
-        candlesData[ticker] = sortedCandles;
-      }
-    });
 
-    // Calculate all market data from candles
-    return calculateMarketData(candlesData, tickerNames);
-  }, [tickerQueries, tickers, tickerNames]);
-  const errors = tickerQueries
-    .filter((query) => query.isError)
-    .map((query) => query.error);
+  const processedData = calculateMarketData(candlesData, names)
 
-  const hasErrors = errors.length > 0;
 
-  if (hasErrors) {
-    return (
-      <div>
-        <div>Errors loading some data:</div>
-        <ul>
-          {errors.map((error, index) => (
-            <li key={index}>{error?.toString()}</li>
-          ))}
-        </ul>
-      </div>
-    );
-  }
 
-  const isLoading = tickerQueries.find((f) => f.isLoading);
 
-  if (isLoading) {
-    return <Loading />;
-  }
 
   let sortedData: EtfMarketData[] = [];
   if (processedData && processedData?.marketData.length > 6) {
@@ -296,7 +215,7 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
               colorMap={{
                 RSP: resolvedTheme === "light" ? "#404040" : "#e5e7eb",
               }}
-              tickerNames={tickerNames}
+              tickerNames={names}
             />
           </div>
         )}
@@ -313,3 +232,25 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
 };
 
 export default MarketSectorsThemesWrapper;
+
+
+const getBars = async (barsKey: string) => {
+  const bars = await fetch(barsKey);
+  const parsed = FMPHistoricalResultsSchema.safeParse(await bars.json());
+  if (!parsed.success) {
+    throw Error("Unable to fetch bars");
+  } else {
+    return parsed.data.historical.map((h) => {
+      const candle: Candle = {
+        date: new Date(h.date).getTime(),
+        dateStr: h.date,
+        open: h.open,
+        high: h.high,
+        low: h.low,
+        close: h.close,
+        volume: h.volume,
+      };
+      return candle;
+    });
+  }
+};
