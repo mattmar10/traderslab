@@ -5,16 +5,14 @@ import {
   RankedEtfMarketData,
 } from "@/lib/types/submarkets-sectors-themes-types";
 import MarketRankGroupAggregateTable from "./market-rank-group-aggregate-table";
-import { useQueries } from "@tanstack/react-query";
-import { useMemo } from "react";
 import { Candle } from "@/lib/types/basic-types";
 import AggregateReturnsChart from "./aggregate-returns-chart";
 import { useTheme } from "next-themes";
-import { FMPHistoricalResultsSchema, FullFMPProfile } from "@/lib/types/fmp-types";
-import { formatDateToEST } from "@/lib/utils/epoch-utils";
-import Loading from "@/components/loading";
+import { FullFMPProfile } from "@/lib/types/fmp-types";
 import { rankMarketData } from "../utils";
-import RankedMarketDataGrid, { RankedEtfDataPoint } from "./ranked-etf-data-grid";
+import RankedMarketDataGrid, {
+  RankedEtfDataPoint,
+} from "./ranked-etf-data-grid";
 import { adrPercent, isADRPercentError } from "@/lib/indicators/adr-percent";
 import { BorderBeam } from "@/components/magicui/border-beam";
 
@@ -33,8 +31,8 @@ const calculateReturns = (candles: Candle[]): ReturnsData[] => {
       index === 0
         ? 0
         : ((candle.close - candles[index - 1].close) /
-          candles[index - 1].close) *
-        100;
+            candles[index - 1].close) *
+          100;
 
     // Calculate cumulative return from the first day
     const cumulativeReturn =
@@ -146,13 +144,10 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
   title,
   data,
   profiles,
-  candlesData
+  candlesData,
 }) => {
   const { theme } = useTheme();
   const resolvedTheme = (theme as "light" | "dark") || "light";
-
-  const uniqueTickers = new Set(["RSP", ...data.map((d) => d.ticker)]);
-
 
   const names: Record<string, string> = {
     RSP: "S&P 500 Equal Weight",
@@ -162,13 +157,7 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
     names[d.ticker] = d.name;
   });
 
-
-
-  const processedData = calculateMarketData(candlesData, names)
-
-
-
-
+  const processedData = calculateMarketData(candlesData, names);
 
   let sortedData: EtfMarketData[] = [];
   if (processedData && processedData?.marketData.length > 6) {
@@ -178,19 +167,18 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
     );
   }
 
-  const topTen = sortedData.slice(0, 10)
+  const topTen = sortedData.slice(0, 10);
 
-  const topTenData = topTen.map(t => {
-
-    const profile = profiles.find(p => p.symbol === t.ticker)
+  const topTenData = topTen.map((t) => {
+    const profile = profiles.find((p) => p.symbol === t.ticker);
 
     const point: RankedEtfDataPoint = {
       etfData: t,
-      profile: profile!
-    }
+      profile: profile!,
+    };
 
-    return point
-  })
+    return point;
+  });
 
   return (
     <div className="flex-col space-y-2 ">
@@ -232,25 +220,3 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
 };
 
 export default MarketSectorsThemesWrapper;
-
-
-const getBars = async (barsKey: string) => {
-  const bars = await fetch(barsKey);
-  const parsed = FMPHistoricalResultsSchema.safeParse(await bars.json());
-  if (!parsed.success) {
-    throw Error("Unable to fetch bars");
-  } else {
-    return parsed.data.historical.map((h) => {
-      const candle: Candle = {
-        date: new Date(h.date).getTime(),
-        dateStr: h.date,
-        open: h.open,
-        high: h.high,
-        low: h.low,
-        close: h.close,
-        volume: h.volume,
-      };
-      return candle;
-    });
-  }
-};
