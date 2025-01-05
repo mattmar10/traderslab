@@ -33,7 +33,7 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({ onApplyFilter }
   const [activeCategory, setActiveCategory] = useState<'myScreens' | 'communityScreens' | 'favorites'>('myScreens');
   const [, setConfirmingDeleteId] = useState<string | null>(null);
 
-  // Queries
+  // Queries and mutations remain the same
   const { data: userFilters, isLoading: isLoadingUserFilters } = useQuery({
     queryKey: ['filter-library-users'],
     queryFn: () => getFilterGroupsForUser(),
@@ -77,7 +77,7 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({ onApplyFilter }
     },
   });
 
-  // Event Handlers
+  // Event handlers remain the same
   const handleToggleFavorite = (filterId: string, isFavorite: boolean) => {
     toggleFavoriteMutation.mutate({ filterId, isFavorite });
   };
@@ -90,10 +90,10 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({ onApplyFilter }
     onApplyFilter(filter);
   };
 
-  // Utility Functions
+  // Utility functions remain the same
   const filterAndSortScreeners = (screeners: any[]) => {
     return screeners
-      .filter(screener => 
+      .filter(screener =>
         screener.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         screener.description?.toLowerCase().includes(searchTerm.toLowerCase())
       )
@@ -125,15 +125,14 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({ onApplyFilter }
     }
   };
 
-
   if (isLoadingUserFilters || isLoadingSharedFilters) {
     return <Loading />;
   }
 
   return (
-    <div className="flex h-[98%] bg-foreground/10">
-      {/* Sidebar - Fixed height */}
-      <div className="w-64 bg-background  flex-shrink-0">
+    <div className="flex  bg-foreground/10 h-[98%]">
+      {/* Sidebar */}
+      <div className="w-64 bg-background flex-shrink-0 border-r">
         <div className="p-4">
           <nav>
             <ul className="space-y-2">
@@ -172,105 +171,107 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({ onApplyFilter }
         </div>
       </div>
 
-      {/* Main content - Scrollable */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
-        <div className="flex-shrink-0 pb-4 pl-1 pt-1 bg-background border-b">
-          <div className="flex justify-between items-center">
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col min-h-0">
+        {/* Fixed header section */}
+        <div className="flex-shrink-0 bg-background border-b">
+          <div className="p-4">
             <div className="relative w-96">
               <Input
                 type="text"
-                placeholder="Search screeners..."
+                placeholder="Search screens..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
-              <Search 
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/50" 
-                size={18} 
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/50"
+                size={18}
               />
             </div>
- 
+          </div>
+
+          {/* Category header and sort */}
+          <div className="px-4 pb-4 flex justify-between items-center">
+            <h2 className="font-semibold text-foreground text-lg">
+              {activeCategory === 'myScreens'
+                ? 'My Screens'
+                : activeCategory === 'communityScreens'
+                  ? 'Community Screens'
+                  : 'Favorites'}
+            </h2>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">Sort By</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setSortBy('name')}>Name</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy('updated')}>Updated</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy('favorite')}>Favorite</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 h-full">
-          <div className="bg-background shadow rounded-lg h-fit">
-            <div className="flex justify-between items-center p-4 bg-gray-50 border-b sticky top-0">
-              <h2 className="font-semibold">
-                {activeCategory === 'myScreens' ? 'My Screens' : 
-                 activeCategory === 'communityScreens' ? 'Community Screens' : 
-                 'Favorites'}
-              </h2>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">Sort By</Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onClick={() => setSortBy('name')}>Name</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSortBy('updated')}>Updated</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSortBy('favorite')}>Favorite</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
-            <ul className="divide-y divide-gray-200">
-              {filterAndSortScreeners(getCategoryScreeners()).map((screener) => (
-                <li key={screener.id} className="hover:bg-foreground/5">
-                  <div className="p-4">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex-shrink-0">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleToggleFavorite(
-                            screener.id,
-                            favoriteFilterIds?.includes(screener.id) || false
+        {/* Scrollable content area */}
+        <div className="flex-1 overflow-y-auto bg-background">
+          <ul className="divide-y divide-gray-200">
+            {filterAndSortScreeners(getCategoryScreeners()).map((screener) => (
+              <li key={screener.id} className="hover:bg-foreground/5">
+                <div className="p-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="flex-shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleToggleFavorite(
+                          screener.id,
+                          favoriteFilterIds?.includes(screener.id) || false
+                        )}
+                        className={favoriteFilterIds?.includes(screener.id) ? 'text-yellow-500' : 'text-foreground/50'}
+                      >
+                        <Star size={18} />
+                      </Button>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-medium truncate">{screener.name}</h3>
+                      <span className="text-sm text-foreground/60 flex items-center whitespace-nowrap mb-1">
+                        Updated {new Date(screener.updatedAt).toLocaleDateString()}
+                      </span>
+                      <p className="text-sm text-foreground/50 line-clamp-2">
+                        {screener.description}
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0 flex items-center space-x-4">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreHorizontal size={18} />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem onClick={() => handleApplyFilter(translateToDTO(screener))}>
+                            Apply
+                          </DropdownMenuItem>
+                          {activeCategory === 'myScreens' && (
+                            <>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                className="text-red-600"
+                                onClick={() => handleDeleteFilter(screener.id)}
+                              >
+                                Delete
+                              </DropdownMenuItem>
+                            </>
                           )}
-                          className={favoriteFilterIds?.includes(screener.id) ? 'text-yellow-500' : 'text-foreground/50'}
-                        >
-                          <Star size={18} />
-                        </Button>
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <h3 className="font-medium truncate">{screener.name}</h3>
-                        
-                        <p className="text-sm text-foreground/50 line-clamp-2">
-                          {screener.description}
-                        </p>
-                        
-                      </div>
-                      <div className="flex-shrink-0 flex items-center space-x-4">
-                       
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreHorizontal size={18} />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem onClick={() => handleApplyFilter(translateToDTO(screener))}>
-                              Apply
-                            </DropdownMenuItem>
-                            {activeCategory === 'myScreens' && (
-                              <>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem 
-                                  className="text-red-600"
-                                  onClick={() => handleDeleteFilter(screener.id)}
-                                >
-                                  Delete
-                                </DropdownMenuItem>
-                              </>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
-                </li>
-              ))}
-            </ul>
-          </div>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>
