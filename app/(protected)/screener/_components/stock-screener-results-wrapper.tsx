@@ -47,10 +47,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import ScreenerLibrary from "./filter-library";
 import { Button } from "@/components/ui/button";
 import { RiStackLine } from "react-icons/ri";
 import ScreenerMiniChartWrapper from "./screener-result-minichart";
+import NewScreenerLibrary from "./screener-library";
 // Define types for localStorage data
 interface LocalStorageData {
   sortConfig: ScreenerSortConfig;
@@ -534,7 +534,7 @@ const ScreenerResultsWrapper = ({
           <DialogHeader>
             <DialogTitle>Screener Library</DialogTitle>
           </DialogHeader>
-          <ScreenerLibrary
+          <NewScreenerLibrary
             onApplyFilter={(filters: FilterGroupDTO | undefined) => {
               handleApplyFilters(filters);
               updateState("isFiltersLibraryOpen", false);
