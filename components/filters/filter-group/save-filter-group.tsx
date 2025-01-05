@@ -107,7 +107,7 @@ const SaveToLibrary: React.FC<SaveToLibraryProps> = ({
           });
           setSaveToLibraryFilterGroupName("");
           setSaveToLibraryFilterGroupDescription("");
-          setSuccessMessage("Filter group saved successfully!");
+          setSuccessMessage("Screen saved successfully!");
           // Auto-hide after 3 seconds
           setTimeout(() => {
             setSuccessMessage(null);
