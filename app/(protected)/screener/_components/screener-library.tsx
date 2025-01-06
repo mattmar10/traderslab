@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, MoreHorizontal, Star, Users, User } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import React, { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Search, MoreHorizontal, Star, Users, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import Loading from '@/components/loading';
+} from "@/components/ui/dropdown-menu";
+import Loading from "@/components/loading";
 import {
   addFavoriteFilterGroup,
   deleteFilter,
@@ -18,34 +18,42 @@ import {
   getSharedFilterGroups,
   getUserFavoriteFilterGroupIds,
   removeFavoriteFilterGroup,
-} from '@/components/filters/actions';
-import { FilterGroup, FilterGroupDTO, FilterGroupPermissionType } from '@/lib/types/screener-types';
-import { NewFilterGroup } from '@/drizzle/schema';
+} from "@/components/filters/actions";
+import {
+  FilterGroup,
+  FilterGroupDTO,
+  FilterGroupPermissionType,
+} from "@/lib/types/screener-types";
+import { NewFilterGroup } from "@/drizzle/schema";
 
 interface NewScreenerLibraryProps {
   onApplyFilter: (filter: FilterGroupDTO) => void;
 }
 
-const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({ onApplyFilter }) => {
+const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
+  onApplyFilter,
+}) => {
   const queryClient = useQueryClient();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<'name' | 'updated' | 'favorite'>('name');
-  const [activeCategory, setActiveCategory] = useState<'myScreens' | 'communityScreens' | 'favorites'>('myScreens');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<"name" | "updated" | "favorite">("name");
+  const [activeCategory, setActiveCategory] = useState<
+    "myScreens" | "communityScreens" | "favorites"
+  >("myScreens");
   const [, setConfirmingDeleteId] = useState<string | null>(null);
 
   // Queries and mutations remain the same
   const { data: userFilters, isLoading: isLoadingUserFilters } = useQuery({
-    queryKey: ['filter-library-users'],
+    queryKey: ["filter-library-users"],
     queryFn: () => getFilterGroupsForUser(),
   });
 
   const { data: sharedFilters, isLoading: isLoadingSharedFilters } = useQuery({
-    queryKey: ['sharedFilters'],
+    queryKey: ["sharedFilters"],
     queryFn: () => getSharedFilterGroups(),
   });
 
   const { data: favoriteFilterIds } = useQuery({
-    queryKey: ['favoriteFilterIds'],
+    queryKey: ["favoriteFilterIds"],
     queryFn: () => getUserFavoriteFilterGroupIds(),
   });
 
@@ -62,22 +70,21 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({ onApplyFilter }
         ? removeFavoriteFilterGroup(filterId)
         : addFavoriteFilterGroup(filterId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['favoriteFilterIds'] });
-      queryClient.invalidateQueries({ queryKey: ['favoriteFilterGroups'] });
+      queryClient.invalidateQueries({ queryKey: ["favoriteFilterIds"] });
+      queryClient.invalidateQueries({ queryKey: ["favoriteFilterGroups"] });
     },
   });
 
   const deleteFilterMutation = useMutation({
     mutationFn: deleteFilter,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['filter-library-users'] });
-      queryClient.invalidateQueries({ queryKey: ['sharedFilters'] });
-      queryClient.invalidateQueries({ queryKey: ['favoriteFilterIds'] });
+      queryClient.invalidateQueries({ queryKey: ["filter-library-users"] });
+      queryClient.invalidateQueries({ queryKey: ["sharedFilters"] });
+      queryClient.invalidateQueries({ queryKey: ["favoriteFilterIds"] });
       setConfirmingDeleteId(null);
     },
   });
 
-  // Event handlers remain the same
   const handleToggleFavorite = (filterId: string, isFavorite: boolean) => {
     toggleFavoriteMutation.mutate({ filterId, isFavorite });
   };
@@ -93,14 +100,18 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({ onApplyFilter }
   // Utility functions remain the same
   const filterAndSortScreeners = (screeners: any[]) => {
     return screeners
-      .filter(screener =>
-        screener.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        screener.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      .filter(
+        (screener) =>
+          screener.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          screener.description?.toLowerCase().includes(searchTerm.toLowerCase())
       )
       .sort((a, b) => {
-        if (sortBy === 'name') return a.name.localeCompare(b.name);
-        if (sortBy === 'updated') return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-        if (sortBy === 'favorite') {
+        if (sortBy === "name") return a.name.localeCompare(b.name);
+        if (sortBy === "updated")
+          return (
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+          );
+        if (sortBy === "favorite") {
           const aFav = favoriteFilterIds?.includes(a.id) || false;
           const bFav = favoriteFilterIds?.includes(b.id) || false;
           return (bFav ? 1 : 0) - (aFav ? 1 : 0);
@@ -111,15 +122,26 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({ onApplyFilter }
 
   const getCategoryScreeners = () => {
     switch (activeCategory) {
-      case 'myScreens':
+      case "myScreens":
         return userFilters || [];
-      case 'communityScreens':
-        return (sharedFilters || []).map(f => f.filterGroup);
-      case 'favorites':
-        return [
+      case "communityScreens":
+        return (sharedFilters || []).map((f) => f.filterGroup);
+      case "favorites":
+        const mergedScreeners = [
           ...(userFilters || []),
-          ...((sharedFilters || []).map(f => f.filterGroup))
-        ].filter(screener => favoriteFilterIds?.includes(screener.id));
+          ...(sharedFilters || []).map((f) => f.filterGroup),
+        ];
+
+        // Remove duplicates by `id`
+        const uniqueScreeners = Array.from(
+          new Map(
+            mergedScreeners.map((screener) => [screener.id, screener])
+          ).values()
+        );
+
+        return uniqueScreeners.filter((screener) =>
+          favoriteFilterIds?.includes(screener.id)
+        );
       default:
         return [];
     }
@@ -138,9 +160,11 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({ onApplyFilter }
             <ul className="space-y-2">
               <li>
                 <Button
-                  variant={activeCategory === 'myScreens' ? 'secondary' : 'ghost'}
+                  variant={
+                    activeCategory === "myScreens" ? "secondary" : "ghost"
+                  }
                   className="w-full justify-start"
-                  onClick={() => setActiveCategory('myScreens')}
+                  onClick={() => setActiveCategory("myScreens")}
                 >
                   <User className="mr-2" size={18} />
                   My Screens
@@ -148,9 +172,13 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({ onApplyFilter }
               </li>
               <li>
                 <Button
-                  variant={activeCategory === 'communityScreens' ? 'secondary' : 'ghost'}
+                  variant={
+                    activeCategory === "communityScreens"
+                      ? "secondary"
+                      : "ghost"
+                  }
                   className="w-full justify-start"
-                  onClick={() => setActiveCategory('communityScreens')}
+                  onClick={() => setActiveCategory("communityScreens")}
                 >
                   <Users className="mr-2" size={18} />
                   Community Screens
@@ -158,9 +186,11 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({ onApplyFilter }
               </li>
               <li>
                 <Button
-                  variant={activeCategory === 'favorites' ? 'secondary' : 'ghost'}
+                  variant={
+                    activeCategory === "favorites" ? "secondary" : "ghost"
+                  }
                   className="w-full justify-start"
-                  onClick={() => setActiveCategory('favorites')}
+                  onClick={() => setActiveCategory("favorites")}
                 >
                   <Star className="mr-2" size={18} />
                   Favorites
@@ -194,20 +224,28 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({ onApplyFilter }
           {/* Category header and sort */}
           <div className="px-4 pb-4 flex justify-between items-center">
             <h2 className="font-semibold text-foreground text-lg">
-              {activeCategory === 'myScreens'
-                ? 'My Screens'
-                : activeCategory === 'communityScreens'
-                  ? 'Community Screens'
-                  : 'Favorites'}
+              {activeCategory === "myScreens"
+                ? "My Screens"
+                : activeCategory === "communityScreens"
+                ? "Community Screens"
+                : "Favorites"}
             </h2>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">Sort By</Button>
+                <Button variant="outline" size="sm">
+                  Sort By
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setSortBy('name')}>Name</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy('updated')}>Updated</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy('favorite')}>Favorite</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("name")}>
+                  Name
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("updated")}>
+                  Updated
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("favorite")}>
+                  Favorite
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -224,11 +262,17 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({ onApplyFilter }
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleToggleFavorite(
-                          screener.id,
-                          favoriteFilterIds?.includes(screener.id) || false
-                        )}
-                        className={favoriteFilterIds?.includes(screener.id) ? 'text-yellow-500' : 'text-foreground/50'}
+                        onClick={() =>
+                          handleToggleFavorite(
+                            screener.id,
+                            favoriteFilterIds?.includes(screener.id) || false
+                          )
+                        }
+                        className={
+                          favoriteFilterIds?.includes(screener.id)
+                            ? "text-yellow-500"
+                            : "text-foreground/50"
+                        }
                       >
                         <Star size={18} />
                       </Button>
@@ -236,7 +280,8 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({ onApplyFilter }
                     <div className="min-w-0 flex-1">
                       <h3 className="font-medium truncate">{screener.name}</h3>
                       <span className="text-sm text-foreground/60 flex items-center whitespace-nowrap mb-1">
-                        Updated {new Date(screener.updatedAt).toLocaleDateString()}
+                        Updated{" "}
+                        {new Date(screener.updatedAt).toLocaleDateString()}
                       </span>
                       <p className="text-sm text-foreground/50 line-clamp-2">
                         {screener.description}
@@ -250,10 +295,14 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({ onApplyFilter }
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          <DropdownMenuItem onClick={() => handleApplyFilter(translateToDTO(screener))}>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleApplyFilter(translateToDTO(screener))
+                            }
+                          >
                             Apply
                           </DropdownMenuItem>
-                          {activeCategory === 'myScreens' && (
+                          {activeCategory === "myScreens" && (
                             <>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem

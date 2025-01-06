@@ -24,61 +24,12 @@ const MarketsSectorsThemesContainer: React.FC = async () => {
       </div>
     );
   } else {
-    const allTickers = [
-      "RSP", // Add RSP since it's needed
-      ...data.sectorMarketData.map((s) => s.ticker),
-      ...data.subMarketData.map((s) => s.ticker),
-      ...data.themeMarketData.map((t) => t.ticker),
-    ];
-
-    const [subMarketProfiles, sectorsProfiles, themesProfiles, allPriceData] =
+    const [subMarketProfiles, sectorsProfiles, themesProfiles] =
       await Promise.all([
         getFullProfiles(data.subMarketData.map((s) => s.ticker)),
         getFullProfiles(data.sectorMarketData.map((s) => s.ticker)),
         getFullProfiles(data.themeMarketData.map((s) => s.ticker)),
-        Promise.all(allTickers.map((t) => getPriceBars(t))),
       ]);
-
-    const priceData: Record<string, Candle[]> = {};
-    allTickers.forEach((ticker, index) => {
-      const data = allPriceData[index];
-      if (!isFMPDataLoadingError(data)) {
-        const sortedCandles = [...data].sort(
-          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-        );
-        priceData[ticker] = sortedCandles;
-      }
-    });
-
-    const themePriceData: Record<string, Candle[]> = {
-      RSP: priceData["RSP"], // Include RSP in each
-      ...Object.fromEntries(
-        data.themeMarketData
-          .map((t) => t.ticker)
-          .filter((ticker) => ticker in priceData)
-          .map((ticker) => [ticker, priceData[ticker]])
-      ),
-    };
-
-    const sectorPriceData: Record<string, Candle[]> = {
-      RSP: priceData["RSP"],
-      ...Object.fromEntries(
-        data.sectorMarketData
-          .map((s) => s.ticker)
-          .filter((ticker) => ticker in priceData)
-          .map((ticker) => [ticker, priceData[ticker]])
-      ),
-    };
-
-    const marketPriceData: Record<string, Candle[]> = {
-      RSP: priceData["RSP"],
-      ...Object.fromEntries(
-        data.subMarketData
-          .map((s) => s.ticker)
-          .filter((ticker) => ticker in priceData)
-          .map((ticker) => [ticker, priceData[ticker]])
-      ),
-    };
 
     return (
       <Tabs defaultValue="themes">
@@ -93,7 +44,6 @@ const MarketsSectorsThemesContainer: React.FC = async () => {
             data={data.themeMarketData}
             profiles={themesProfiles}
             title={"Themes"}
-            candlesData={themePriceData}
           />
         </TabsContent>
 
@@ -102,7 +52,6 @@ const MarketsSectorsThemesContainer: React.FC = async () => {
             data={data.sectorMarketData}
             profiles={sectorsProfiles}
             title="Sectors"
-            candlesData={sectorPriceData}
           />
         </TabsContent>
 
@@ -111,7 +60,6 @@ const MarketsSectorsThemesContainer: React.FC = async () => {
             data={data.subMarketData}
             profiles={subMarketProfiles}
             title={"Sub Markets"}
-            candlesData={marketPriceData}
           />
         </TabsContent>
       </Tabs>

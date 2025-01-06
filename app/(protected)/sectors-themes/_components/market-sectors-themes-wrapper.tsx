@@ -6,7 +6,6 @@ import {
 } from "@/lib/types/submarkets-sectors-themes-types";
 import MarketRankGroupAggregateTable from "./market-rank-group-aggregate-table";
 import { Candle } from "@/lib/types/basic-types";
-import AggregateReturnsChart from "./aggregate-returns-chart";
 import { useTheme } from "next-themes";
 import { FullFMPProfile } from "@/lib/types/fmp-types";
 import { rankMarketData } from "../utils";
@@ -15,6 +14,9 @@ import RankedMarketDataGrid, {
 } from "./ranked-etf-data-grid";
 import { adrPercent, isADRPercentError } from "@/lib/indicators/adr-percent";
 import { BorderBeam } from "@/components/magicui/border-beam";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { formatDateToEST } from "@/lib/utils/epoch-utils";
 
 export interface ReturnsData {
   date: string;
@@ -137,17 +139,80 @@ export interface MarketSectorsThemesWrapperProps {
   title: string;
   data: EtfMarketData[];
   profiles: FullFMPProfile[];
-  candlesData: Record<string, Candle[]>;
 }
 
 const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
   title,
   data,
   profiles,
-  candlesData,
 }) => {
   const { theme } = useTheme();
   const resolvedTheme = (theme as "light" | "dark") || "light";
+
+  const tickers = useMemo(
+    () => Array.from(new Set(profiles.map((profile) => profile.symbol))),
+    [profiles]
+  );
+  console.log(tickers);
+
+  const fetchBatchCandlesData = async (
+    tickers: string[]
+  ): Promise<Record<string, Candle[]>> => {
+    const currentDate = new Date();
+    const startDate = new Date(
+      currentDate.getFullYear() - 2,
+      currentDate.getMonth(),
+      currentDate.getDate(),
+      currentDate.getHours(),
+      currentDate.getMinutes(),
+      currentDate.getSeconds(),
+      currentDate.getMilliseconds()
+    );
+    const startDateStr = formatDateToEST(startDate);
+    const response = await fetch(
+      `/api/bars/batch?tickers=${tickers.join(
+        ","
+      )}&fromDateString=${startDateStr}`
+    );
+    if (!response.ok) throw new Error("Failed to fetch batch candles data");
+    return await response.json(); // Assuming it returns a record of `{ ticker: Candle[] }`
+  };
+
+  const { data: batchData, isLoading: batchLoading } = useQuery({
+    queryKey: ["candlesBatch", tickers],
+    queryFn: () => fetchBatchCandlesData(tickers),
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 3 * 60 * 1000, // 3 minutes (should be longer than staleTime)
+    refetchOnMount: false, // Prevent refetch on component mount
+    refetchOnWindowFocus: false, // Prevent refetch on window focus
+  });
+
+  /*
+  const candlesQueries = useQueries({
+    queries: tickers.map((ticker) => ({
+      queryKey: ["candles", ticker],
+      queryFn: () => fetchCandlesData(ticker),
+      staleTime: 2 * 60 * 1000, // Consider data stale after 5 minutes
+    })),
+  });
+
+  const isLoading = candlesQueries.some((query) => query.isLoading);
+  const isError = candlesQueries.some((query) => query.isError);*/
+
+  // If any query is loading, show loading state
+  if (batchLoading) {
+    return <LoadingMarketIndicator />;
+  }
+
+  if (!batchData) {
+    return <div>Error loading data</div>;
+  }
+  /*const candlesData: Record<string, Candle[]> = {};
+  candlesQueries.forEach((query, index) => {
+    if (query.data) {
+      candlesData[tickers[index]] = query.data;
+    }
+  });*/
 
   const names: Record<string, string> = {
     RSP: "S&P 500 Equal Weight",
@@ -157,7 +222,7 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
     names[d.ticker] = d.name;
   });
 
-  const processedData = calculateMarketData(candlesData, names);
+  const processedData = calculateMarketData(batchData, names);
 
   let sortedData: EtfMarketData[] = [];
   if (processedData && processedData?.marketData.length > 6) {
@@ -193,7 +258,7 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
           />
         </div>
       )}
-      <div>
+      {/*<div>
         {processedData && (
           <div className="relative mt-4 w-full">
             <AggregateReturnsChart
@@ -207,7 +272,7 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
             />
           </div>
         )}
-      </div>
+      </div>*/}
 
       {processedData && (
         <MarketRankGroupAggregateTable
@@ -220,3 +285,25 @@ const MarketSectorsThemesWrapper: React.FC<MarketSectorsThemesWrapperProps> = ({
 };
 
 export default MarketSectorsThemesWrapper;
+
+const LoadingMarketIndicator = () => {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[200px] gap-3">
+      <div className="flex gap-1 items-center">
+        <div
+          className="w-2 h-2 rounded-full bg-primary/60 animate-bounce"
+          style={{ animationDelay: "0ms" }}
+        />
+        <div
+          className="w-2 h-2 rounded-full bg-primary/60 animate-bounce"
+          style={{ animationDelay: "150ms" }}
+        />
+        <div
+          className="w-2 h-2 rounded-full bg-primary/60 animate-bounce"
+          style={{ animationDelay: "300ms" }}
+        />
+      </div>
+      <span className=" text-muted-foreground">Building Dashboard</span>
+    </div>
+  );
+};
