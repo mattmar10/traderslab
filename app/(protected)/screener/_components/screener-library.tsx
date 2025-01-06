@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Search, MoreHorizontal, Star, Users, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -41,7 +41,31 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
   >("myScreens");
   const [, setConfirmingDeleteId] = useState<string | null>(null);
 
-  // Queries and mutations remain the same
+  const [isSortMenuOpen, setIsSortMenuOpen] = useState(false); // For Sort By Dropdown
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null); // For individual screener dropdowns
+
+  // Auto-close logic for the "Sort By" dropdown
+  useEffect(() => {
+    let sortTimer: NodeJS.Timeout;
+    if (isSortMenuOpen) {
+      sortTimer = setTimeout(() => {
+        setIsSortMenuOpen(false);
+      }, 3000); // 3 seconds
+    }
+    return () => clearTimeout(sortTimer);
+  }, [isSortMenuOpen]);
+
+  // Auto-close logic for individual screener dropdowns
+  useEffect(() => {
+    let screenerTimer: NodeJS.Timeout;
+    if (openDropdownId) {
+      screenerTimer = setTimeout(() => {
+        setOpenDropdownId(null);
+      }, 3000); // 3 seconds
+    }
+    return () => clearTimeout(screenerTimer);
+  }, [openDropdownId]);
+
   const { data: userFilters, isLoading: isLoadingUserFilters } = useQuery({
     queryKey: ["filter-library-users"],
     queryFn: () => getFilterGroupsForUser(),
@@ -57,7 +81,6 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
     queryFn: () => getUserFavoriteFilterGroupIds(),
   });
 
-  // Mutations
   const toggleFavoriteMutation = useMutation({
     mutationFn: ({
       filterId,
@@ -97,7 +120,6 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
     onApplyFilter(filter);
   };
 
-  // Utility functions remain the same
   const filterAndSortScreeners = (screeners: any[]) => {
     return screeners
       .filter(
@@ -131,14 +153,11 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
           ...(userFilters || []),
           ...(sharedFilters || []).map((f) => f.filterGroup),
         ];
-
-        // Remove duplicates by `id`
         const uniqueScreeners = Array.from(
           new Map(
             mergedScreeners.map((screener) => [screener.id, screener])
           ).values()
         );
-
         return uniqueScreeners.filter((screener) =>
           favoriteFilterIds?.includes(screener.id)
         );
@@ -153,7 +172,6 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
 
   return (
     <div className="flex  bg-foreground/10 h-[98%]">
-      {/* Sidebar */}
       <div className="w-64 bg-background flex-shrink-0 border-r">
         <div className="p-4">
           <nav>
@@ -201,9 +219,7 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
         </div>
       </div>
 
-      {/* Main content area */}
       <div className="flex-1 flex flex-col min-h-0">
-        {/* Fixed header section */}
         <div className="flex-shrink-0 bg-background border-b">
           <div className="p-4">
             <div className="relative w-96">
@@ -221,16 +237,15 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
             </div>
           </div>
 
-          {/* Category header and sort */}
           <div className="px-4 pb-4 flex justify-between items-center">
             <h2 className="font-semibold text-foreground text-lg">
               {activeCategory === "myScreens"
                 ? "My Screens"
                 : activeCategory === "communityScreens"
-                ? "Community Screens"
-                : "Favorites"}
+                  ? "Community Screens"
+                  : "Favorites"}
             </h2>
-            <DropdownMenu>
+            <DropdownMenu open={isSortMenuOpen} onOpenChange={setIsSortMenuOpen}>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
                   Sort By
@@ -251,7 +266,6 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
           </div>
         </div>
 
-        {/* Scrollable content area */}
         <div className="flex-1 overflow-y-auto bg-background">
           <ul className="divide-y divide-gray-200">
             {filterAndSortScreeners(getCategoryScreeners()).map((screener) => (
@@ -279,16 +293,20 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="font-medium truncate">{screener.name}</h3>
-                      <span className="text-sm text-foreground/60 flex items-center whitespace-nowrap mb-1">
-                        Updated{" "}
-                        {new Date(screener.updatedAt).toLocaleDateString()}
+                      <span className="text-sm text-foreground/60">
+                        Updated {new Date(screener.updatedAt).toLocaleDateString()}
                       </span>
                       <p className="text-sm text-foreground/50 line-clamp-2">
                         {screener.description}
                       </p>
                     </div>
                     <div className="flex-shrink-0 flex items-center space-x-4">
-                      <DropdownMenu>
+                      <DropdownMenu
+                        open={openDropdownId === screener.id}
+                        onOpenChange={(isOpen) =>
+                          setOpenDropdownId(isOpen ? screener.id : null)
+                        }
+                      >
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="sm">
                             <MoreHorizontal size={18} />
@@ -330,7 +348,7 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
 export default NewScreenerLibrary;
 
 function translateToDTO(dbModel: NewFilterGroup): FilterGroupDTO {
-  const translated: FilterGroupDTO = {
+  return {
     filterGroupName: dbModel.name!,
     userId: dbModel.userId!,
     permission: dbModel.permissionType as FilterGroupPermissionType,
@@ -338,6 +356,4 @@ function translateToDTO(dbModel: NewFilterGroup): FilterGroupDTO {
     filterGroup: dbModel.payload as FilterGroup,
     filterGroupDescription: dbModel.description!,
   };
-
-  return translated;
 }

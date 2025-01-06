@@ -1,8 +1,10 @@
 import PageContainer from "@/components/layout/page-container";
 import { Lato } from "next/font/google";
-import { Suspense } from "react";
-import Loading from "@/components/loading";
+
 import MarketsSectorsThemesContainer from "./_components/markets-sectors-themes-containter";
+import { getSubMarketsSectorsThemesData } from "@/actions/market-data/actions";
+import { isFMPDataLoadingError } from "@/lib/types/fmp-types";
+import ErrorCard from "@/components/error-card";
 
 const lato = Lato({
   subsets: ["latin"],
@@ -10,15 +12,18 @@ const lato = Lato({
   display: "swap",
 });
 
-const ErrorBoundary = ({ children }: { children: React.ReactNode }) => {
-  return <div className="w-full">{children}</div>;
-};
 
-const Skeleton = () => {
-  return <Loading />;
-};
+const SectorsThemesPage: React.FC = async () => {
 
-const StockScreener: React.FC = () => {
+  const data = await getSubMarketsSectorsThemesData();
+  if (isFMPDataLoadingError(data)) {
+    return (
+      <div>
+        <ErrorCard errorMessage={"Unable to load data"} />
+      </div>
+    );
+  }
+
   return (
     <PageContainer scrollable={false}>
       <div className="space-y-4 mt-2">
@@ -28,13 +33,9 @@ const StockScreener: React.FC = () => {
           </h2>
         </div>
 
-        <ErrorBoundary>
-          <Suspense fallback={<Skeleton />}>
-            <MarketsSectorsThemesContainer />
-          </Suspense>
-        </ErrorBoundary>
+        <MarketsSectorsThemesContainer data={data} />
       </div>
     </PageContainer>
   );
 };
-export default StockScreener;
+export default SectorsThemesPage;

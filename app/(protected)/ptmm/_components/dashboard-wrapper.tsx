@@ -76,7 +76,7 @@ const DashboardWrapper: React.FC<DashboardWrapperProps> = ({
         <div className="space-y-1">
           <span className="text-foreground/60">{datasetDescription}</span>
 
-          <div className="flex space-x-3">
+          <div className="flex space-x-3 items-center">
             <div className="flex  items-center">
               <Image
                 src="/tl-transparent.png"
