@@ -1,3 +1,4 @@
+"use client";
 import { EtfMarketData } from "@/lib/types/submarkets-sectors-themes-types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import RankedEtfCard from "./ranked-etf-card";
@@ -8,10 +9,9 @@ import {
 import { useState } from "react";
 import { FullFMPProfile } from "@/lib/types/fmp-types";
 
-
 export interface RankedEtfDataPoint {
-  etfData: EtfMarketData,
-  profile: FullFMPProfile
+  etfData: EtfMarketData;
+  profile: FullFMPProfile;
 }
 
 export interface RankedEtfDataGridProps {
@@ -43,7 +43,7 @@ const RankedMarketDataGrid: React.FC<RankedEtfDataGridProps> = ({
               etf={etf.etfData}
               chartSettings={chartSettings}
               theme={theme}
-              allEtfs={rankedData.map(e => e.etfData)}
+              allEtfs={rankedData.map((e) => e.etfData)}
             />
           ))}
         </div>
