@@ -1,12 +1,16 @@
+"use client";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EtfMarketData } from "@/lib/types/submarkets-sectors-themes-types";
 import { useQuery } from "@tanstack/react-query";
-import { getLeadingStocksForEtf, getSettingUpStocksForEtf } from "@/actions/screener/actions";
+
 import { ChartSettings } from "@/components/settings/chart-settings";
 import ScreenerMiniChartWrapper from "../../screener/_components/screener-result-minichart";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { isRight } from "@/lib/utils";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import EtfReturnsRadarChart from "./etf-returns-radar-chart";
 import Link from "next/link";
 import EtfReturnsBarChart from "./etf-returns-barchart";
@@ -14,6 +18,7 @@ import { FullFMPProfile } from "@/lib/types/fmp-types";
 import { ChartSplineIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useMemo } from "react";
+import { EtfScreenerResults } from "@/lib/types/screener-types";
 
 interface RankedEtfCardProps {
   rank: number;
@@ -40,14 +45,21 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({
     queryKey: [`leading-stocks`, etf],
     queryFn: async () => {
       try {
-        const result = await getLeadingStocksForEtf(etf.ticker);
-        return result;
+        const response = await fetch(
+          `/api/sectors-and-themes/leaders/${etf.ticker}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch leaders");
+        }
+        return (await response.json()) as EtfScreenerResults;
       } catch (error) {
         console.error("Error fetching leaders for etf:", error);
         throw error;
       }
     },
-    refetchInterval: 120000,
+    refetchInterval: 180000, // 3 minutes in milliseconds
+    staleTime: 180000,
+    gcTime: 300000,
   });
 
   const {
@@ -58,14 +70,21 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({
     queryKey: [`setting-up-stocks`, etf],
     queryFn: async () => {
       try {
-        const result = await getSettingUpStocksForEtf(etf.ticker);
-        return result;
+        const response = await fetch(
+          `/api/sectors-and-themes/setting-up/${etf.ticker}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch leaders");
+        }
+        return (await response.json()) as EtfScreenerResults;
       } catch (error) {
         console.error("Error fetching setting up for etf:", error);
         throw error;
       }
     },
-    refetchInterval: 120000,
+    refetchInterval: 180000, // 3 minutes in milliseconds
+    staleTime: 180000,
+    gcTime: 300000,
   });
 
   const twoYearsAgo = useMemo(() => {
@@ -120,7 +139,10 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({
       <CardHeader className="p-4 pb-2">
         <div className="flex items-center justify-between border-b border-border/40 pb-3">
           <div className="flex-1 min-w-0">
-            <div className="font-bold text-lg tracking-tight truncate" title={etf.name}>
+            <div
+              className="font-bold text-lg tracking-tight truncate"
+              title={etf.name}
+            >
               <Link href={`/sectors-themes/${etf.ticker}`}>{etf.name}</Link>
             </div>
           </div>
@@ -158,12 +180,12 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({
           <div>
             <h3 className="text-base font-semibold mb-2">Leaders</h3>
             <div className="text-sm px-3 py-2 bg-accent/70 rounded-md">
-              {leadersData && isRight(leadersData)
+              {leadersData
                 ? renderStockList(
-                  leadersData.value.holdings,
-                  leadersIsLoading,
-                  leadersError
-                )
+                    leadersData.holdings,
+                    leadersIsLoading,
+                    leadersError
+                  )
                 : null}
             </div>
           </div>
@@ -171,12 +193,12 @@ const RankedEtfCard: React.FC<RankedEtfCardProps> = ({
           <div>
             <h3 className="text-base font-semibold mb-2">Setting Up</h3>
             <div className="text-sm px-3 py-2 bg-accent/70 rounded-md">
-              {settingUpData && isRight(settingUpData)
+              {settingUpData
                 ? renderStockList(
-                  settingUpData.value.holdings,
-                  settingUpIsLoading,
-                  settingUpError
-                )
+                    settingUpData.holdings,
+                    settingUpIsLoading,
+                    settingUpError
+                  )
                 : null}
             </div>
           </div>
