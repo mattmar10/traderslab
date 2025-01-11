@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { CustomizableChartMALine } from "@/components/customizable-price-chart";
 import ErrorCard from "@/components/error-card";
 import Loading from "@/components/loading";
@@ -26,6 +26,7 @@ import CompactStrengthIndicator, {
   NameValuePair,
 } from "./compact-rs-indicator";
 import { RelativeStrengthResults } from "@/lib/types/relative-strength-types";
+import Link from "next/link";
 
 export interface ScreenerMiniChartWrapperProps {
   profile: FMPSymbolProfile | FullFMPProfile;
@@ -263,15 +264,15 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> =
         const volumeMA =
           chartSettings.volumeMA.type === "SMA"
             ? calculateSMA(
-              sortedTickerData,
-              chartSettings.volumeMA.period,
-              (c) => c.volume
-            )
+                sortedTickerData,
+                chartSettings.volumeMA.period,
+                (c) => c.volume
+              )
             : calculateEMA(
-              sortedTickerData,
-              chartSettings.volumeMA.period,
-              (c) => c.volume
-            );
+                sortedTickerData,
+                chartSettings.volumeMA.period,
+                (c) => c.volume
+              );
 
         if (!isMovingAverageError(volumeMA)) {
           volumeMovingAverage = {
@@ -284,34 +285,43 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> =
           };
         }
       }
-      const volAdjustedScores: NameValuePair[] = !relativeStrengthResults ? [] : [
-        {
-          name: "1M",
-          value:
-            relativeStrengthResults.volAdjustedRelativeStrengthStats.oneMonth,
-        },
-        {
-          name: "3M",
-          value:
-            relativeStrengthResults.volAdjustedRelativeStrengthStats.threeMonth,
-        },
-        {
-          name: "6M",
-          value:
-            relativeStrengthResults.volAdjustedRelativeStrengthStats.sixMonth,
-        },
-        {
-          name: "1Y",
-          value: relativeStrengthResults.volAdjustedRelativeStrengthStats.oneYear,
-        },
-      ];
+      const volAdjustedScores: NameValuePair[] = !relativeStrengthResults
+        ? []
+        : [
+            {
+              name: "1M",
+              value:
+                relativeStrengthResults.volAdjustedRelativeStrengthStats
+                  .oneMonth,
+            },
+            {
+              name: "3M",
+              value:
+                relativeStrengthResults.volAdjustedRelativeStrengthStats
+                  .threeMonth,
+            },
+            {
+              name: "6M",
+              value:
+                relativeStrengthResults.volAdjustedRelativeStrengthStats
+                  .sixMonth,
+            },
+            {
+              name: "1Y",
+              value:
+                relativeStrengthResults.volAdjustedRelativeStrengthStats
+                  .oneYear,
+            },
+          ];
 
       return (
         <div>
           <div className="flex items-start justify-between pt-2 pb-2">
             <div>
-              <span className="font-semibold">{ticker} </span>
-              {profile.companyName}
+              <Link href={`/symbol/${ticker}`}>
+                <span className="font-semibold">{ticker} </span>
+                {profile.companyName}
+              </Link>
               <div className="flex space-x-1 text-sm text-foreground/50">
                 <div>{profile.sector}</div>
                 <div>•</div>
@@ -346,7 +356,7 @@ const ScreenerMiniChartWrapper: React.FC<ScreenerMiniChartWrapperProps> =
         prevProps.theme === nextProps.theme &&
         prevProps.startDate.getTime() === nextProps.startDate.getTime() &&
         JSON.stringify(prevProps.chartSettings) ===
-        JSON.stringify(nextProps.chartSettings)
+          JSON.stringify(nextProps.chartSettings)
       );
     }
   );

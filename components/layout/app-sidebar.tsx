@@ -79,8 +79,8 @@ export const navItems: NavItem[] = [
     items: [], // Empty array as there are no child items for Dashboard
   },
   {
-    title: "PTMM Breadth",
-    url: "#", // Placeholder as there is no direct link for the parent
+    title: "TLMM Breadth",
+    url: "/ptmm/s&p500", // Placeholder as there is no direct link for the parent
     icon: "billing",
     isActive: true,
 
@@ -160,7 +160,6 @@ export default function AppSidebar({
       ? "/tl-light-theme-nav-logo.png"
       : "/tl-dark-theme-nav-logo.png";
 
-
   const handleBillingPortalRedirect = async () => {
     try {
       const { data } = await axios.post(
@@ -183,9 +182,6 @@ export default function AppSidebar({
       return;
     }
   };
-
-  
-
 
   return (
     <>
@@ -306,8 +302,7 @@ export default function AppSidebar({
                 >
                   <DropdownMenuItem>
                     <Link href={"/user-profile"}>
-                      <div className="block select-none space-y-1 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-left cursor-pointer"
-                      >
+                      <div className="block select-none space-y-1 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-left cursor-pointer">
                         <div className="text-sm font-medium leading-none">
                           Profile Settings
                         </div>
@@ -316,18 +311,15 @@ export default function AppSidebar({
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <div
-                      className=
-                      "block select-none space-y-1 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-left cursor-pointer"
+                      className="block select-none space-y-1 rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-left cursor-pointer"
                       onClick={handleBillingPortalRedirect}
                     >
                       <div className="text-sm font-medium leading-none">
                         Subscription Settings
                       </div>
-
                     </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleSignOut}>
-
                     <LogOut />
                     <div className="ml-2">Log Out</div>
                   </DropdownMenuItem>
@@ -347,7 +339,6 @@ export default function AppSidebar({
             {<SearchInput />}
           </div>
           <div className="hidden md:flex items-center gap-2 px-4">
-
             <ThemeToggle />
           </div>
         </header>
