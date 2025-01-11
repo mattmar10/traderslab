@@ -3,16 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Search, Star, Users, User, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+
 import Loading from "@/components/loading";
 import {
   addFavoriteFilterGroup,
@@ -28,6 +19,7 @@ import {
   FilterGroupPermissionType,
 } from "@/lib/types/screener-types";
 import { NewFilterGroup } from "@/drizzle/schema";
+import ConfirmationDialog from "@/components/confirmation-dialog";
 
 interface NewScreenerLibraryProps {
   onApplyFilter: (filter: FilterGroupDTO) => void;
@@ -43,6 +35,7 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
     "myScreens" | "communityScreens" | "favorites"
   >("myScreens");
   const [filterToDelete, setFilterToDelete] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const { data: userFilters, isLoading: isLoadingUserFilters } = useQuery({
     queryKey: ["filter-library-users"],
@@ -287,46 +280,35 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
                     </div>
                     {activeCategory === "myScreens" && (
                       <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-red-600"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setFilterToDelete(screener.id);
-                              }}
-                            >
-                              <Trash2 size={18} />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Filter</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete this filter?
-                                This action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                Cancel
-                              </AlertDialogCancel>
-                              <Button
-                                variant="destructive"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteFilter();
-                                }}
-                              >
-                                Delete
-                              </Button>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-600"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFilterToDelete(screener.id);
+                            setIsDeleteDialogOpen(true); // Add this state
+                          }}
+                        >
+                          <Trash2 size={18} />
+                        </Button>
+
+                        <ConfirmationDialog
+                          isOpen={isDeleteDialogOpen} // Add this state
+                          onClose={(e) => {
+                            e?.stopPropagation?.();
+                            setIsDeleteDialogOpen(false);
+                          }}
+                          onConfirm={(e) => {
+                            e?.stopPropagation?.();
+                            handleDeleteFilter();
+                            setIsDeleteDialogOpen(false);
+                          }}
+                          title="Delete Filter"
+                          message="Are you sure you want to delete this filter? This action cannot be undone."
+                          confirmText="Delete"
+                          cancelText="Cancel"
+                        />
                       </div>
                     )}
                   </div>
