@@ -1,15 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Search, MoreHorizontal, Star, Users, User } from "lucide-react";
+import { Search, Star, Users, User, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import Loading from "@/components/loading";
 import {
   addFavoriteFilterGroup,
@@ -25,6 +19,7 @@ import {
   FilterGroupPermissionType,
 } from "@/lib/types/screener-types";
 import { NewFilterGroup } from "@/drizzle/schema";
+import ConfirmationDialog from "@/components/confirmation-dialog";
 
 interface NewScreenerLibraryProps {
   onApplyFilter: (filter: FilterGroupDTO) => void;
@@ -39,32 +34,8 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
   const [activeCategory, setActiveCategory] = useState<
     "myScreens" | "communityScreens" | "favorites"
   >("myScreens");
-  const [, setConfirmingDeleteId] = useState<string | null>(null);
-
-  const [isSortMenuOpen, setIsSortMenuOpen] = useState(false); // For Sort By Dropdown
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null); // For individual screener dropdowns
-
-  // Auto-close logic for the "Sort By" dropdown
-  useEffect(() => {
-    let sortTimer: NodeJS.Timeout;
-    if (isSortMenuOpen) {
-      sortTimer = setTimeout(() => {
-        setIsSortMenuOpen(false);
-      }, 3000); // 3 seconds
-    }
-    return () => clearTimeout(sortTimer);
-  }, [isSortMenuOpen]);
-
-  // Auto-close logic for individual screener dropdowns
-  useEffect(() => {
-    let screenerTimer: NodeJS.Timeout;
-    if (openDropdownId) {
-      screenerTimer = setTimeout(() => {
-        setOpenDropdownId(null);
-      }, 3000); // 3 seconds
-    }
-    return () => clearTimeout(screenerTimer);
-  }, [openDropdownId]);
+  const [filterToDelete, setFilterToDelete] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const { data: userFilters, isLoading: isLoadingUserFilters } = useQuery({
     queryKey: ["filter-library-users"],
@@ -104,20 +75,23 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
       queryClient.invalidateQueries({ queryKey: ["filter-library-users"] });
       queryClient.invalidateQueries({ queryKey: ["sharedFilters"] });
       queryClient.invalidateQueries({ queryKey: ["favoriteFilterIds"] });
-      setConfirmingDeleteId(null);
+      setFilterToDelete(null);
     },
   });
 
-  const handleToggleFavorite = (filterId: string, isFavorite: boolean) => {
+  const handleToggleFavorite = (
+    e: React.MouseEvent,
+    filterId: string,
+    isFavorite: boolean
+  ) => {
+    e.stopPropagation();
     toggleFavoriteMutation.mutate({ filterId, isFavorite });
   };
 
-  const handleDeleteFilter = async (filterId: string) => {
-    await deleteFilterMutation.mutateAsync(filterId);
-  };
-
-  const handleApplyFilter = (filter: FilterGroupDTO) => {
-    onApplyFilter(filter);
+  const handleDeleteFilter = async () => {
+    if (filterToDelete) {
+      await deleteFilterMutation.mutateAsync(filterToDelete);
+    }
   };
 
   const filterAndSortScreeners = (screeners: any[]) => {
@@ -171,7 +145,7 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
   }
 
   return (
-    <div className="flex  bg-foreground/10 h-[98%]">
+    <div className="flex bg-foreground/10 h-[98%]">
       <div className="w-64 bg-background flex-shrink-0 border-r">
         <div className="p-4">
           <nav>
@@ -222,62 +196,65 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
       <div className="flex-1 flex flex-col min-h-0">
         <div className="flex-shrink-0 bg-background border-b">
           <div className="p-4">
-            <div className="relative w-96">
-              <Input
-                type="text"
-                placeholder="Search screens..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-              <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/50"
-                size={18}
-              />
-            </div>
-          </div>
-
-          <div className="px-4 pb-4 flex justify-between items-center">
-            <h2 className="font-semibold text-foreground text-lg">
-              {activeCategory === "myScreens"
-                ? "My Screens"
-                : activeCategory === "communityScreens"
-                  ? "Community Screens"
-                  : "Favorites"}
-            </h2>
-            <DropdownMenu open={isSortMenuOpen} onOpenChange={setIsSortMenuOpen}>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  Sort By
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setSortBy("name")}>
+            <div className="flex items-center gap-4">
+              <div className="relative w-96">
+                <Input
+                  type="text"
+                  placeholder="Search screens..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/50"
+                  size={18}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-foreground/50">Sort by:</span>
+                <Button
+                  variant={sortBy === "name" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setSortBy("name")}
+                >
                   Name
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy("updated")}>
+                </Button>
+                <Button
+                  variant={sortBy === "updated" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setSortBy("updated")}
+                >
                   Updated
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy("favorite")}>
+                </Button>
+                <Button
+                  variant={sortBy === "favorite" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setSortBy("favorite")}
+                >
                   Favorite
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto bg-background">
           <ul className="divide-y divide-gray-200">
             {filterAndSortScreeners(getCategoryScreeners()).map((screener) => (
-              <li key={screener.id} className="hover:bg-foreground/5">
+              <li
+                key={screener.id}
+                className="hover:bg-foreground/5 group cursor-pointer"
+                onClick={() => onApplyFilter(translateToDTO(screener))}
+              >
                 <div className="p-4">
                   <div className="flex items-center space-x-4">
                     <div className="flex-shrink-0">
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() =>
+                        onClick={(e) =>
                           handleToggleFavorite(
+                            e,
                             screener.id,
                             favoriteFilterIds?.includes(screener.id) || false
                           )
@@ -294,46 +271,46 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
                     <div className="min-w-0 flex-1">
                       <h3 className="font-medium truncate">{screener.name}</h3>
                       <span className="text-sm text-foreground/60">
-                        Updated {new Date(screener.updatedAt).toLocaleDateString()}
+                        Updated{" "}
+                        {new Date(screener.updatedAt).toLocaleDateString()}
                       </span>
                       <p className="text-sm text-foreground/50 line-clamp-2">
                         {screener.description}
                       </p>
                     </div>
-                    <div className="flex-shrink-0 flex items-center space-x-4">
-                      <DropdownMenu
-                        open={openDropdownId === screener.id}
-                        onOpenChange={(isOpen) =>
-                          setOpenDropdownId(isOpen ? screener.id : null)
-                        }
-                      >
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal size={18} />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              handleApplyFilter(translateToDTO(screener))
-                            }
-                          >
-                            Apply
-                          </DropdownMenuItem>
-                          {activeCategory === "myScreens" && (
-                            <>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                className="text-red-600"
-                                onClick={() => handleDeleteFilter(screener.id)}
-                              >
-                                Delete
-                              </DropdownMenuItem>
-                            </>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+                    {activeCategory === "myScreens" && (
+                      <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-600"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFilterToDelete(screener.id);
+                            setIsDeleteDialogOpen(true); // Add this state
+                          }}
+                        >
+                          <Trash2 size={18} />
+                        </Button>
+
+                        <ConfirmationDialog
+                          isOpen={isDeleteDialogOpen} // Add this state
+                          onClose={(e) => {
+                            e?.stopPropagation?.();
+                            setIsDeleteDialogOpen(false);
+                          }}
+                          onConfirm={(e) => {
+                            e?.stopPropagation?.();
+                            handleDeleteFilter();
+                            setIsDeleteDialogOpen(false);
+                          }}
+                          title="Delete Filter"
+                          message="Are you sure you want to delete this filter? This action cannot be undone."
+                          confirmText="Delete"
+                          cancelText="Cancel"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </li>
