@@ -119,7 +119,7 @@ const MobilePriceChart: React.FC<MobilePriceChartProps> = ({
     const volumeMASeries = chartRef.current.addLineSeries({
       lineWidth: 1,
       title: `Volume MA`,
-      color: "#d33682",
+      color: chartSettings.volumeMA.color,
       priceLineVisible: false,
       priceScaleId: "volume",
       crosshairMarkerVisible: false,

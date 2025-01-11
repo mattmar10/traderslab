@@ -287,7 +287,7 @@ const CustomizablePriceChart: React.FC<CustomizablePriceChartProps> = ({
           title: chartSettings.showVolumeMovingAvgLegends
             ? `Volume ${volumeMovingAverage.period} ${volumeMovingAverage.type}`
             : "",
-          color: "#d33682",
+          color: chartSettings.volumeMA.color,
           priceLineVisible: false,
           priceScaleId: "volume",
           crosshairMarkerVisible: false,
