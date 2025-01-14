@@ -75,6 +75,7 @@ export const subscriptionPlansTable = pgTable("subscriptions_plans", {
   currency: varchar("currency", { length: 10 }).notNull(),
   interval: varchar("interval", { length: 255 }).notNull(),
 });
+
 export type NewSubscriptionPlan = typeof subscriptionPlansTable.$inferInsert;
 export type ExistingSubscriptionPlan =
   typeof subscriptionPlansTable.$inferSelect;
@@ -122,7 +123,20 @@ export const tags = pgTable("tags", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// New table for user favorite filter groups
+export const filterGroupTags = pgTable("filter_group_tags", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  filterGroupId: uuid("filter_group_id")
+    .notNull()
+    .references(() => filterGroups.id, { onDelete: "cascade" }),
+  tagId: uuid("tag_id")
+    .notNull()
+    .references(() => tags.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type NewFilterGroupTag = typeof filterGroupTags.$inferInsert;
+export type ExistingFilterGroupTag = typeof filterGroupTags.$inferSelect;
+
 export const userFavoriteFilterGroups = pgTable("user_favorite_filter_groups", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id")
@@ -154,10 +168,8 @@ export const subscriptionRelations = relations(
       fields: [subscriptionsTable.userId],
       references: [usersTable.id],
     }),
-  })
-);
+  }));
 
-// Relations for `paymentsTable`
 export const paymentRelations = relations(paymentsTable, ({ one }) => ({
   user: one(usersTable, {
     fields: [paymentsTable.userId],
@@ -165,27 +177,35 @@ export const paymentRelations = relations(paymentsTable, ({ one }) => ({
   }),
 }));
 
-// Relations for `invoicesTable`
 export const invoiceRelations = relations(invoicesTable, ({ one }) => ({
   user: one(usersTable, {
     fields: [invoicesTable.userId],
     references: [usersTable.id],
   }),
 }));
-export const filterGroupRelations = relations(
-  filterGroups,
-  ({ one, many }) => ({
-    user: one(usersTable, {
-      fields: [filterGroups.userId],
-      references: [usersTable.id],
-    }),
-    tags: many(tags),
-    favoritedBy: many(userFavoriteFilterGroups),
-  })
-);
+
+export const filterGroupRelations = relations(filterGroups, ({ one, many }) => ({
+  user: one(usersTable, {
+    fields: [filterGroups.userId],
+    references: [usersTable.id],
+  }),
+  filterGroupTags: many(filterGroupTags),
+  favoritedBy: many(userFavoriteFilterGroups),
+}));
 
 export const tagRelations = relations(tags, ({ many }) => ({
-  filterGroups: many(filterGroups),
+  filterGroupTags: many(filterGroupTags),
+}));
+
+export const filterGroupTagRelations = relations(filterGroupTags, ({ one }) => ({
+  filterGroup: one(filterGroups, {
+    fields: [filterGroupTags.filterGroupId],
+    references: [filterGroups.id],
+  }),
+  tag: one(tags, {
+    fields: [filterGroupTags.tagId],
+    references: [tags.id],
+  }),
 }));
 
 export const userFavoriteFilterGroupRelations = relations(

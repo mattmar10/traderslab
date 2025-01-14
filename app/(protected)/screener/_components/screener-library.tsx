@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Search, Star, Users, User, Trash2 } from "lucide-react";
+import { Search, Star, Users, User, Trash2, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -8,6 +8,7 @@ import Loading from "@/components/loading";
 import {
   addFavoriteFilterGroup,
   deleteFilter,
+  getAlexScreens,
   getFilterGroupsForUser,
   getSharedFilterGroups,
   getUserFavoriteFilterGroupIds,
@@ -32,7 +33,7 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "updated" | "favorite">("name");
   const [activeCategory, setActiveCategory] = useState<
-    "myScreens" | "communityScreens" | "favorites"
+    "myScreens" | "communityScreens" | "favorites" | "alexScreens"
   >("myScreens");
   const [filterToDelete, setFilterToDelete] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -45,6 +46,11 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
   const { data: sharedFilters, isLoading: isLoadingSharedFilters } = useQuery({
     queryKey: ["sharedFilters"],
     queryFn: () => getSharedFilterGroups(),
+  });
+
+  const { data: alexScreens, isLoading: isLoadingAlexScreens } = useQuery({
+    queryKey: ["alexScreens"],
+    queryFn: () => getAlexScreens(),
   });
 
   const { data: favoriteFilterIds } = useQuery({
@@ -122,6 +128,8 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
         return userFilters || [];
       case "communityScreens":
         return (sharedFilters || []).map((f) => f.filterGroup);
+      case "alexScreens":
+        return (alexScreens || []).map((f) => f.filterGroup);
       case "favorites":
         const mergedScreeners = [
           ...(userFilters || []),
@@ -140,7 +148,7 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
     }
   };
 
-  if (isLoadingUserFilters || isLoadingSharedFilters) {
+  if (isLoadingUserFilters || isLoadingSharedFilters || isLoadingAlexScreens) {
     return <Loading />;
   }
 
@@ -152,9 +160,17 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
             <ul className="space-y-2">
               <li>
                 <Button
-                  variant={
-                    activeCategory === "myScreens" ? "secondary" : "ghost"
-                  }
+                  variant={activeCategory === "favorites" ? "secondary" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveCategory("favorites")}
+                >
+                  <Star className="mr-2" size={18} />
+                  Favorites
+                </Button>
+              </li>
+              <li>
+                <Button
+                  variant={activeCategory === "myScreens" ? "secondary" : "ghost"}
                   className="w-full justify-start"
                   onClick={() => setActiveCategory("myScreens")}
                 >
@@ -165,9 +181,7 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
               <li>
                 <Button
                   variant={
-                    activeCategory === "communityScreens"
-                      ? "secondary"
-                      : "ghost"
+                    activeCategory === "communityScreens" ? "secondary" : "ghost"
                   }
                   className="w-full justify-start"
                   onClick={() => setActiveCategory("communityScreens")}
@@ -178,16 +192,15 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
               </li>
               <li>
                 <Button
-                  variant={
-                    activeCategory === "favorites" ? "secondary" : "ghost"
-                  }
+                  variant={activeCategory === "alexScreens" ? "secondary" : "ghost"}
                   className="w-full justify-start"
-                  onClick={() => setActiveCategory("favorites")}
+                  onClick={() => setActiveCategory("alexScreens")}
                 >
-                  <Star className="mr-2" size={18} />
-                  Favorites
+                  <Zap className="mr-2" size={18} />
+                  Alex&#39;s Screens
                 </Button>
               </li>
+
             </ul>
           </nav>
         </div>
@@ -287,14 +300,14 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
                           onClick={(e) => {
                             e.stopPropagation();
                             setFilterToDelete(screener.id);
-                            setIsDeleteDialogOpen(true); // Add this state
+                            setIsDeleteDialogOpen(true);
                           }}
                         >
                           <Trash2 size={18} />
                         </Button>
 
                         <ConfirmationDialog
-                          isOpen={isDeleteDialogOpen} // Add this state
+                          isOpen={isDeleteDialogOpen}
                           onClose={(e) => {
                             e?.stopPropagation?.();
                             setIsDeleteDialogOpen(false);

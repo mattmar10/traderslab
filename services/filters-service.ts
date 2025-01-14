@@ -1,5 +1,7 @@
 import {
   filterGroups,
+  filterGroupTags,
+  tags,
   userFavoriteFilterGroups,
   usersTable,
 } from "@/drizzle/schema";
@@ -66,6 +68,24 @@ export class FiltersService {
           eq(filterGroups.permissionType, "SYSTEM")
         )
       )
+      .orderBy(desc(filterGroups.updatedAt));
+  }
+
+  async getFilterGroupsByTag(tagName: string) {
+    return this.db
+      .select({
+        filterGroup: filterGroups
+      })
+      .from(filterGroups)
+      .innerJoin(
+        filterGroupTags,
+        eq(filterGroups.id, filterGroupTags.filterGroupId)
+      )
+      .innerJoin(
+        tags,
+        eq(filterGroupTags.tagId, tags.id)
+      )
+      .where(eq(tags.name, tagName))
       .orderBy(desc(filterGroups.updatedAt));
   }
 
