@@ -127,6 +127,12 @@ export async function getSharedFilterGroups() {
     return filterService.getAllSharedFilterGroups();
 }
 
+export async function getAlexScreens() {
+    const db = await getDatabaseInstance();
+    const filterService = new FiltersService(db);
+    return filterService.getFilterGroupsByTag("TL-ALEX");
+}
+
 
 export async function getUserFavoriteFilterGroupIds() {
     const { userId: clerkUserId } = await auth()
