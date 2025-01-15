@@ -1,6 +1,5 @@
 "use client";
 import { useState, useTransition } from "react";
-
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,16 +11,21 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
-import { X } from "lucide-react";
-import { FilterGroup, FilterGroupDTO, FilterGroupPermissionType } from "@/lib/types/screener-types";
+import { X, Save, Plus, Tag } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { saveFilterGroup, updateFilterGroup } from "../actions";
+import {
+  FilterGroup,
+  FilterGroupDTO,
+  FilterGroupPermissionType,
+} from "@/lib/types/screener-types";
+import { Badge } from "@/components/ui/badge";
 
 export interface SaveToLibraryProps {
-  fgToSave: FilterGroupDTO;
+  fgToSave: any;
   updateMode: boolean;
   onCancel: () => void;
-  onSuccess: (createdOrUpdated: FilterGroupDTO) => void;
+  onSuccess: (createdOrUpdated: any) => void;
 }
 
 const SaveToLibrary: React.FC<SaveToLibraryProps> = ({
@@ -31,27 +35,31 @@ const SaveToLibrary: React.FC<SaveToLibraryProps> = ({
   onSuccess,
 }) => {
   const queryClient = useQueryClient();
-
   const [saveToLibraryFilterGroupName, setSaveToLibraryFilterGroupName] =
     useState(fgToSave.filterGroupName);
-
   const [selectedPermission, setSelectedPermission] =
     useState<FilterGroupPermissionType>(fgToSave.permission || "PRIVATE");
   const [
     saveToLibraryFilterGroupDescription,
     setSaveToLibraryFilterGroupDescription,
-  ] = useState(fgToSave.filterGroupDescription); // New state for description
-
+  ] = useState(fgToSave.filterGroupDescription);
+  const [tags, setTags] = useState<string[]>(fgToSave.tags || []);
+  const [newTag, setNewTag] = useState("");
   const [saveToLibraryFormError, setSaveToLibraryFormError] =
     useState<string>("");
-
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [, setFailureMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [, setFailureMessage] = useState<string | null>(null);
+  const handleAddTag = () => {
+    if (newTag && !tags.includes(newTag)) {
+      setTags([...tags, newTag]);
+      setNewTag("");
+    }
+  };
 
-  const handleSaveToLibrary = async (formData: FormData) => {
-    const name = formData.get("filterGroupName") as string;
-    const description = formData.get("filterGroupDescription") as string;
+  const handleSaveToLibrary = async () => {
+    const name = saveToLibraryFilterGroupName.trim();
+    const description = saveToLibraryFilterGroupDescription.trim();
 
     // Ensure both name and description are filled
     if (name.trim() === "") {
@@ -121,6 +129,7 @@ const SaveToLibrary: React.FC<SaveToLibraryProps> = ({
               permission: saved.permissionType as FilterGroupPermissionType,
               filterGroupId: saved.id,
               filterGroup: saved.payload as FilterGroup,
+              tags: [],
             };
 
             onSuccess(translated);
@@ -139,113 +148,158 @@ const SaveToLibrary: React.FC<SaveToLibraryProps> = ({
     });
   };
 
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter((tag) => tag !== tagToRemove));
+  };
+
   const header = updateMode ? "Update in Library" : "Save to Library";
 
   return (
-    <div className="w-full transition-all duration-300 ease-in-out">
-      <div className="border border-foreground/10 pt-2 pb-4 px-4 ">
-        <div className="flex justify-between items-start">
-          <div className="font-semibold">{header}</div>
-          <X
-            className="cursor-pointer text-foreground/50 h-4 w-4"
+    <div className="fixed inset-0 z-50 bg-foreground/10 flex items-center justify-center">
+      <div className="w-full max-w-2xl bg-background p-6 rounded-lg shadow-lg">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="rounded-full bg-primary/10 p-2">
+              <Save className="h-5 w-5" />
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold">{header}</h2>
+              <p className="text-sm text-muted-foreground">
+                {updateMode
+                  ? "Update your screen settings"
+                  : "Save your screen to access it later"}
+              </p>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100"
             onClick={onCancel}
-          />
-        </div>
-        {successMessage && (
-          <div
-            className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
-            role="alert"
           >
-            <span className="block sm:inline">{successMessage}</span>
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </Button>
+        </div>
+
+        {successMessage && (
+          <div className="mb-4 rounded-md bg-traderslabblue/10 p-3 text-sm text-traderslabblue ">
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-traderslabblue/50" />
+              {successMessage}
+            </div>
           </div>
         )}
-        <form action={handleSaveToLibrary}>
-          <div className="flex items-end gap-2 pt-2">
-            <div className="flex flex-col flex-grow">
-              <Label
-                htmlFor="filterGroupName"
-                className="text-sm font-semibold"
-              >
-                Screen Name
-              </Label>
+
+        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="filterGroupName">Screen Name</Label>
               <Input
                 id="filterGroupName"
                 name="filterGroupName"
-                defaultValue={
-                  saveToLibraryFilterGroupName || fgToSave.filterGroupName
+                value={saveToLibraryFilterGroupName}
+                onChange={(e) =>
+                  setSaveToLibraryFilterGroupName(e.target.value)
                 }
                 placeholder="Enter filter group name"
-                className="flex-grow mt-1 required"
               />
             </div>
-
-            <div className="flex flex-col">
-              <Label htmlFor="permission" className="text-sm font-semibold">
-                Permission
-              </Label>
+            <div className="space-y-2">
+              <Label htmlFor="permission">Permission</Label>
               <Select
-                name="permission"
                 value={selectedPermission}
                 onValueChange={(value) =>
                   setSelectedPermission(value as FilterGroupPermissionType)
                 }
               >
-                <SelectTrigger className="w-[150px]">
+                <SelectTrigger>
                   <SelectValue placeholder="Select Permission" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="PRIVATE">Private</SelectItem>
                   <SelectItem value="SHARED">Shared</SelectItem>
+                  <SelectItem value="SYSTEM">System</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Saving..." : "Save"}
-            </Button>
-
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => {
-                setSaveToLibraryFormError("");
-                onCancel();
-              }}
-            >
-              Cancel
-            </Button>
           </div>
-
-          <div className="flex flex-col mt-4">
-            <Label
-              htmlFor="filterGroupDescription"
-              className="text-sm font-semibold"
-            >
-              Screen Description
-            </Label>
+          <div className="space-y-2">
+            <Label htmlFor="filterGroupDescription">Screen Description</Label>
             <Textarea
-              id="filterGroupDescription" // Associate textarea with label using the id
+              id="filterGroupDescription"
               name="filterGroupDescription"
-              defaultValue={
-                saveToLibraryFilterGroupDescription ||
-                fgToSave.filterGroupDescription
-              }
+              value={saveToLibraryFilterGroupDescription}
               onChange={(e) =>
                 setSaveToLibraryFilterGroupDescription(e.target.value)
               }
-              rows={5}
-              placeholder="Enter filter group description"
-              className="flex-grow rounded-none required mt-1"
+              placeholder="Enter a detailed description"
+              rows={4}
+              className="resize-none"
             />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="tags">Tags</Label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {tags.map((tag) => (
+                <Badge key={tag} variant="secondary" className="text-sm">
+                  {tag}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 ml-1"
+                    onClick={() => handleRemoveTag(tag)}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </Badge>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                id="newTag"
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                placeholder="Add a tag"
+                className="flex-grow"
+              />
+              <Button type="button" onClick={handleAddTag} size="sm">
+                <Plus className="h-4 w-4 mr-1" />
+                Add
+              </Button>
+            </div>
+          </div>
+
           {saveToLibraryFormError && (
-            <div
-              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3  relative mt-2"
-              role="alert"
-            >
-              <span className="block sm:inline">{saveToLibraryFormError}</span>
+            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-destructive" />
+                {saveToLibraryFormError}
+              </div>
             </div>
           )}
+
+          <div className="flex items-center justify-end gap-4">
+            <Button type="button" variant="outline" onClick={onCancel}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              onClick={handleSaveToLibrary}
+              disabled={isPending}
+              className="min-w-[80px]"
+            >
+              {isPending ? (
+                <div className="flex items-center gap-1">
+                  <span>Saving</span>
+                  <span className="animate-pulse">...</span>
+                </div>
+              ) : (
+                "Save"
+              )}
+            </Button>
+          </div>
         </form>
       </div>
     </div>

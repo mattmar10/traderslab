@@ -160,7 +160,9 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
             <ul className="space-y-2">
               <li>
                 <Button
-                  variant={activeCategory === "favorites" ? "secondary" : "ghost"}
+                  variant={
+                    activeCategory === "favorites" ? "secondary" : "ghost"
+                  }
                   className="w-full justify-start"
                   onClick={() => setActiveCategory("favorites")}
                 >
@@ -170,7 +172,9 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
               </li>
               <li>
                 <Button
-                  variant={activeCategory === "myScreens" ? "secondary" : "ghost"}
+                  variant={
+                    activeCategory === "myScreens" ? "secondary" : "ghost"
+                  }
                   className="w-full justify-start"
                   onClick={() => setActiveCategory("myScreens")}
                 >
@@ -181,7 +185,9 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
               <li>
                 <Button
                   variant={
-                    activeCategory === "communityScreens" ? "secondary" : "ghost"
+                    activeCategory === "communityScreens"
+                      ? "secondary"
+                      : "ghost"
                   }
                   className="w-full justify-start"
                   onClick={() => setActiveCategory("communityScreens")}
@@ -192,7 +198,9 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
               </li>
               <li>
                 <Button
-                  variant={activeCategory === "alexScreens" ? "secondary" : "ghost"}
+                  variant={
+                    activeCategory === "alexScreens" ? "secondary" : "ghost"
+                  }
                   className="w-full justify-start"
                   onClick={() => setActiveCategory("alexScreens")}
                 >
@@ -200,7 +208,6 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
                   Alex&#39;s Screens
                 </Button>
               </li>
-
             </ul>
           </nav>
         </div>
@@ -345,5 +352,6 @@ function translateToDTO(dbModel: NewFilterGroup): FilterGroupDTO {
     filterGroupId: dbModel.id,
     filterGroup: dbModel.payload as FilterGroup,
     filterGroupDescription: dbModel.description!,
+    tags: [],
   };
 }

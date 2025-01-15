@@ -9,7 +9,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-
 import { useQuery } from "@tanstack/react-query";
 import {
   FilterGroupPermissionType,
@@ -18,7 +17,6 @@ import {
 } from "../actions";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Star } from "lucide-react";
-
 
 import { useEffect, useState } from "react";
 import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu";
@@ -132,7 +130,6 @@ const FilterGroupSelector: React.FC<FilterGroupSelectorProps> = ({
 export default FilterGroupSelector;
 
 async function loadFilterGroups(): Promise<FilterGroupDTO[]> {
-
   const fromDB = await getFilterGroupsForUser();
 
   return fromDB.map((fg) => {
@@ -143,6 +140,7 @@ async function loadFilterGroups(): Promise<FilterGroupDTO[]> {
       permission: fg.permissionType as FilterGroupPermissionType,
       filterGroupId: fg.id,
       filterGroup: fg.payload as FilterGroup,
+      tags: [],
     };
 
     return translated;
@@ -150,7 +148,6 @@ async function loadFilterGroups(): Promise<FilterGroupDTO[]> {
 }
 
 async function loadFavorites(): Promise<FilterGroupDTO[]> {
-
   const fromDB = await getUserFavoriteFilterGroups();
 
   return fromDB.map((fg) => {
@@ -161,6 +158,7 @@ async function loadFavorites(): Promise<FilterGroupDTO[]> {
       permission: fg.filterGroup.permissionType as FilterGroupPermissionType,
       filterGroupId: fg.filterGroup.id,
       filterGroup: fg.filterGroup.payload as FilterGroup,
+      tags: [],
     };
 
     return translated;

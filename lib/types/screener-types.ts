@@ -129,6 +129,7 @@ export interface FilterGroupDTO {
   userId?: string;
   permission: FilterGroupPermissionType;
   filterGroup: FilterGroup;
+  tags: string[];
 }
 
 export const EtfHoldingSchema = z.object({
@@ -139,8 +140,6 @@ export const EtfHoldingSchema = z.object({
 });
 
 export type EtfHolding = z.infer<typeof EtfHoldingSchema>;
-
-
 
 const SymbolWithStatsSchema = z.object({
   profile: FMPSymbolProfileDataSchema,
@@ -194,10 +193,11 @@ export type EtfHoldingWithStatsWithRank = z.infer<
   typeof EtfHoldingWithStatsWithRankSchema
 >;
 
-export type EtfHoldingWithStatsWithRankWithWeight = EtfHoldingWithStatsWithRank & {
-  weightPercentage: number,
-  sharesNumber: number
-}
+export type EtfHoldingWithStatsWithRankWithWeight =
+  EtfHoldingWithStatsWithRank & {
+    weightPercentage: number;
+    sharesNumber: number;
+  };
 
 export const ScreenerRangesSchema = z.object({
   countries: z.array(z.string()),
@@ -237,9 +237,7 @@ export const EtfScreenerResultsSchema = z.object({
   pageSize: z.number(),
 });
 
-export type EtfScreenerResults = z.infer<
-  typeof EtfScreenerResultsSchema
->;
+export type EtfScreenerResults = z.infer<typeof EtfScreenerResultsSchema>;
 
 export const ScreenerResultsSchema = z.object({
   stocks: z.array(SymbolWithStatsWithRankSchema),
@@ -275,8 +273,7 @@ export interface ScreenerSortConfig {
   direction: "asc" | "desc";
 }
 
-export type EtfScreenerSortableKeys = ScreenerSortableKeys | "weightPercentage"
-
+export type EtfScreenerSortableKeys = ScreenerSortableKeys | "weightPercentage";
 
 export interface EtfScreenerSortConfig {
   key: EtfScreenerSortableKeys;

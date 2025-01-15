@@ -136,6 +136,13 @@ export const filterGroupTags = pgTable("filter_group_tags", {
 
 export type NewFilterGroupTag = typeof filterGroupTags.$inferInsert;
 export type ExistingFilterGroupTag = typeof filterGroupTags.$inferSelect;
+type ExistingFilterGroup = InferModel<typeof filterGroups, "select">;
+
+// Define a new type to include tags as part of the filter group
+export type ExistingFilterGroupWithTags = {
+  filterGroup: ExistingFilterGroup;
+  tags: string[]; // Array of tag names
+};
 
 export const userFavoriteFilterGroups = pgTable("user_favorite_filter_groups", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -168,7 +175,8 @@ export const subscriptionRelations = relations(
       fields: [subscriptionsTable.userId],
       references: [usersTable.id],
     }),
-  }));
+  })
+);
 
 export const paymentRelations = relations(paymentsTable, ({ one }) => ({
   user: one(usersTable, {
@@ -184,29 +192,35 @@ export const invoiceRelations = relations(invoicesTable, ({ one }) => ({
   }),
 }));
 
-export const filterGroupRelations = relations(filterGroups, ({ one, many }) => ({
-  user: one(usersTable, {
-    fields: [filterGroups.userId],
-    references: [usersTable.id],
-  }),
-  filterGroupTags: many(filterGroupTags),
-  favoritedBy: many(userFavoriteFilterGroups),
-}));
+export const filterGroupRelations = relations(
+  filterGroups,
+  ({ one, many }) => ({
+    user: one(usersTable, {
+      fields: [filterGroups.userId],
+      references: [usersTable.id],
+    }),
+    filterGroupTags: many(filterGroupTags),
+    favoritedBy: many(userFavoriteFilterGroups),
+  })
+);
 
 export const tagRelations = relations(tags, ({ many }) => ({
   filterGroupTags: many(filterGroupTags),
 }));
 
-export const filterGroupTagRelations = relations(filterGroupTags, ({ one }) => ({
-  filterGroup: one(filterGroups, {
-    fields: [filterGroupTags.filterGroupId],
-    references: [filterGroups.id],
-  }),
-  tag: one(tags, {
-    fields: [filterGroupTags.tagId],
-    references: [tags.id],
-  }),
-}));
+export const filterGroupTagRelations = relations(
+  filterGroupTags,
+  ({ one }) => ({
+    filterGroup: one(filterGroups, {
+      fields: [filterGroupTags.filterGroupId],
+      references: [filterGroups.id],
+    }),
+    tag: one(tags, {
+      fields: [filterGroupTags.tagId],
+      references: [tags.id],
+    }),
+  })
+);
 
 export const userFavoriteFilterGroupRelations = relations(
   userFavoriteFilterGroups,
