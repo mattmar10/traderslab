@@ -177,20 +177,66 @@ export class FiltersService {
       .where(eq(filterGroupTags.filterGroupId, filterGroupId));
   }
 
-  async getFilterGroupById(id: string) {
+  async getFilterGroupById(
+    id: string
+  ): Promise<ExistingFilterGroupWithTags | null> {
     const result = await this.db
-      .select()
+      .select({
+        filterGroup: filterGroups,
+        tagName: tags.name,
+      })
       .from(filterGroups)
-      .where(eq(filterGroups.id, id))
-      .limit(1);
+      .leftJoin(
+        filterGroupTags,
+        eq(filterGroups.id, filterGroupTags.filterGroupId)
+      )
+      .leftJoin(tags, eq(filterGroupTags.tagId, tags.id))
+      .where(eq(filterGroups.id, id));
 
-    // Return the first item in the array, or null if no items are found
-    return result.length > 0 ? result[0] : null;
-  }
-  async getAllFilterGroups() {
-    return this.db.select().from(filterGroups);
+    if (result.length === 0) return null;
+
+    // Group results by filter group and collect tags
+    const tagNames = result
+      .filter((r) => r.tagName !== null)
+      .map((r) => r.tagName!);
+
+    return {
+      filterGroup: result[0].filterGroup,
+      tags: tagNames,
+    };
   }
 
+  async getAllFilterGroups(): Promise<ExistingFilterGroupWithTags[]> {
+    const result = await this.db
+      .select({
+        filterGroup: filterGroups,
+        tagName: tags.name,
+      })
+      .from(filterGroups)
+      .leftJoin(
+        filterGroupTags,
+        eq(filterGroups.id, filterGroupTags.filterGroupId)
+      )
+      .leftJoin(tags, eq(filterGroupTags.tagId, tags.id));
+
+    // Group results by filter group ID
+    const groupedResults = new Map<string, ExistingFilterGroupWithTags>();
+
+    result.forEach((row) => {
+      const id = row.filterGroup.id;
+      if (!groupedResults.has(id)) {
+        groupedResults.set(id, {
+          filterGroup: row.filterGroup,
+          tags: [],
+        });
+      }
+      if (row.tagName) {
+        groupedResults.get(id)!.tags.push(row.tagName);
+      }
+    });
+
+    return Array.from(groupedResults.values());
+  }
   async deleteFilterGroup(id: string) {
     return this.db
       .delete(filterGroups)
@@ -198,21 +244,54 @@ export class FiltersService {
       .returning();
   }
 
-  async getFilterGroupsByUserId(userId: string) {
-    return this.db
-      .select()
-      .from(filterGroups)
-      .where(eq(filterGroups.userId, userId))
-      .orderBy(desc(filterGroups.updatedAt));
-  }
-
-  async getAllSharedFilterGroups() {
-    return this.db
+  async getFilterGroupsByUserId(
+    userId: string
+  ): Promise<ExistingFilterGroupWithTags[]> {
+    const result = await this.db
       .select({
         filterGroup: filterGroups,
+        tagName: tags.name,
+      })
+      .from(filterGroups)
+      .leftJoin(
+        filterGroupTags,
+        eq(filterGroups.id, filterGroupTags.filterGroupId)
+      )
+      .leftJoin(tags, eq(filterGroupTags.tagId, tags.id))
+      .where(eq(filterGroups.userId, userId))
+      .orderBy(desc(filterGroups.updatedAt));
+
+    // Group results by filter group ID
+    const groupedResults = new Map<string, ExistingFilterGroupWithTags>();
+
+    result.forEach((row) => {
+      const id = row.filterGroup.id;
+      if (!groupedResults.has(id)) {
+        groupedResults.set(id, {
+          filterGroup: row.filterGroup,
+          tags: [],
+        });
+      }
+      if (row.tagName) {
+        groupedResults.get(id)!.tags.push(row.tagName);
+      }
+    });
+
+    return Array.from(groupedResults.values());
+  }
+  async getAllSharedFilterGroups(): Promise<ExistingFilterGroupWithTags[]> {
+    const result = await this.db
+      .select({
+        filterGroup: filterGroups,
+        tagName: tags.name,
       })
       .from(filterGroups)
       .leftJoin(usersTable, eq(filterGroups.userId, usersTable.id))
+      .leftJoin(
+        filterGroupTags,
+        eq(filterGroups.id, filterGroupTags.filterGroupId)
+      )
+      .leftJoin(tags, eq(filterGroupTags.tagId, tags.id))
       .where(
         or(
           eq(filterGroups.permissionType, "SHARED"),
@@ -220,12 +299,32 @@ export class FiltersService {
         )
       )
       .orderBy(desc(filterGroups.updatedAt));
-  }
 
-  async getFilterGroupsByTag(tagName: string) {
-    return this.db
+    // Group results by filter group ID
+    const groupedResults = new Map<string, ExistingFilterGroupWithTags>();
+
+    result.forEach((row) => {
+      const id = row.filterGroup.id;
+      if (!groupedResults.has(id)) {
+        groupedResults.set(id, {
+          filterGroup: row.filterGroup,
+          tags: [],
+        });
+      }
+      if (row.tagName) {
+        groupedResults.get(id)!.tags.push(row.tagName);
+      }
+    });
+
+    return Array.from(groupedResults.values());
+  }
+  async getFilterGroupsByTag(
+    tagName: string
+  ): Promise<ExistingFilterGroupWithTags[]> {
+    const result = await this.db
       .select({
         filterGroup: filterGroups,
+        tagName: tags.name,
       })
       .from(filterGroups)
       .innerJoin(
@@ -235,6 +334,41 @@ export class FiltersService {
       .innerJoin(tags, eq(filterGroupTags.tagId, tags.id))
       .where(eq(tags.name, tagName))
       .orderBy(desc(filterGroups.updatedAt));
+
+    // Group results by filter group ID
+    const groupedResults = new Map<string, ExistingFilterGroupWithTags>();
+
+    result.forEach((row) => {
+      const id = row.filterGroup.id;
+      if (!groupedResults.has(id)) {
+        groupedResults.set(id, {
+          filterGroup: row.filterGroup,
+          tags: [],
+        });
+      }
+      if (row.tagName) {
+        groupedResults.get(id)!.tags.push(row.tagName);
+      }
+    });
+
+    return Array.from(groupedResults.values());
+  }
+
+  private async getTagsForFilterGroup(
+    filterGroupId: string
+  ): Promise<string[]> {
+    const result = await this.db
+      .select({
+        tagName: tags.name,
+      })
+      .from(tags)
+      .innerJoin(filterGroupTags, eq(tags.id, filterGroupTags.tagId))
+      .where(eq(filterGroupTags.filterGroupId, filterGroupId));
+
+    // Filter out any null values and ensure we only return valid strings
+    return result
+      .map((r) => r.tagName)
+      .filter((tagName): tagName is string => tagName !== null);
   }
 
   async getUserFavoriteFilterGroupIds(externalId: string) {
@@ -302,7 +436,9 @@ export class FiltersService {
       .returning();
   }
 
-  async getUserFavoriteFilterGroups(externalId: string) {
+  async getUserFavoriteFilterGroups(
+    externalId: string
+  ): Promise<ExistingFilterGroupWithTags[]> {
     // Resolve the `id` first
     const user = await this.db
       .select({ id: usersTable.id })
@@ -316,10 +452,11 @@ export class FiltersService {
 
     const userId = user[0].id;
 
-    // Use the resolved `id` in the main query
-    return this.db
+    // Get filter groups with their tags
+    const result = await this.db
       .select({
         filterGroup: filterGroups,
+        tagName: tags.name,
       })
       .from(userFavoriteFilterGroups)
       .innerJoin(
@@ -327,7 +464,30 @@ export class FiltersService {
         eq(userFavoriteFilterGroups.filterGroupId, filterGroups.id)
       )
       .innerJoin(usersTable, eq(filterGroups.userId, usersTable.id))
+      .leftJoin(
+        filterGroupTags,
+        eq(filterGroups.id, filterGroupTags.filterGroupId)
+      )
+      .leftJoin(tags, eq(filterGroupTags.tagId, tags.id))
       .where(eq(userFavoriteFilterGroups.userId, userId))
       .orderBy(desc(filterGroups.updatedAt));
+
+    // Group results by filter group ID
+    const groupedResults = new Map<string, ExistingFilterGroupWithTags>();
+
+    result.forEach((row) => {
+      const id = row.filterGroup.id;
+      if (!groupedResults.has(id)) {
+        groupedResults.set(id, {
+          filterGroup: row.filterGroup,
+          tags: [],
+        });
+      }
+      if (row.tagName) {
+        groupedResults.get(id)!.tags.push(row.tagName);
+      }
+    });
+
+    return Array.from(groupedResults.values());
   }
 }

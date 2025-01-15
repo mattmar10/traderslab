@@ -41,6 +41,7 @@ const emptyFG: FilterGroupDTO = {
     filters: [],
   },
   tags: [],
+  updatedAt: new Date(),
 };
 
 const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({

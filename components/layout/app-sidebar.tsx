@@ -224,7 +224,15 @@ export default function AppSidebar({
                           tooltip={item.title}
                           isActive={pathname === item.url}
                         >
-                          {item.icon && <Icon />}
+                          <div className="flex items-center">
+                            <Link
+                              href={item.url}
+                              className="hover:bg-accent rounded-md p-1 -m-1"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Icon className="w-4 h-4" />{" "}
+                            </Link>
+                          </div>
                           <span>{item.title}</span>
                           <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                         </SidebarMenuButton>

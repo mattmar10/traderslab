@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Search, Star, Users, User, Trash2, Zap } from "lucide-react";
@@ -19,8 +20,13 @@ import {
   FilterGroupDTO,
   FilterGroupPermissionType,
 } from "@/lib/types/screener-types";
-import { NewFilterGroup } from "@/drizzle/schema";
+import {
+  ExistingFilterGroup,
+  ExistingFilterGroupWithTags,
+  NewFilterGroup,
+} from "@/drizzle/schema";
 import ConfirmationDialog from "@/components/confirmation-dialog";
+import { Badge } from "@/components/ui/badge";
 
 interface NewScreenerLibraryProps {
   onApplyFilter: (filter: FilterGroupDTO) => void;
@@ -100,52 +106,88 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
     }
   };
 
-  const filterAndSortScreeners = (screeners: any[]) => {
+  const filterAndSortScreeners = (screeners: FilterGroupDTO[]) => {
     return screeners
       .filter(
         (screener) =>
-          screener.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          screener.description?.toLowerCase().includes(searchTerm.toLowerCase())
+          screener.filterGroupName
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          screener.filterGroupDescription
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase())
       )
       .sort((a, b) => {
-        if (sortBy === "name") return a.name.localeCompare(b.name);
+        if (sortBy === "name")
+          return a.filterGroupName.localeCompare(b.filterGroupName);
         if (sortBy === "updated")
           return (
-            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+            new Date(b.updatedAt!).getTime() - new Date(a.updatedAt!).getTime()
           );
         if (sortBy === "favorite") {
-          const aFav = favoriteFilterIds?.includes(a.id) || false;
-          const bFav = favoriteFilterIds?.includes(b.id) || false;
+          const aFav = favoriteFilterIds?.includes(a.filterGroupId!) || false;
+          const bFav = favoriteFilterIds?.includes(b.filterGroupId!) || false;
           return (bFav ? 1 : 0) - (aFav ? 1 : 0);
         }
         return 0;
       });
   };
 
-  const getCategoryScreeners = () => {
+  const getCategoryScreeners = (): FilterGroupDTO[] => {
     switch (activeCategory) {
       case "myScreens":
-        return userFilters || [];
+        return (userFilters || []).map((fgWithTags) =>
+          translateExistingFGWithTagsToFilterGroupDTO(fgWithTags)
+        );
       case "communityScreens":
-        return (sharedFilters || []).map((f) => f.filterGroup);
+        return (sharedFilters || []).map((fgWithTags) =>
+          translateExistingFGWithTagsToFilterGroupDTO(fgWithTags)
+        );
       case "alexScreens":
-        return (alexScreens || []).map((f) => f.filterGroup);
+        return (alexScreens || []).map((fgWithTags) =>
+          translateExistingFGWithTagsToFilterGroupDTO(fgWithTags)
+        );
       case "favorites":
         const mergedScreeners = [
           ...(userFilters || []),
-          ...(sharedFilters || []).map((f) => f.filterGroup),
+          ...(sharedFilters || []),
         ];
         const uniqueScreeners = Array.from(
           new Map(
-            mergedScreeners.map((screener) => [screener.id, screener])
+            mergedScreeners.map((screener) => [
+              screener.filterGroup.id,
+              screener,
+            ])
           ).values()
         );
-        return uniqueScreeners.filter((screener) =>
-          favoriteFilterIds?.includes(screener.id)
-        );
+        return uniqueScreeners
+          .filter((screener) =>
+            favoriteFilterIds?.includes(screener.filterGroup.id)
+          )
+          .map((fgWithTags) =>
+            translateExistingFGWithTagsToFilterGroupDTO(fgWithTags)
+          );
       default:
         return [];
     }
+  };
+
+  const translateExistingFGWithTagsToFilterGroupDTO = (
+    fgWithTags: ExistingFilterGroupWithTags
+  ) => {
+    const translated: FilterGroupDTO = {
+      filterGroupName: fgWithTags.filterGroup.name!,
+      filterGroupDescription: fgWithTags.filterGroup.description || "",
+      updatedAt: fgWithTags.filterGroup.updatedAt!,
+      userId: fgWithTags.filterGroup.userId!,
+      permission: fgWithTags.filterGroup
+        .permissionType as FilterGroupPermissionType,
+      filterGroupId: fgWithTags.filterGroup.id,
+      filterGroup: fgWithTags.filterGroup.payload as FilterGroup,
+      tags: fgWithTags.tags,
+    };
+
+    return translated;
   };
 
   if (isLoadingUserFilters || isLoadingSharedFilters || isLoadingAlexScreens) {
@@ -262,12 +304,13 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
           <ul className="divide-y divide-gray-200">
             {filterAndSortScreeners(getCategoryScreeners()).map((screener) => (
               <li
-                key={screener.id}
+                key={screener.filterGroupId}
                 className="hover:bg-foreground/5 group cursor-pointer"
-                onClick={() => onApplyFilter(translateToDTO(screener))}
+                onClick={() => onApplyFilter(screener)}
               >
                 <div className="p-4">
-                  <div className="flex items-center space-x-4">
+                  {/* Title row with star and tags */}
+                  <div className="flex items-center space-x-1 ">
                     <div className="flex-shrink-0">
                       <Button
                         variant="ghost"
@@ -275,12 +318,14 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
                         onClick={(e) =>
                           handleToggleFavorite(
                             e,
-                            screener.id,
-                            favoriteFilterIds?.includes(screener.id) || false
+                            screener.filterGroupId!,
+                            favoriteFilterIds?.includes(
+                              screener.filterGroupId!
+                            ) || false
                           )
                         }
                         className={
-                          favoriteFilterIds?.includes(screener.id)
+                          favoriteFilterIds?.includes(screener.filterGroupId!)
                             ? "text-yellow-500"
                             : "text-foreground/50"
                         }
@@ -288,14 +333,39 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
                         <Star size={18} />
                       </Button>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-medium truncate">{screener.name}</h3>
+                    <div className="flex-1 flex items-center justify-between">
+                      <h3 className="font-medium truncate">
+                        {screener.filterGroupName}
+                      </h3>
+                      {screener.tags && screener.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 ml-2">
+                          {screener.tags.map((tag) => (
+                            <Badge
+                              key={tag}
+                              variant="secondary"
+                              className={`text-xs px-2 py-1 border ${
+                                tag === "TL-ALEX"
+                                  ? "bg-traderslabblue text-white"
+                                  : ""
+                              }`}
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Info and delete button row */}
+                  <div className="flex items-center space-x-4">
+                    <div className="min-w-0 flex-1 ml-12">
                       <span className="text-sm text-foreground/60">
                         Updated{" "}
-                        {new Date(screener.updatedAt).toLocaleDateString()}
+                        {new Date(screener.updatedAt!).toLocaleDateString()}
                       </span>
                       <p className="text-sm text-foreground/50 line-clamp-2">
-                        {screener.description}
+                        {screener.filterGroupDescription}
                       </p>
                     </div>
                     {activeCategory === "myScreens" && (
@@ -306,7 +376,7 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
                           className="text-red-600"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setFilterToDelete(screener.id);
+                            setFilterToDelete(screener.filterGroupId!);
                             setIsDeleteDialogOpen(true);
                           }}
                         >
@@ -353,5 +423,6 @@ function translateToDTO(dbModel: NewFilterGroup): FilterGroupDTO {
     filterGroup: dbModel.payload as FilterGroup,
     filterGroupDescription: dbModel.description!,
     tags: [],
+    updatedAt: dbModel.updatedAt!,
   };
 }

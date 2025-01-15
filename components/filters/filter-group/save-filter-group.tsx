@@ -131,6 +131,7 @@ const SaveToLibrary: React.FC<SaveToLibraryProps> = ({
               permission: saved.permissionType as FilterGroupPermissionType,
               filterGroupId: saved.id,
               filterGroup: saved.payload as FilterGroup,
+              updatedAt: saved.updatedAt!,
               tags: [],
             };
 

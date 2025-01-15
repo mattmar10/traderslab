@@ -80,7 +80,7 @@ export async function updateFilterGroup(
       return { success: false, error: "Filter group not found" };
     }
 
-    if (existingFilterGroup.userId! !== drizzleUser[0].id) {
+    if (existingFilterGroup.filterGroup.userId! !== drizzleUser[0].id) {
       return {
         success: false,
         error: "User does not have permission to update this filter group",

@@ -127,6 +127,7 @@ export interface FilterGroupDTO {
   filterGroupName: string;
   filterGroupDescription: string;
   userId?: string;
+  updatedAt: Date;
   permission: FilterGroupPermissionType;
   filterGroup: FilterGroup;
   tags: string[];

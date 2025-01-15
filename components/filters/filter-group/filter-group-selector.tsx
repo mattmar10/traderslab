@@ -1,3 +1,4 @@
+"use client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -132,15 +133,17 @@ export default FilterGroupSelector;
 async function loadFilterGroups(): Promise<FilterGroupDTO[]> {
   const fromDB = await getFilterGroupsForUser();
 
-  return fromDB.map((fg) => {
+  return fromDB.map((fgWithTags) => {
     const translated: FilterGroupDTO = {
-      filterGroupName: fg.name!,
-      filterGroupDescription: fg.description || "",
-      userId: fg.userId!,
-      permission: fg.permissionType as FilterGroupPermissionType,
-      filterGroupId: fg.id,
-      filterGroup: fg.payload as FilterGroup,
-      tags: [],
+      filterGroupName: fgWithTags.filterGroup.name!,
+      filterGroupDescription: fgWithTags.filterGroup.description || "",
+      userId: fgWithTags.filterGroup.userId!,
+      permission: fgWithTags.filterGroup
+        .permissionType as FilterGroupPermissionType,
+      filterGroupId: fgWithTags.filterGroup.id,
+      filterGroup: fgWithTags.filterGroup.payload as FilterGroup,
+      tags: fgWithTags.tags,
+      updatedAt: fgWithTags.filterGroup.updatedAt!,
     };
 
     return translated;
@@ -158,7 +161,8 @@ async function loadFavorites(): Promise<FilterGroupDTO[]> {
       permission: fg.filterGroup.permissionType as FilterGroupPermissionType,
       filterGroupId: fg.filterGroup.id,
       filterGroup: fg.filterGroup.payload as FilterGroup,
-      tags: [],
+      updatedAt: fg.filterGroup.updatedAt!,
+      tags: fg.tags,
     };
 
     return translated;

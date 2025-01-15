@@ -139,7 +139,7 @@ export type ExistingFilterGroupTag = typeof filterGroupTags.$inferSelect;
 export type ExistingFilterGroup = typeof filterGroups.$inferSelect;
 export type ExistingFilterGroupWithTags = {
   filterGroup: ExistingFilterGroup;
-  tags: string[]; // Array of tag names
+  tags: string[];
 };
 
 export const userFavoriteFilterGroups = pgTable("user_favorite_filter_groups", {
