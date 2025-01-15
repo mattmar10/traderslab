@@ -92,13 +92,15 @@ const SaveToLibrary: React.FC<SaveToLibraryProps> = ({
             fgToSave.filterGroupId,
             filterGroupToSave,
             saveToLibraryFilterGroupDescription,
-            selectedPermission
+            selectedPermission,
+            tags
           );
         } else {
           result = await saveFilterGroup(
             filterGroupToSave,
             saveToLibraryFilterGroupDescription,
-            selectedPermission
+            selectedPermission,
+            tags
           );
         }
 

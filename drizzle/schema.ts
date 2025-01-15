@@ -136,9 +136,7 @@ export const filterGroupTags = pgTable("filter_group_tags", {
 
 export type NewFilterGroupTag = typeof filterGroupTags.$inferInsert;
 export type ExistingFilterGroupTag = typeof filterGroupTags.$inferSelect;
-type ExistingFilterGroup = InferModel<typeof filterGroups, "select">;
-
-// Define a new type to include tags as part of the filter group
+export type ExistingFilterGroup = typeof filterGroups.$inferSelect;
 export type ExistingFilterGroupWithTags = {
   filterGroup: ExistingFilterGroup;
   tags: string[]; // Array of tag names

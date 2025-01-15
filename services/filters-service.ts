@@ -1,18 +1,180 @@
 import {
+  ExistingFilterGroupWithTags,
   filterGroups,
   filterGroupTags,
   tags,
   userFavoriteFilterGroups,
   usersTable,
 } from "@/drizzle/schema";
-import { eq, desc, or, and } from "drizzle-orm";
+import { eq, desc, or, and, inArray } from "drizzle-orm";
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
 
+export type FilterGroupResponse =
+  | {
+      success: true;
+      data: (typeof filterGroups.$inferSelect)[];
+      error?: never;
+    }
+  | { success: false; data: never[]; error: string };
 export class FiltersService {
-  constructor(private db: NodePgDatabase) { }
+  constructor(private db: NodePgDatabase) {}
 
-  async createFilterGroup(data: typeof filterGroups.$inferInsert) {
-    return this.db.insert(filterGroups).values(data).returning();
+  async createFilterGroup(
+    data: typeof filterGroups.$inferInsert & { tags?: string[] }
+  ): Promise<FilterGroupResponse> {
+    try {
+      const { tags: tagNames, ...filterGroupData } = data;
+
+      const filterGroup = await this.db.transaction(async (tx) => {
+        // Create the filter group first
+        const [fg] = await tx
+          .insert(filterGroups)
+          .values(filterGroupData)
+          .returning();
+
+        // If tags were provided, process them
+        if (tagNames && tagNames.length > 0) {
+          // Get or create tags using the transaction
+          const tagResults = await Promise.all(
+            tagNames.map(async (tagName) => {
+              const [existingTag] = await tx
+                .select()
+                .from(tags)
+                .where(eq(tags.name, tagName));
+
+              if (existingTag) {
+                return existingTag;
+              }
+
+              const [newTag] = await tx
+                .insert(tags)
+                .values({ name: tagName })
+                .returning();
+
+              return newTag;
+            })
+          );
+
+          // Associate tags with filter group using the transaction
+          await Promise.all(
+            tagResults.map((tag) =>
+              tx.insert(filterGroupTags).values({
+                filterGroupId: fg.id,
+                tagId: tag.id,
+              })
+            )
+          );
+        }
+
+        return fg;
+      });
+
+      return { success: true, data: [filterGroup] };
+    } catch (error) {
+      console.error("Error in createFilterGroup:", error);
+      return {
+        success: false,
+        data: [],
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
+      };
+    }
+  }
+  async updateFilterGroup(
+    id: string,
+    data: Partial<
+      Omit<
+        ExistingFilterGroupWithTags["filterGroup"],
+        "id" | "createdAt" | "updatedAt"
+      >
+    > & { tags?: string[] }
+  ): Promise<FilterGroupResponse> {
+    try {
+      const { tags: tagNames, ...filterGroupData } = data;
+
+      const updatedFilterGroup = await this.db.transaction(async (tx) => {
+        // Update the filter group first
+        const [fg] = await tx
+          .update(filterGroups)
+          .set({ ...filterGroupData, updatedAt: new Date() })
+          .where(eq(filterGroups.id, id))
+          .returning();
+
+        // If tags were provided (even as empty array), update them
+        if (tagNames !== undefined) {
+          // Remove existing tags
+          await this.removeFilterGroupTags(id);
+
+          // Add new tags if any were provided
+          if (tagNames.length > 0) {
+            const tagIds = await this.getOrCreateTags(tagNames);
+            await this.associateFilterGroupWithTags(id, tagIds);
+          }
+        }
+
+        return fg;
+      });
+
+      return { success: true, data: [updatedFilterGroup] };
+    } catch (error) {
+      return {
+        success: false,
+        data: [],
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
+      };
+    }
+  }
+
+  private async associateFilterGroupWithTags(
+    filterGroupId: string,
+    tagIds: string[]
+  ) {
+    // Create the associations
+    return this.db
+      .insert(filterGroupTags)
+      .values(
+        tagIds.map((tagId) => ({
+          filterGroupId,
+          tagId,
+        }))
+      )
+      .onConflictDoNothing()
+      .returning();
+  }
+
+  private async getOrCreateTags(tagNames: string[]) {
+    // First, try to find existing tags
+    const existingTags = await this.db
+      .select()
+      .from(tags)
+      .where(inArray(tags.name, tagNames));
+
+    // Create a map of existing tag names
+    const existingTagMap = new Map(existingTags.map((tag) => [tag.name, tag]));
+
+    // Identify which tags need to be created
+    const tagsToCreate = tagNames.filter((name) => !existingTagMap.has(name));
+
+    // Create new tags if needed
+    if (tagsToCreate.length > 0) {
+      const newTags = await this.db
+        .insert(tags)
+        .values(tagsToCreate.map((name) => ({ name })))
+        .returning();
+
+      // Add new tags to our map
+      newTags.forEach((tag) => existingTagMap.set(tag.name, tag));
+    }
+
+    // Return all tag IDs in the original order
+    return tagNames.map((name) => existingTagMap.get(name)!.id);
+  }
+
+  private async removeFilterGroupTags(filterGroupId: string) {
+    return this.db
+      .delete(filterGroupTags)
+      .where(eq(filterGroupTags.filterGroupId, filterGroupId));
   }
 
   async getFilterGroupById(id: string) {
@@ -27,17 +189,6 @@ export class FiltersService {
   }
   async getAllFilterGroups() {
     return this.db.select().from(filterGroups);
-  }
-
-  async updateFilterGroup(
-    id: string,
-    data: Partial<typeof filterGroups.$inferInsert>
-  ) {
-    return this.db
-      .update(filterGroups)
-      .set({ ...data, updatedAt: new Date() })
-      .where(eq(filterGroups.id, id))
-      .returning();
   }
 
   async deleteFilterGroup(id: string) {
@@ -58,7 +209,7 @@ export class FiltersService {
   async getAllSharedFilterGroups() {
     return this.db
       .select({
-        filterGroup: filterGroups
+        filterGroup: filterGroups,
       })
       .from(filterGroups)
       .leftJoin(usersTable, eq(filterGroups.userId, usersTable.id))
@@ -74,23 +225,19 @@ export class FiltersService {
   async getFilterGroupsByTag(tagName: string) {
     return this.db
       .select({
-        filterGroup: filterGroups
+        filterGroup: filterGroups,
       })
       .from(filterGroups)
       .innerJoin(
         filterGroupTags,
         eq(filterGroups.id, filterGroupTags.filterGroupId)
       )
-      .innerJoin(
-        tags,
-        eq(filterGroupTags.tagId, tags.id)
-      )
+      .innerJoin(tags, eq(filterGroupTags.tagId, tags.id))
       .where(eq(tags.name, tagName))
       .orderBy(desc(filterGroups.updatedAt));
   }
 
   async getUserFavoriteFilterGroupIds(externalId: string) {
-
     const user = await this.db
       .select({ id: usersTable.id })
       .from(usersTable)
@@ -112,7 +259,6 @@ export class FiltersService {
   }
 
   async addFavoriteFilterGroup(externalId: string, filterGroupId: string) {
-
     const user = await this.db
       .select({ id: usersTable.id })
       .from(usersTable)
@@ -133,8 +279,6 @@ export class FiltersService {
   }
 
   async removeFavoriteFilterGroup(externalId: string, filterGroupId: string) {
-
-
     const user = await this.db
       .select({ id: usersTable.id })
       .from(usersTable)
