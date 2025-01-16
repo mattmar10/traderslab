@@ -21,11 +21,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
+import { Column } from "./screener-table-columns";
 
 interface ExportComponentProps {
   toExport: SymbolWithStatsWithRank[];
   filterGroupName: string;
   sortAttribute: ScreenerSortableKeys;
+  headers: Column[];
 }
 
 type ExportFormat = "csv" | "tradingview" | "clipboard" | "twitter";
@@ -34,6 +36,7 @@ const ExportComponent: React.FC<ExportComponentProps> = ({
   toExport,
   filterGroupName,
   sortAttribute,
+  headers,
 }) => {
   const [isExporting, setIsExporting] = useState(false);
   const [exportFormat, setExportFormat] = useState<ExportFormat>("csv");
@@ -66,10 +69,11 @@ const ExportComponent: React.FC<ExportComponentProps> = ({
       if (exportFormat !== "twitter") {
         toast({
           title: "Export Successful",
-          description: `Data exported to ${exportFormat === "clipboard"
-            ? "clipboard"
-            : exportFormat.toUpperCase()
-            }`,
+          description: `Data exported to ${
+            exportFormat === "clipboard"
+              ? "clipboard"
+              : exportFormat.toUpperCase()
+          }`,
         });
       }
     } catch (error) {
@@ -84,37 +88,17 @@ const ExportComponent: React.FC<ExportComponentProps> = ({
     }
   };
   const convertToCSV = (stocks: SymbolWithStatsWithRank[]) => {
-    const headers = [
-      "Symbol",
-      "Company Name",
-      "Industry",
-      "RS Rank",
-      "Price",
-      "1D %",
-      "1W %",
-      "1M %",
-      "3M %",
-      "6M %",
-      "% from 52W Low",
-      "% from 52W High",
-    ];
-    const rows = stocks.map((stock) => [
-      stock.profile.symbol,
-      stock.profile.companyName,
-      stock.profile.industry,
-      stock.rsRank,
-      stock.quote.price,
-      stock.oneDayReturnPercent,
-      stock.oneWeekReturnPercent,
-      stock.oneMonthReturnPercent,
-      stock.threeMonthReturnPercent,
-      stock.sixMonthReturnPercent,
-      stock.percentFromFiftyTwoWeekLow,
-      stock.percentFromFiftyTwoWeekHigh,
-    ]);
-    return [headers, ...rows].map((row) => row.join(",")).join("\n");
-  };
+    const csvHeaders = headers.map((column) => column.label);
 
+    const rows = stocks.map((stock) =>
+      headers.map((column) =>
+        getValueFromColumn(column, stock).replaceAll(",", "")
+      )
+    );
+
+    // Combine headers and rows into CSV format
+    return [csvHeaders, ...rows].map((row) => row.join(",")).join("\n");
+  };
   const convertToTradingView = (stocks: SymbolWithStatsWithRank[]) => {
     return stocks
       .map(
@@ -176,9 +160,10 @@ const ExportComponent: React.FC<ExportComponentProps> = ({
     const symbols = stocks
       .map((stock) => `$${stock.profile.symbol}`)
       .join(", ");
-    const tagline = `${filterGroupName || "Check out these hot stocks"
-      } sorted by ${getSortName(sortAttribute)}.`;
-    console.log(tagline)
+    const tagline = `${
+      filterGroupName || "Check out these hot stocks"
+    } sorted by ${getSortName(sortAttribute)}.`;
+    console.log(tagline);
 
     const tweetText = `${tagline}\n\n${symbols}\n\n By @TradersLab_`;
     //const hashtags = "traderslab,stocks,investing";
@@ -257,3 +242,82 @@ const ExportComponent: React.FC<ExportComponentProps> = ({
 };
 
 export default ExportComponent;
+
+const formatEarnings = (dateTimeString: string) => {
+  const date = new Date(dateTimeString);
+  const now = new Date();
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+  const day = String(date.getDate()).padStart(2, "0");
+
+  // Calculate the difference in days
+  const diffTime = Math.abs(date.getTime() - now.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  return `${month}/${day}/${year} (${diffDays})`;
+};
+
+function getValueFromColumn(
+  column: Column,
+  item: SymbolWithStatsWithRank
+): string {
+  switch (column.key) {
+    case "rsRank":
+      return item.rsRank.toString();
+    case "profile.symbol":
+      return item.profile.symbol;
+    case "profile.companyName":
+      return item.profile.companyName;
+    case "sector":
+      return item.profile.sector || "";
+    case "industry":
+      return item.profile.industry || "";
+    case "quote.price":
+      return item.quote.price.toFixed(2);
+    case "oneDayReturnPercent":
+      return `${item.oneDayReturnPercent.toFixed(2)}%`;
+    case "oneWeekReturnPercent":
+      return `${item.oneWeekReturnPercent.toFixed(2)}%`;
+    case "oneMonthReturnPercent":
+      return `${item.oneMonthReturnPercent.toFixed(2)}%`;
+    case "threeMonthReturnPercent":
+      return `${item.threeMonthReturnPercent.toFixed(2)}%`;
+    case "sixMonthReturnPercent":
+      return `${item.sixMonthReturnPercent.toFixed(2)}%`;
+    case "oneMonthRS":
+      return `${item.relativeStrength.relativeStrengthStats.oneMonth.toFixed(
+        2
+      )}%`;
+    case "threeMonthRS":
+      return `${item.relativeStrength.relativeStrengthStats.threeMonth.toFixed(
+        2
+      )}%`;
+    case "sixMonthRS":
+      return `${item.relativeStrength.relativeStrengthStats.sixMonth.toFixed(
+        2
+      )}%`;
+    case "oneYearRS":
+      return `${item.relativeStrength.relativeStrengthStats.oneYear.toFixed(
+        2
+      )}%`;
+    case "compositeRS":
+      return `${item.relativeStrength.relativeStrengthStats.composite.toFixed(
+        2
+      )}%`;
+    case "percentFromFiftyTwoWeekLow":
+      return `${item.percentFromFiftyTwoWeekLow.toFixed(2)}%`;
+    case "percentFromFiftyTwoWeekHigh":
+      return `${item.percentFromFiftyTwoWeekHigh.toFixed(2)}%`;
+    case "nextEarnings":
+      return item.quote.earningsAnnouncement
+        ? formatEarnings(item.quote.earningsAnnouncement)
+        : "";
+    case "relativeVolume":
+      return item.relativeVolume.toFixed(2);
+    case "breakoutIntensityScore":
+      return item.breakoutIntensityScore.toFixed(2);
+    default:
+      return "";
+  }
+}

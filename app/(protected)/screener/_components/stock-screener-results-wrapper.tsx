@@ -184,14 +184,14 @@ const ScreenerResultsWrapper = ({
           filters.filterGroup,
           initialData.ranges
         );
-        filters.filterGroup = filterGroup
+        filters.filterGroup = filterGroup;
       } else {
         const convertedGroup = convertToFilterGroup(filters as FilterCriteria);
         filterGroup = adjustFilterGroupForSave(
           convertedGroup,
           initialData.ranges
         );
-        filters.filterGroup = filterGroup
+        filters.filterGroup = filterGroup;
       }
 
       updatePersistedState("filterGroup", filters);
@@ -460,10 +460,11 @@ const ScreenerResultsWrapper = ({
             <div className="flex items-center space-x-2 pl-4 pb-2 sm:mt-0 pt-6">
               <div className="flex items-center space-x-4">
                 <span
-                  className={` ${state.displayAs === "charts"
-                    ? "text-foreground"
-                    : "text-foreground/50"
-                    }`}
+                  className={` ${
+                    state.displayAs === "charts"
+                      ? "text-foreground"
+                      : "text-foreground/50"
+                  }`}
                 >
                   CHARTS
                 </span>
@@ -474,10 +475,11 @@ const ScreenerResultsWrapper = ({
                   className="transform scale-125" // Scale up the switch
                 />
                 <span
-                  className={` ${state.displayAs === "table"
-                    ? "text-foreground "
-                    : "text-foreground/50"
-                    }`}
+                  className={` ${
+                    state.displayAs === "table"
+                      ? "text-foreground "
+                      : "text-foreground/50"
+                  }`}
                 >
                   TABLE
                 </span>
@@ -522,6 +524,7 @@ const ScreenerResultsWrapper = ({
                 persistedState.filterGroup?.filterGroupName || ""
               }
               sortAttribute={persistedState.sortConfig.key}
+              headers={persistedState.selectedColumns}
             />
           </div>
         </div>

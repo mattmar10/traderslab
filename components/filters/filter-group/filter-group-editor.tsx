@@ -40,6 +40,8 @@ const emptyFG: FilterGroupDTO = {
     operator: "AND",
     filters: [],
   },
+  tags: [],
+  updatedAt: new Date(),
 };
 
 const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
@@ -266,26 +268,28 @@ const FilterGroupEditor: React.FC<FilterGroupEditorProps> = ({
                 )}
               </div>
             </div>
-            <div className="flex space-x-2 pr-4">
+            <div className="flex items-center gap-2 mr-8">
               <Button
-                size={"sm"}
-                variant={"outline"}
-                className="rounded-none"
+                size="sm"
+                variant="ghost"
+                className="flex items-center gap-2 px-3 py-2 h-9"
                 onClick={() => setShowSaveToLibrarySection(true)}
               >
-                <Save className="mr-2 h-4 w-4" /> Save As
+                <Save className="h-4 w-4" />
+                Save As
               </Button>
 
               {filterGroupDTO &&
                 filterGroupDTO.filterGroupId &&
                 filterGroupDTO.userId === userId && (
                   <Button
-                    size={"sm"}
-                    variant={"outline"}
-                    className="rounded-none"
+                    size="sm"
+                    variant="ghost"
+                    className="flex items-center gap-2 px-3 py-2 h-9"
                     onClick={() => setShowUpdateSection(true)}
                   >
-                    <Upload className="mr-2 h-4 w-4" /> Update
+                    <Upload className="h-4 w-4" />
+                    Update
                   </Button>
                 )}
             </div>

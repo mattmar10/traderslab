@@ -1,3 +1,4 @@
+"use client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-
 import { useQuery } from "@tanstack/react-query";
 import {
   FilterGroupPermissionType,
@@ -18,7 +18,6 @@ import {
 } from "../actions";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Star } from "lucide-react";
-
 
 import { useEffect, useState } from "react";
 import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu";
@@ -132,17 +131,19 @@ const FilterGroupSelector: React.FC<FilterGroupSelectorProps> = ({
 export default FilterGroupSelector;
 
 async function loadFilterGroups(): Promise<FilterGroupDTO[]> {
-
   const fromDB = await getFilterGroupsForUser();
 
-  return fromDB.map((fg) => {
+  return fromDB.map((fgWithTags) => {
     const translated: FilterGroupDTO = {
-      filterGroupName: fg.name!,
-      filterGroupDescription: fg.description || "",
-      userId: fg.userId!,
-      permission: fg.permissionType as FilterGroupPermissionType,
-      filterGroupId: fg.id,
-      filterGroup: fg.payload as FilterGroup,
+      filterGroupName: fgWithTags.filterGroup.name!,
+      filterGroupDescription: fgWithTags.filterGroup.description || "",
+      userId: fgWithTags.filterGroup.userId!,
+      permission: fgWithTags.filterGroup
+        .permissionType as FilterGroupPermissionType,
+      filterGroupId: fgWithTags.filterGroup.id,
+      filterGroup: fgWithTags.filterGroup.payload as FilterGroup,
+      tags: fgWithTags.tags,
+      updatedAt: fgWithTags.filterGroup.updatedAt!,
     };
 
     return translated;
@@ -150,7 +151,6 @@ async function loadFilterGroups(): Promise<FilterGroupDTO[]> {
 }
 
 async function loadFavorites(): Promise<FilterGroupDTO[]> {
-
   const fromDB = await getUserFavoriteFilterGroups();
 
   return fromDB.map((fg) => {
@@ -161,6 +161,8 @@ async function loadFavorites(): Promise<FilterGroupDTO[]> {
       permission: fg.filterGroup.permissionType as FilterGroupPermissionType,
       filterGroupId: fg.filterGroup.id,
       filterGroup: fg.filterGroup.payload as FilterGroup,
+      updatedAt: fg.filterGroup.updatedAt!,
+      tags: fg.tags,
     };
 
     return translated;
