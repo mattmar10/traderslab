@@ -17,7 +17,7 @@ import {
   getUserFavoriteFilterGroups,
 } from "../actions";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Star } from "lucide-react";
+import { ChevronDown, Star, Tag } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu";
@@ -61,9 +61,14 @@ const FilterGroupSelector: React.FC<FilterGroupSelectorProps> = ({
 
   const handleLibrarySelection = (filterGroup: FilterGroupDTO) => {
     setFilterGroup(filterGroup);
-
     onApplyFilters(filterGroup);
     handleApplyFilter(filterGroup);
+  };
+
+  const tags = [...new Set(privateFilterGroups?.map((fg) => fg.tags).flat())];
+
+  const getFilterGroupsByTag = (tag: string) => {
+    return privateFilterGroups?.filter((fg) => fg.tags.includes(tag)) || [];
   };
 
   return (
@@ -85,8 +90,8 @@ const FilterGroupSelector: React.FC<FilterGroupSelectorProps> = ({
 
       <DropdownMenuContent>
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger className=" py-2">
-            <Star className="mr-2 h-5 w-5 " />
+          <DropdownMenuSubTrigger className="py-2">
+            <Star className="mr-2 h-5 w-5" />
             Favorites
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
@@ -95,7 +100,7 @@ const FilterGroupSelector: React.FC<FilterGroupSelectorProps> = ({
             ) : (
               (favoriteFilterGroups || []).map((fav) => (
                 <DropdownMenuItem
-                  key={`fg-${fav.filterGroupName}`}
+                  key={`fg-${fav.filterGroupId}`}
                   onSelect={() => handleLibrarySelection(fav)}
                   className="px-4 py-2"
                 >
@@ -107,6 +112,36 @@ const FilterGroupSelector: React.FC<FilterGroupSelectorProps> = ({
         </DropdownMenuSub>
 
         <DropdownMenuSeparator />
+
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger className="py-2">
+            <Tag className="mr-2 h-4 w-4" />
+            Tags
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            {tags.map((tag) => (
+              <DropdownMenuSub key={`tag-${tag}`}>
+                <DropdownMenuSubTrigger className="py-2">
+                  {tag}
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  {getFilterGroupsByTag(tag).map((fg) => (
+                    <DropdownMenuItem
+                      key={`tag-fg-${fg.filterGroupId}`}
+                      onSelect={() => handleLibrarySelection(fg)}
+                      className="px-4 py-2"
+                    >
+                      {fg.filterGroupName}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            ))}
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+
+        <DropdownMenuSeparator />
+
         <DropdownMenuLabel className="p-2 font-semibold text-sm">
           My Screens
         </DropdownMenuLabel>
@@ -115,7 +150,7 @@ const FilterGroupSelector: React.FC<FilterGroupSelectorProps> = ({
         ) : (
           (privateFilterGroups || []).map((uf) => (
             <DropdownMenuItem
-              key={`user-fg-${uf.filterGroupName}`}
+              key={`user-fg-${uf.filterGroupId}`}
               onSelect={() => handleLibrarySelection(uf)}
               className="px-4 py-2"
             >
@@ -123,6 +158,8 @@ const FilterGroupSelector: React.FC<FilterGroupSelectorProps> = ({
             </DropdownMenuItem>
           ))
         )}
+
+
       </DropdownMenuContent>
     </DropdownMenu>
   );
