@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
-import { X, Save, Plus, Tag } from "lucide-react";
+import { X, Save, Plus } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { saveFilterGroup, updateFilterGroup } from "../actions";
 import {

@@ -1,7 +1,6 @@
 "use server";
 import {
   ExistingFilterGroupWithTags,
-  NewFilterGroup,
   usersTable,
 } from "@/drizzle/schema";
 import { FilterGroup } from "@/lib/types/screener-types";

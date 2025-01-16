@@ -21,9 +21,7 @@ import {
   FilterGroupPermissionType,
 } from "@/lib/types/screener-types";
 import {
-  ExistingFilterGroup,
   ExistingFilterGroupWithTags,
-  NewFilterGroup,
 } from "@/drizzle/schema";
 import ConfirmationDialog from "@/components/confirmation-dialog";
 import { Badge } from "@/components/ui/badge";
@@ -343,11 +341,10 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
                             <Badge
                               key={tag}
                               variant="secondary"
-                              className={`text-xs px-2 py-1 border ${
-                                tag === "TL-ALEX"
-                                  ? "bg-traderslabblue text-white"
-                                  : ""
-                              }`}
+                              className={`text-xs px-2 py-1 border ${tag === "TL-ALEX"
+                                ? "bg-traderslabblue hover:bg-traderslabblue  text-white"
+                                : "bg-foreground/10 hover:bg-foreground/10"
+                                }`}
                             >
                               {tag}
                             </Badge>
@@ -414,15 +411,3 @@ const NewScreenerLibrary: React.FC<NewScreenerLibraryProps> = ({
 
 export default NewScreenerLibrary;
 
-function translateToDTO(dbModel: NewFilterGroup): FilterGroupDTO {
-  return {
-    filterGroupName: dbModel.name!,
-    userId: dbModel.userId!,
-    permission: dbModel.permissionType as FilterGroupPermissionType,
-    filterGroupId: dbModel.id,
-    filterGroup: dbModel.payload as FilterGroup,
-    filterGroupDescription: dbModel.description!,
-    tags: [],
-    updatedAt: dbModel.updatedAt!,
-  };
-}
