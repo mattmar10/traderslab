@@ -71,74 +71,79 @@ const DashboardWrapper: React.FC<DashboardWrapperProps> = ({
   const momentumRows = bulidMomentumRows(data);
 
   return (
-    <PageContainer scrollable>
-      <div className="space-y-4 mt-2">
-        <div className="space-y-1">
-          <span className="text-foreground/60">{datasetDescription}</span>
+    <>
+      <div className="space-y-1 pt-4">
+        <span className="pl-8  text-foreground/60">{datasetDescription}</span>
 
-          <div className="flex space-x-3 items-center">
-            <div className="flex  items-center">
-              <Image
-                src="/tl-transparent.png"
-                alt="TL Logo"
-                width={48}
-                height={48}
-                priority // Optional: Ensures the image is loaded quickly if above the fold
-              />
-              <div
-                className={`text-2xl font-bold tracking-tight ${lato.className}`}
-              >
-                TLMM Dashboard{" "}
-                <span className="text-2xl font-semibold">
-                  {" "}
-                  ({getTickerForDataset(dataset)})
-                </span>
-              </div>
+        <div className="flex items-center justify-between space-y-2  pl-5">
+          <div className="flex items-center">
+            <Image
+              src="/tl-transparent.png"
+              alt="TL Logo"
+              width={48}
+              height={48}
+              priority
+            />
+            <div
+              className={`text-2xl font-bold tracking-tight ${lato.className}`}
+            >
+              TLMM Dashboard{" "}
+              <span className="text-2xl font-semibold">
+                {" "}
+                ({getTickerForDataset(dataset)})
+              </span>
             </div>
-
-            <DesktopTrendModelStatus dataset={dataset} />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 3xl:grid-cols-4">
-          <div className="col-span-3">
-            <MarketBreadthSnapshotTable />
-          </div>
-          <CombinedHighsLowsMcClellan overview={data} />
-
-          <div className="col-span-2">
-            <ClientOverviewPriceChart ticker={getTickerForDataset(dataset)} />
-          </div>
-          <div className="col-span-1 ">
-            <STMomentumUpDownChartTV momentumRows={momentumRows} />
-          </div>
-          <div className="col-span-1">
-            <PercentOfStocksAboveMAs
-              percentAboveFiveSMA={
-                data.marketBreadthOverview.percentAboveFiveSMA
-              }
-              percentAboveTenEMA={data.marketBreadthOverview.percentAboveTenEMA}
-              percentAboveTwentyOneEMA={
-                data.marketBreadthOverview.percentAboveTwentyOneEMA
-              }
-              percentAboveFiftySMA={
-                data.marketBreadthOverview.percentAboveFiftySMA
-              }
-              percentAboveTwoHundredSMA={
-                data.marketBreadthOverview.percentAboveTwoHundredSMA
-              }
-            />
-          </div>
-          <div className="col-span-4">
-            <MarketBreadthTable
-              overview={data.marketBreadthOverview}
-              dataset={dataset}
-              datasetDescription={datasetDescription}
-            />
+            <div className="pl-4">
+              <DesktopTrendModelStatus dataset={dataset} />
+            </div>
           </div>
         </div>
       </div>
-    </PageContainer>
+      <PageContainer scrollable>
+        <div className="space-y-4 mt-2">
+
+
+          <div className="grid grid-cols-1 gap-4 3xl:grid-cols-4">
+            <div className="col-span-3">
+              <MarketBreadthSnapshotTable />
+            </div>
+            <CombinedHighsLowsMcClellan overview={data} />
+
+            <div className="col-span-2">
+              <ClientOverviewPriceChart ticker={getTickerForDataset(dataset)} />
+            </div>
+            <div className="col-span-1 ">
+              <STMomentumUpDownChartTV momentumRows={momentumRows} />
+            </div>
+            <div className="col-span-1">
+              <PercentOfStocksAboveMAs
+                percentAboveFiveSMA={
+                  data.marketBreadthOverview.percentAboveFiveSMA
+                }
+                percentAboveTenEMA={data.marketBreadthOverview.percentAboveTenEMA}
+                percentAboveTwentyOneEMA={
+                  data.marketBreadthOverview.percentAboveTwentyOneEMA
+                }
+                percentAboveFiftySMA={
+                  data.marketBreadthOverview.percentAboveFiftySMA
+                }
+                percentAboveTwoHundredSMA={
+                  data.marketBreadthOverview.percentAboveTwoHundredSMA
+                }
+              />
+            </div>
+            <div className="col-span-4">
+              <MarketBreadthTable
+                overview={data.marketBreadthOverview}
+                dataset={dataset}
+                datasetDescription={datasetDescription}
+              />
+            </div>
+          </div>
+        </div>
+      </PageContainer>
+    </>
+
   );
 };
 
