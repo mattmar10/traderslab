@@ -1,4 +1,4 @@
-import { InferModel, relations } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import {
   text,
   timestamp,
@@ -6,6 +6,11 @@ import {
   uuid,
   varchar,
   jsonb,
+  bigint,
+  uniqueIndex,
+  doublePrecision,
+  integer,
+  decimal,
 } from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable("users", {
@@ -242,3 +247,53 @@ export const prereleaseUsersTable = pgTable("prerelease_users", {
 
 export type NewPrereleaseUser = typeof prereleaseUsersTable.$inferInsert;
 export type ExistingPrereleaseUser = typeof prereleaseUsersTable.$inferSelect;
+
+//market breadth snapshots
+export const marketBreadthSnapshotsTable = pgTable(
+  "market_breadth_snapshots",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    timestamp: bigint("timestamp", { mode: "number" }).notNull(),
+    data: jsonb("data").notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => ({
+    timestampIdx: uniqueIndex("market_breadth_snapshots_timestamp_idx").on(
+      table.timestamp
+    ),
+  })
+);
+
+export type NewMarketBreadthSnapshot = typeof marketBreadthSnapshotsTable.$inferInsert;
+export type ExistingMarketBreadthSnapshot = typeof marketBreadthSnapshotsTable.$inferSelect;
+
+export const quotesTable = pgTable('quotes', {
+  // Primary identifier
+  symbol: varchar('symbol', { length: 20 }).primaryKey(),
+  name: varchar('name', { length: 255 }).notNull(),
+
+  // Price-related fields
+  price: decimal('price', { precision: 18, scale: 4 }).notNull(),
+  changesPercentage: decimal('changes_percentage', { precision: 10, scale: 4 }).notNull(),
+  change: decimal('change', { precision: 18, scale: 4 }).notNull(),
+  dayLow: decimal('day_low', { precision: 18, scale: 4 }).notNull(),
+  dayHigh: decimal('day_high', { precision: 18, scale: 4 }).notNull(),
+  yearHigh: decimal('year_high', { precision: 18, scale: 4 }).notNull(),
+  yearLow: decimal('year_low', { precision: 18, scale: 4 }).notNull(),
+
+  // Market data
+  marketCap: decimal('market_cap', { precision: 24, scale: 4 }),
+  exchange: varchar('exchange', { length: 20 }),
+  volume: decimal('volume', { precision: 18, scale: 4 }).notNull(),
+  avgVolume: decimal('avg_volume', { precision: 18, scale: 4 }),
+  open: decimal('open', { precision: 18, scale: 4 }).notNull(),
+  previousClose: decimal('previous_close', { precision: 18, scale: 4 }).notNull(),
+
+  // Additional data
+  earningsAnnouncement: varchar('earnings_announcement', { length: 30 }),
+  sharesOutstanding: decimal('shares_outstanding', { precision: 18, scale: 4 }),
+  timestamp: bigint('timestamp', { mode: 'number' }).notNull()
+});
+
+export type ExistingQuote = typeof quotesTable.$inferSelect;

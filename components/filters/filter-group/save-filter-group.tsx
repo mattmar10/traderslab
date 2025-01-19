@@ -222,7 +222,6 @@ const SaveToLibrary: React.FC<SaveToLibraryProps> = ({
                 <SelectContent>
                   <SelectItem value="PRIVATE">Private</SelectItem>
                   <SelectItem value="SHARED">Shared</SelectItem>
-                  <SelectItem value="SYSTEM">System</SelectItem>
                 </SelectContent>
               </Select>
             </div>

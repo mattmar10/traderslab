@@ -22,6 +22,41 @@
       "when": 1736821514069,
       "tag": "0002_curly_obadiah_stane",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1737054000288,
+      "tag": "0003_brave_rattler",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1737074931871,
+      "tag": "0004_breezy_masked_marvel",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1737075331596,
+      "tag": "0005_odd_starbolt",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1737077176337,
+      "tag": "0006_tan_chameleon",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1737125547150,
+      "tag": "0007_youthful_mentor",
+      "breakpoints": true
     }
   ]
 }

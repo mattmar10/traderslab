@@ -11,13 +11,13 @@ const lato = Lato({
   display: "swap",
 });
 
-export default function SectorsThemesPage() {
+export default function RelativeRotationPage() {
   return (
     <PageContainer scrollable={false}>
       <div className="space-y-4 mt-2">
         <div className="flex items-center justify-between space-y-2">
           <h2 className={`text-2xl font-bold tracking-tight ${lato.className}`}>
-            Relative Strength
+            Relative Rotation (Expirimental)
           </h2>
         </div>
 
