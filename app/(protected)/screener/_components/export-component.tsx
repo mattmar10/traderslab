@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { DownloadIcon, ClipboardCopyIcon, CheckIcon } from "lucide-react";
+import { DownloadIcon, ClipboardCopyIcon, CheckIcon, FileTextIcon, BarChartIcon, OrbitIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 import { Column } from "./screener-table-columns";
+import { useRouter } from "next/navigation";
 
 interface ExportComponentProps {
   toExport: SymbolWithStatsWithRank[];
@@ -30,7 +31,7 @@ interface ExportComponentProps {
   headers: Column[];
 }
 
-type ExportFormat = "csv" | "tradingview" | "clipboard" | "twitter";
+type ExportFormat = "csv" | "tradingview" | "clipboard" | "rrg" | "twitter";
 
 const ExportComponent: React.FC<ExportComponentProps> = ({
   toExport,
@@ -42,6 +43,7 @@ const ExportComponent: React.FC<ExportComponentProps> = ({
   const [exportFormat, setExportFormat] = useState<ExportFormat>("csv");
   const [isOpen, setIsOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const router = useRouter();
   const { toast } = useToast();
   const handleExport = async () => {
     setIsExporting(true);
@@ -51,6 +53,8 @@ const ExportComponent: React.FC<ExportComponentProps> = ({
         await copyToClipboard(allStocks);
       } else if (exportFormat === "twitter") {
         shareToTwitter(allStocks.slice(0, 20));
+      } else if (exportFormat === "rrg") {
+        shareToRRG(allStocks);
       } else {
         let content: string;
         let filename: string;
@@ -69,11 +73,10 @@ const ExportComponent: React.FC<ExportComponentProps> = ({
       if (exportFormat !== "twitter") {
         toast({
           title: "Export Successful",
-          description: `Data exported to ${
-            exportFormat === "clipboard"
-              ? "clipboard"
-              : exportFormat.toUpperCase()
-          }`,
+          description: `Data exported to ${exportFormat === "clipboard"
+            ? "clipboard"
+            : exportFormat.toUpperCase()
+            }`,
         });
       }
     } catch (error) {
@@ -87,6 +90,15 @@ const ExportComponent: React.FC<ExportComponentProps> = ({
       setIsExporting(false);
     }
   };
+
+  const shareToRRG = (stocks: SymbolWithStatsWithRank[]) => {
+    // Take top 100 stocks
+    const top100 = stocks.slice(0, 100);
+    console.log('Sharing top 100 stocks to RRG:', top100);
+    localStorage.setItem("rrgScreenerData", JSON.stringify(top100));
+    router.push("/relative-rotation?source=screener");
+  };
+
   const convertToCSV = (stocks: SymbolWithStatsWithRank[]) => {
     const csvHeaders = headers.map((column) => column.label);
 
@@ -160,9 +172,8 @@ const ExportComponent: React.FC<ExportComponentProps> = ({
     const symbols = stocks
       .map((stock) => `$${stock.profile.symbol}`)
       .join(", ");
-    const tagline = `${
-      filterGroupName || "Check out these hot stocks"
-    } sorted by ${getSortName(sortAttribute)}.`;
+    const tagline = `${filterGroupName || "Check out these hot stocks"
+      } sorted by ${getSortName(sortAttribute)}.`;
     console.log(tagline);
 
     const tweetText = `${tagline}\n\n${symbols}\n\n By @TradersLab_`;
@@ -197,15 +208,34 @@ const ExportComponent: React.FC<ExportComponentProps> = ({
               <SelectValue placeholder="Select format" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="csv">CSV</SelectItem>
-              <SelectItem value="tradingview">TradingView</SelectItem>
+              <SelectItem value="csv">
+                <div className="flex items-center">
+                  <FileTextIcon className="mr-2 h-4 w-4" />
+                  CSV
+                </div>
+              </SelectItem>
+              <SelectItem value="tradingview">
+                <div className="flex items-center">
+                  <BarChartIcon className="mr-2 h-4 w-4" />
+                  TradingView
+                </div>
+              </SelectItem>
               <SelectItem value="clipboard">
-                Copy Tickers to Clipboard
+                <div className="flex items-center">
+                  <ClipboardCopyIcon className="mr-2 h-4 w-4" />
+                  Copy Tickers to Clipboard
+                </div>
+              </SelectItem>
+              <SelectItem value="rrg">
+                <div className="flex items-center">
+                  <OrbitIcon className="mr-2 h-4 w-4" />
+                  View as RRG
+                </div>
               </SelectItem>
               <SelectItem value="twitter">
-                <div className="flex space-x-1 items-center">
-                  <div>Share on</div>
+                <div className="flex items-center">
                   <FaXTwitter className="mr-2 h-4 w-4" />
+                  Share on X
                 </div>
               </SelectItem>
             </SelectContent>
@@ -217,22 +247,43 @@ const ExportComponent: React.FC<ExportComponentProps> = ({
           >
             {isExporting ? (
               "Exporting..."
-            ) : exportFormat === "clipboard" ? (
-              <>
-                {isCopied ? (
-                  <CheckIcon className="mr-2 h-4 w-4" />
-                ) : (
-                  <ClipboardCopyIcon className="mr-2 h-4 w-4" />
-                )}
-                {isCopied ? "Copied!" : "Copy to Clipboard"}
-              </>
-            ) : exportFormat === "twitter" ? (
-              <>
-                <FaXTwitter className="mr-2 h-4 w-4" />
-                Share on X
-              </>
             ) : (
-              `Export to ${exportFormat.toUpperCase()}`
+              <>
+                {exportFormat === "csv" && (
+                  <>
+                    <FileTextIcon className="mr-2 h-4 w-4" />
+                    Export to CSV
+                  </>
+                )}
+                {exportFormat === "tradingview" && (
+                  <>
+                    <BarChartIcon className="mr-2 h-4 w-4" />
+                    Export to TradingView
+                  </>
+                )}
+                {exportFormat === "clipboard" && (
+                  <>
+                    {isCopied ? (
+                      <CheckIcon className="mr-2 h-4 w-4" />
+                    ) : (
+                      <ClipboardCopyIcon className="mr-2 h-4 w-4" />
+                    )}
+                    {isCopied ? "Copied!" : "Copy Tickers to Clipboard"}
+                  </>
+                )}
+                {exportFormat === "rrg" && (
+                  <>
+                    <OrbitIcon className="mr-2 h-4 w-4" />
+                    View as RRG
+                  </>
+                )}
+                {exportFormat === "twitter" && (
+                  <>
+                    <FaXTwitter className="mr-2 h-4 w-4" />
+                    Share on X
+                  </>
+                )}
+              </>
             )}
           </Button>
         </div>

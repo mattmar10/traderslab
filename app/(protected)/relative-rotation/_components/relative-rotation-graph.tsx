@@ -14,7 +14,7 @@ import MemoizedRRGChart from "./rrg-chart";
 import PeriodForm, { PeriodSettings } from "./period-form";
 
 // Types and Interfaces
-interface SecurityRRG {
+export interface SecurityRRG {
   ticker: string;
   color?: string;
   trail?: RelativeStrengthRotationPoint[];
@@ -110,27 +110,32 @@ const BenchmarkSelector = memo(({
   onBenchmarkChange,
   initialBenchmark,
   securities
-}: BenchmarkSelectorProps) => (
-  <div>
-    <label className="block text-sm font-medium mb-2">
-      Benchmark Symbol
-    </label>
-    <Select value={benchmark} onValueChange={onBenchmarkChange}>
-      <SelectTrigger className="w-48">
-        <SelectValue placeholder="Select a benchmark" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value={initialBenchmark}>{initialBenchmark}</SelectItem>
-        {securities.map((symbol) => (
-          <SelectItem key={symbol.ticker} value={symbol.ticker}>
-            {symbol.ticker}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  </div>
-));
+}: BenchmarkSelectorProps) => {
+  const sortedSecurities = useMemo(() => {
+    return [...securities].sort((a, b) => a.ticker.localeCompare(b.ticker));
+  }, [securities]);
 
+  return (
+    <div>
+      <label className="block text-sm font-medium mb-2">
+        Benchmark Symbol
+      </label>
+      <Select value={benchmark} onValueChange={onBenchmarkChange}>
+        <SelectTrigger className="w-48">
+          <SelectValue placeholder="Select a benchmark" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={initialBenchmark}>{initialBenchmark}</SelectItem>
+          {sortedSecurities.map((symbol) => (
+            <SelectItem key={symbol.ticker} value={symbol.ticker}>
+              {symbol.ticker}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+});
 BenchmarkSelector.displayName = "BenchmarkSelector";
 
 /*const PeriodForm = memo(({

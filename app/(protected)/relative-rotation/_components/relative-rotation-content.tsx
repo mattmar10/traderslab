@@ -1,7 +1,7 @@
 import { getPriceBars, getSubMarketsSectorsThemesData } from "@/actions/market-data/actions";
 import { isFMPDataLoadingError } from "@/lib/types/fmp-types";
 import ErrorCard from "@/components/error-card";
-import RelativeStrengthGraph from "./relative-strength-rotation-graph";
+import RelativeStrengthGraph from "./relative-rotation-graph";
 import { Candle } from "@/lib/types/basic-types";
 import { formatDateToEST } from "@/lib/utils/epoch-utils";
 

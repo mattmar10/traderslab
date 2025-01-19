@@ -5,7 +5,7 @@ import { Candle } from "@/lib/types/basic-types";
 import { isFMPDataLoadingError } from "@/lib/types/fmp-types";
 import { isLeft } from "@/lib/utils";
 import { formatDateToEST } from "@/lib/utils/epoch-utils";
-import RelativeStrengthGraph from "./relative-strength-rotation-graph";
+import RelativeStrengthGraph from "./relative-rotation-graph";
 
 
 export interface RelativeStrengthEtfContentProps {

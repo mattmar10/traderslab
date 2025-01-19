@@ -1,6 +1,6 @@
 import { memo, useMemo } from 'react';
 import RRGScatterChart from './rrgplot';
-import { SecurityRRG } from './relative-rotation-graph-form';
+import { SecurityRRG } from './relative-rotation-graph';
 
 interface MemoizedRRGChartProps {
     securities: SecurityRRG[];
