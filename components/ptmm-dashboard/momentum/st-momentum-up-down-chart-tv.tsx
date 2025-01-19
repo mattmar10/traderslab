@@ -162,7 +162,7 @@ const STMomentumUpDownChartTV: React.FC<STMomentumUpDownChartProps> = ({
     return () => {
       stChart.remove(); // Cleanup on component unmount
     };
-  }, [theme]); // Ensure this effect only runs once and when the theme changes
+  }, [theme, chartOptions]); // Ensure this effect only runs once and when the theme changes
 
   useEffect(() => {
     const ups = momentumRows.map((m) => ({

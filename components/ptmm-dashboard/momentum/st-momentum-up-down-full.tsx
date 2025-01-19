@@ -158,7 +158,7 @@ const STMomentumUpDownChartFullTV: React.FC<
     return () => {
       stChart.remove(); // Cleanup on unmount
     };
-  }, [theme]); // Effect runs once and when the theme changes
+  }, [theme, chartOptions]); // Effect runs once and when the theme changes
 
   // Update chart data whenever the momentumRows change
   useEffect(() => {

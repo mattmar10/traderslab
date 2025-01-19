@@ -4,7 +4,7 @@ import { Lato } from "next/font/google";
 import { Suspense } from "react";
 import BuildingContentLoader from "@/components/animated-loader";
 
-import RelativeStrengthEtfContent from "../_components/relative-strength-etf-content";
+import RelativeStrengthEtfContent from "../_components/relative-rotation-etf-content";
 
 const lato = Lato({
     subsets: ["latin"],
