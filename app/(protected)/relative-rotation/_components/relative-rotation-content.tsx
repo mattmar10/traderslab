@@ -6,13 +6,16 @@ import { Candle } from "@/lib/types/basic-types";
 import { formatDateToEST } from "@/lib/utils/epoch-utils";
 
 
+export interface RelativeStrengthContentProps {
+    source: "sectors" | "themes"
+}
 
-export default async function RelativeStrengthContent() {
+export default async function RelativeStrengthContent({ source }: RelativeStrengthContentProps) {
     const data = await getSubMarketsSectorsThemesData();
     const currentDate = new Date();
     const twoYearsAgo = new Date(
-        currentDate.getFullYear() - 2,
-        currentDate.getMonth(),
+        currentDate.getFullYear() - 1,
+        currentDate.getMonth() - 7,
         currentDate.getDate()
     );
     if (isFMPDataLoadingError(data)) {
@@ -20,9 +23,9 @@ export default async function RelativeStrengthContent() {
     }
 
     const sectorTickers = data.sectorMarketData.map(sector => sector.ticker);
+    const themeTickers = data.themeMarketData.map(theme => theme.ticker);
 
-    // Fetch price data for SPY, RSP and all sector tickers
-    const allTickers = ["RSP", "SPY", ...sectorTickers];
+    const allTickers = ["RSP", "SPY", ...(source === "sectors" ? sectorTickers : themeTickers)];
     const priceDataPromises = allTickers.map(ticker => getPriceBars(ticker, formatDateToEST(twoYearsAgo)));
     const priceDataResults = await Promise.all(priceDataPromises);
 
