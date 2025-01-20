@@ -1,7 +1,7 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MomentumRow } from "./momentum-types";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ColorType,
   CrosshairMode,
@@ -44,7 +44,7 @@ const STMomentumUpDownChartTV: React.FC<STMomentumUpDownChartProps> = ({
   const ratioColor = "#268bd2";
   const tenDayColor = "#b58900";
 
-  const chartOptions = {
+  const chartOptions = useMemo(() => ({
     layout: {
       textColor: theme === "light" ? "black" : "white",
       background: { type: ColorType.Solid, color: bgColor },
@@ -68,7 +68,7 @@ const STMomentumUpDownChartTV: React.FC<STMomentumUpDownChartProps> = ({
     crosshair: {
       mode: CrosshairMode.Normal,
     },
-  };
+  }), [theme, bgColor, gridColor]);
 
   // Use effect to create the chart and the price lines, runs only once
   useEffect(() => {
@@ -160,9 +160,9 @@ const STMomentumUpDownChartTV: React.FC<STMomentumUpDownChartProps> = ({
     fiveDayRatioSeries.createPriceLine(neutral);
 
     return () => {
-      stChart.remove(); // Cleanup on component unmount
+      stChart.remove();
     };
-  }, [theme, chartOptions]); // Ensure this effect only runs once and when the theme changes
+  }, [theme, chartOptions]);
 
   useEffect(() => {
     const ups = momentumRows.map((m) => ({

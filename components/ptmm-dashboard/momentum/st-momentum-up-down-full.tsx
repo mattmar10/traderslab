@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ColorType,
   CrosshairMode,
@@ -35,13 +35,17 @@ const STMomentumUpDownChartFullTV: React.FC<
   const ratioColor = "#268bd2";
   const tenDayColor = "#b58900";
 
-  const chartOptions = {
+  const chartOptions = useMemo(() => ({
     layout: {
       textColor: theme === "light" ? "black" : "white",
       background: { type: ColorType.Solid, color: bgColor },
     },
     rightPriceScale: {
       borderColor: "gray",
+      scaleMargins: {
+        top: 0.05,
+        bottom: 0.4,
+      },
     },
     timeScale: {
       borderColor: "gray",
@@ -55,7 +59,7 @@ const STMomentumUpDownChartFullTV: React.FC<
     crosshair: {
       mode: CrosshairMode.Normal,
     },
-  };
+  }), [theme, bgColor, gridColor]);
 
   // Use effect to initialize the chart and add price lines only once
   useEffect(() => {
