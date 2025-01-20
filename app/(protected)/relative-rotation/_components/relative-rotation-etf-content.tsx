@@ -28,13 +28,13 @@ const RelativeStrengthEtfContent = async ({ etf }: RelativeStrengthEtfContentPro
     }
     const currentDate = new Date();
     const twoYearsAgo = new Date(
-        currentDate.getFullYear() - 2,
-        currentDate.getMonth(),
+        currentDate.getFullYear() - 1,
+        currentDate.getMonth() - 7,
         currentDate.getDate()
     );
     const etfHoldingsSymbols = etfHoldings
         .sort((a, b) => b.weightPercentage - a.weightPercentage)
-        .slice(0, 100)
+        .slice(0, 54)
         .map(holding => holding.asset);
     const allTickers = [etf, "RSP", "SPY", "QQQ", "QQQE", ...etfHoldingsSymbols];
     const priceDataPromises = allTickers.map(ticker => getPriceBars(ticker, formatDateToEST(twoYearsAgo)));
