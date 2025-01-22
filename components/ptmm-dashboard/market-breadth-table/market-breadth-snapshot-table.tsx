@@ -108,7 +108,6 @@ const sectorsTickerMap: Map<string, string> = new Map([
 
 const getTableRow = (
   name: string,
-  url: string,
   currentTheme: "dark" | "light",
   borderBottom: string,
   overview: CurrentDayMarketBreadthSnapshotPoint
@@ -427,14 +426,12 @@ const MarketBreadthSnapshotTable: React.FC = () => {
               </tr>
               {getTableRow(
                 "Russell 2000",
-                "",
                 currentTheme,
                 "border-foreground/20",
                 data.iwmTradingOverview
               )}
               {getTableRow(
                 "NDX 100",
-                "",
                 currentTheme,
                 "border-foreground/20",
                 data.qqqETradingOverview
@@ -442,14 +439,12 @@ const MarketBreadthSnapshotTable: React.FC = () => {
 
               {getTableRow(
                 "S&P 500",
-                "prime-trading",
                 currentTheme,
                 "border-foreground/20",
                 data.rspTradingOverview
               )}
               {getTableRow(
                 "NYSE COMPOSITE",
-                "exchange/nyse",
                 currentTheme,
                 "border-foreground/60",
                 data.nyseOverview
@@ -457,8 +452,7 @@ const MarketBreadthSnapshotTable: React.FC = () => {
 
               {sortedSectors.map((so) => {
                 const row = getTableRow(
-                  sectorsNameMap.get(so.sector) || "UNKNOWN",
-                  `sector/${so.sector}`,
+                  so.sector,
                   currentTheme,
                   "border-foreground/20 hover:cursor-pointer hover:bg-foreground/5",
                   so.overview

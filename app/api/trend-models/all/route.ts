@@ -8,8 +8,8 @@ export async function GET() {
       { status: 500 }
     );
   }
-  const url = `${process.env.TRADERS_LAB_API}/trend-model/all`;
-
+  const url = `${process.env.TRADERS_LAB_COMPUTE_API}/trend-model/all`;
+  console.log(url);
   try {
     console.log(`fetching breadth snapshot from ${url}`);
     const data = await fetchWithRetries(
