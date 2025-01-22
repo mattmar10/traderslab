@@ -23,7 +23,10 @@ export interface DesktopTrendModelStatusProps {
 const DesktopTrendModelStatus: FC<DesktopTrendModelStatusProps> = ({
   dataset,
 }) => {
-  const key = `/api/trend-model/${getTickerForDataset(dataset)}`;
+  const key = `/api/trend-model/${getTickerForDataset(dataset).replaceAll(
+    "^NYA",
+    "NYSE"
+  )}`;
 
   const getTrendModel = async () => {
     const res = await fetch(key);
