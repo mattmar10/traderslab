@@ -11,9 +11,10 @@ export async function GET(req: Request,
             { status: 500 }
         );
     }
-    const url = `${process.env.TRADERS_LAB_API
-        }/breadth/overview/trend-model/${params.dataset.toUpperCase()}`;
+    const url = `${process.env.TRADERS_LAB_COMPUTE_API
+        }/trend-model/${params.dataset.toUpperCase()}`;
 
+    console.log(url);
     try {
         console.log(`fetching trend model from ${url}`);
         const data = await fetchWithRetries(
