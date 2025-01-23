@@ -1,12 +1,12 @@
 "use client";
 
 import Loading from "@/components/loading";
-import { CurrentDayMarketBreadthSnapshot, CurrentDayMarketBreadthSnapshotArraySchema, MarketBreadthGDBSnapshot, MarketBreadthGDBSnapshotSchema, MarketBreadthSnapshotArraySchema } from "@/lib/types/market-breadth-types";
+import { MarketBreadthGDBSnapshot, MarketBreadthSnapshotArraySchema } from "@/lib/types/market-breadth-types";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import IntradayGDBTVChart, { IntradayGDBChartPoint, IntradayGDBChartSeries } from "./overview-intraday-gdb-tv-chart";
-import { getSectorShortName } from "@/lib/utils";
+//import { getSectorShortName } from "@/lib/utils";
 
 /*type ChartDataPoint = {
   time: string; // formatted "HH:mm" string for the timestamp
@@ -73,7 +73,7 @@ const OverviewIntradayGDB: React.FC = () => {
           ),
         }));*/
 
-      const series = buildChartSeries(data, true, false);
+      const series = buildChartSeries(data, true);
       setChartSeries(series);
       // setChartData(filteredData);
       setErrorState(null);
@@ -197,7 +197,7 @@ export default OverviewIntradayGDB;
 function buildChartSeries(
   data: MarketBreadthGDBSnapshot[],
   showMarkets: boolean,
-  showSectors: boolean
+  //showSectors: boolean
 ): IntradayGDBChartSeries[] {
   // Map for each snapshot for each overview (NYSE, RSP, QQE, IWM)
   const nyseSeries: IntradayGDBChartPoint[] = data.map((snapshot) => ({
@@ -220,7 +220,7 @@ function buildChartSeries(
     value: snapshot.iwmTradingOverview.globalDailyBreadthPercentileRank,
   }));
 
-  const generateSectorColors = () => [
+  /*const generateSectorColors = () => [
     "#FF6B6B", // Coral Red
     "#4ECDC4", // Caribbean Green
     "#45B7D1", // Picton Blue
@@ -236,7 +236,7 @@ function buildChartSeries(
     "#BA55D3", // Medium Orchid
     "#FF4500", // Orange Red
     "#1E90FF", // Dodger Blue
-  ];
+  ];*/
 
   const series: IntradayGDBChartSeries[] = showMarkets
     ? [
