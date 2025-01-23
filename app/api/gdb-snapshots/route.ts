@@ -3,7 +3,7 @@
 
 import { NextResponse } from "next/server";
 import { fetchWithRetries } from "../utils";
-import { CurrentDayMarketBreadthSnapshot, CurrentDayMarketBreadthSnapshotArraySchema, CurrentDayMarketBreadthSnapshotPoint, CurrentDayMarketBreadthSnapshotSchema, SectorCurrentDayMarketBreadthSnapshot } from "@/lib/types/market-breadth-types";
+import { CurrentDayMarketBreadthSnapshot, CurrentDayMarketBreadthSnapshotArraySchema, CurrentDayMarketBreadthSnapshotPoint } from "@/lib/types/market-breadth-types";
 
 export async function GET() {
     if (!process.env.TRADERS_LAB_COMPUTE_API) {
@@ -56,9 +56,9 @@ const convertFromCurrentDayMarketBreadthSnapshotToGDBSnapshot = (snapshot: Curre
     };
 };
 
-const convertFromSectorCurrentDayMarketBreadthSnapshotToGDBSnapshot = (snapshot: SectorCurrentDayMarketBreadthSnapshot) => {
+/*const convertFromSectorCurrentDayMarketBreadthSnapshotToGDBSnapshot = (snapshot: SectorCurrentDayMarketBreadthSnapshot) => {
     return {
         sector: snapshot.sector,
         overview: convertFromCurrentDayMarketBreadthSnapshotPointToGDBSnapshot(snapshot.overview),
     };
-};
+};*/

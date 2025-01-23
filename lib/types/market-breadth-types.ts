@@ -262,10 +262,10 @@ const MarketBreadthGDBSnapshotPointSchema = z.object({
   globalDailyBreadthPercentileRank: z.number(),
 });
 
-const SectorMarketBreadthGDBSnapshotSchema = z.object({
+/*const SectorMarketBreadthGDBSnapshotSchema = z.object({
   sector: z.string(),
   overview: MarketBreadthGDBSnapshotPointSchema,
-});
+});*/
 
 export const MarketBreadthGDBSnapshotSchema = z.object({
   timestamp: z.number(),
