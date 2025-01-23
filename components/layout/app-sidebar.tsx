@@ -80,29 +80,29 @@ export const navItems: NavItem[] = [
   },
   {
     title: "TLMM Breadth",
-    url: "/ptmm/s&p500", // Placeholder as there is no direct link for the parent
+    url: "/tlmm/s&p500", // Placeholder as there is no direct link for the parent
     icon: "billing",
     isActive: true,
 
     items: [
       {
         title: "NYSE Composite",
-        url: "/ptmm/nyse",
+        url: "/tlmm/nyse",
         icon: "userPen",
       },
       {
         title: "S&P 500",
-        url: "/ptmm/s&p500",
+        url: "/tlmm/s&p500",
         icon: "login",
       },
       {
         title: "Nasdaq 100",
-        url: "/ptmm/ndx100",
+        url: "/tlmm/ndx100",
         icon: "login",
       },
       {
         title: "Russell 2K",
-        url: "/ptmm/IWM",
+        url: "/tlmm/IWM",
         icon: "login",
       },
     ],

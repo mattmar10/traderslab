@@ -75,7 +75,7 @@ export default function NavigationMenuDemo() {
         description: "NYSE Composite Index",
         data: snapshotsData.nyseOverview,
         ptTrendModel: trendModelsData.nyseTrendModel,
-        href: "/ptmm/nyse",
+        href: "/tlmm/nyse",
       },
       {
         key: "rsp",
@@ -84,7 +84,7 @@ export default function NavigationMenuDemo() {
         description: "Equal Weight S&P 500",
         data: snapshotsData.rspTradingOverview,
         ptTrendModel: trendModelsData.rspTrendModel,
-        href: "/ptmm/s&p500",
+        href: "/tlmm/s&p500",
       },
       {
         key: "ndx",
@@ -93,7 +93,7 @@ export default function NavigationMenuDemo() {
         description: "Equal Weight Nasdaq 100",
         data: snapshotsData.qqqETradingOverview,
         ptTrendModel: trendModelsData.qqqeTrendModel,
-        href: "/ptmm/ndx100",
+        href: "/tlmm/ndx100",
       },
       {
         key: "iwm",
@@ -102,7 +102,7 @@ export default function NavigationMenuDemo() {
         description: "Small Cap Index",
         data: snapshotsData.iwmTradingOverview,
         ptTrendModel: trendModelsData.iwmTrendModel,
-        href: "/ptmm/iwm",
+        href: "/tlmm/iwm",
       },
     ];
 

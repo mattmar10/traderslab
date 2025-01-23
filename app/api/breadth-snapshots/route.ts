@@ -2,13 +2,13 @@ import { NextResponse } from "next/server";
 import { fetchWithRetries } from "../utils";
 
 export async function GET() {
-    if (!process.env.TRADERS_LAB_API) {
+    if (!process.env.TRADERS_LAB_COMPUTE_API) {
         return NextResponse.json(
-            { error: "TRADERS_LAB_API must be specified" },
+            { error: "TRADERS_LAB_COMPUTE_API must be specified" },
             { status: 500 }
         );
     }
-    const url = `${process.env.TRADERS_LAB_API}/breadth/overview/snapshots`;
+    const url = `${process.env.TRADERS_LAB_COMPUTE_API}/breadth/snapshots`;
 
     try {
         console.log(`fetching breadth snapshots from ${url}`);

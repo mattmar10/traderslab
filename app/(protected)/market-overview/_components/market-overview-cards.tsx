@@ -63,7 +63,7 @@ const MarketOverViewCards: React.FC = () => {
         description: "NYSE Composite Index",
         data: snapshotsData.nyseOverview,
         ptTrendModel: trendModelsData.nyseTrendModel,
-        href: "/ptmm/nyse",
+        href: "/tlmm/nyse",
       },
       {
         key: "rsp",
@@ -72,7 +72,7 @@ const MarketOverViewCards: React.FC = () => {
         description: "Equal Weight S&P 500",
         data: snapshotsData.rspTradingOverview,
         ptTrendModel: trendModelsData.rspTrendModel,
-        href: "/ptmm/s&p500",
+        href: "/tlmm/s&p500",
       },
       {
         key: "ndx",
@@ -81,7 +81,7 @@ const MarketOverViewCards: React.FC = () => {
         description: "Equal Weight Nasdaq 100",
         data: snapshotsData.qqqETradingOverview,
         ptTrendModel: trendModelsData.qqqeTrendModel,
-        href: "/ptmm/ndx100",
+        href: "/tlmm/ndx100",
       },
       {
         key: "iwm",
@@ -90,7 +90,7 @@ const MarketOverViewCards: React.FC = () => {
         description: "Small Cap Index",
         data: snapshotsData.iwmTradingOverview,
         ptTrendModel: trendModelsData.iwmTrendModel,
-        href: "/ptmm/iwm",
+        href: "/tlmm/iwm",
       },
     ];
 
