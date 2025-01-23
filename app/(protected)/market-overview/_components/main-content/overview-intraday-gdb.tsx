@@ -1,7 +1,7 @@
 "use client";
 
 import Loading from "@/components/loading";
-import { CurrentDayMarketBreadthSnapshot, CurrentDayMarketBreadthSnapshotArraySchema } from "@/lib/types/market-breadth-types";
+import { CurrentDayMarketBreadthSnapshot, CurrentDayMarketBreadthSnapshotArraySchema, MarketBreadthGDBSnapshot, MarketBreadthGDBSnapshotSchema, MarketBreadthSnapshotArraySchema } from "@/lib/types/market-breadth-types";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -28,12 +28,12 @@ const OverviewIntradayGDB: React.FC = () => {
   const [chartSeries, setChartSeries] = useState<any[]>([]);
   const [errorState, setErrorState] = useState<string | null>(null);
 
-  const snapshotsKey = `/api/breadth-snapshots`;
+  const snapshotsKey = `/api/gdb-snapshots`;
 
   const getSnapshots = async () => {
     const res = await fetch(snapshotsKey);
     const data = await res.json();
-    const parsed = CurrentDayMarketBreadthSnapshotArraySchema.safeParse(data);
+    const parsed = MarketBreadthSnapshotArraySchema.safeParse(data);
     return parsed.success ? parsed.data : "Unable to parse quote results";
   };
 
@@ -195,7 +195,7 @@ const OverviewIntradayGDB: React.FC = () => {
 export default OverviewIntradayGDB;
 
 function buildChartSeries(
-  data: CurrentDayMarketBreadthSnapshot[],
+  data: MarketBreadthGDBSnapshot[],
   showMarkets: boolean,
   showSectors: boolean
 ): IntradayGDBChartSeries[] {
@@ -267,7 +267,7 @@ function buildChartSeries(
     ]
     : [];
 
-  if (showSectors) {
+  /*if (showSectors) {
     const sectorColors = generateSectorColors();
     const sectorSeriesMap: { [key: string]: IntradayGDBChartPoint[] } = {};
 
@@ -293,7 +293,7 @@ function buildChartSeries(
     }));
 
     return [...series, ...sectorSeries];
-  }
+  }*/
 
   return series;
 }
