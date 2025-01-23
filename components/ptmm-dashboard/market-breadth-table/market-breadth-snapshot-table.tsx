@@ -93,17 +93,17 @@ const sectorsNameMap: Map<string, string> = new Map([
 ]);
 
 const sectorsTickerMap: Map<string, string> = new Map([
-  ["utilities", "RSPU"],
-  ["consumer-defensive", "RSPS"],
-  ["real-estate", "RSPR"],
-  ["industrials", "RSPN"],
-  ["basic-materials", "RSPM"],
-  ["healthcare", "RSPH"],
-  ["consumer-cyclical", "RSPD"],
-  ["technology", "RSPT"],
-  ["financial-services", "RSPF"],
-  ["energy", "RSPG"],
-  ["communication-services", "RSPC"],
+  ["Utilities", "RSPU"],
+  ["Consumer Defensive", "RSPS"],
+  ["Real Estate", "RSPR"],
+  ["Industrials", "RSPN"],
+  ["Basic Materials", "RSPM"],
+  ["Healthcare", "RSPH"],
+  ["Consumer Cyclical", "RSPD"],
+  ["Technology", "RSPT"],
+  ["Financial Services", "RSPF"],
+  ["Energy", "RSPG"],
+  ["Communication Services", "RSPC"],
 ]);
 
 const getTableRow = (
