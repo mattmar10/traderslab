@@ -258,6 +258,24 @@ const CurrentDayMarketBreadthSnapshotPointSchema = z.object({
   globalDailyBreadthPercentileRank: z.number(),
 });
 
+const MarketBreadthGDBSnapshotPointSchema = z.object({
+  globalDailyBreadthPercentileRank: z.number(),
+});
+
+const SectorMarketBreadthGDBSnapshotSchema = z.object({
+  sector: z.string(),
+  overview: MarketBreadthGDBSnapshotPointSchema,
+});
+
+export const MarketBreadthGDBSnapshotSchema = z.object({
+  timestamp: z.number(),
+  nyseOverview: MarketBreadthGDBSnapshotPointSchema,
+  rspTradingOverview: MarketBreadthGDBSnapshotPointSchema,
+  qqqETradingOverview: MarketBreadthGDBSnapshotPointSchema,
+  iwmTradingOverview: MarketBreadthGDBSnapshotPointSchema,
+  //sectorsOverviews: z.array(SectorMarketBreadthGDBSnapshotSchema),
+});
+
 const SectorCurrentDayMarketBreadthSnapshotSchema = z.object({
   sector: z.string(),
   overview: CurrentDayMarketBreadthSnapshotPointSchema,
@@ -288,3 +306,11 @@ export const CurrentDayMarketBreadthSnapshotArraySchema = z.array(
 export type CurrentDayMarketBreadthSnapshotList = z.infer<
   typeof CurrentDayMarketBreadthSnapshotArraySchema
 >;
+
+export type MarketBreadthGDBSnapshot = z.infer<
+  typeof MarketBreadthGDBSnapshotSchema
+>;
+
+export const MarketBreadthSnapshotArraySchema = z.array(
+  MarketBreadthGDBSnapshotSchema
+);
