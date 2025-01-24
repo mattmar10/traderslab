@@ -1,7 +1,7 @@
 "use client";
 
 import Loading from "@/components/loading";
-import { MarketBreadthGDBSnapshot, MarketBreadthSnapshotArraySchema } from "@/lib/types/market-breadth-types";
+import { IntradayGDBResponse, IntradayGDBResponseSchema } from "@/lib/types/market-breadth-types";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -33,7 +33,7 @@ const OverviewIntradayGDB: React.FC = () => {
   const getSnapshots = async () => {
     const res = await fetch(snapshotsKey);
     const data = await res.json();
-    const parsed = MarketBreadthSnapshotArraySchema.safeParse(data);
+    const parsed = IntradayGDBResponseSchema.safeParse(data);
     return parsed.success ? parsed.data : "Unable to parse quote results";
   };
 
@@ -195,30 +195,31 @@ const OverviewIntradayGDB: React.FC = () => {
 export default OverviewIntradayGDB;
 
 function buildChartSeries(
-  data: MarketBreadthGDBSnapshot[],
+  data: IntradayGDBResponse,
   showMarkets: boolean,
   //showSectors: boolean
 ): IntradayGDBChartSeries[] {
-  // Map for each snapshot for each overview (NYSE, RSP, QQE, IWM)
-  const nyseSeries: IntradayGDBChartPoint[] = data.map((snapshot) => ({
-    timestamp: snapshot.timestamp,
-    value: snapshot.nyseOverview.globalDailyBreadthPercentileRank,
-  }));
 
-  const rspSeries: IntradayGDBChartPoint[] = data.map((snapshot) => ({
-    timestamp: snapshot.timestamp,
-    value: snapshot.rspTradingOverview.globalDailyBreadthPercentileRank,
-  }));
+  const nyseSeries: IntradayGDBChartPoint[] = data.data.find(line => line.symbol === "NYSE")?.series.map(point => ({
+    timestamp: point.timestamp,
+    value: point.value,
+  })) || [];
 
-  const qqeSeries: IntradayGDBChartPoint[] = data.map((snapshot) => ({
-    timestamp: snapshot.timestamp,
-    value: snapshot.qqqETradingOverview.globalDailyBreadthPercentileRank,
-  }));
+  const rspSeries: IntradayGDBChartPoint[] = data.data.find(line => line.symbol === "RSP")?.series.map(point => ({
+    timestamp: point.timestamp,
+    value: point.value,
+  })) || [];
 
-  const iwmSeries: IntradayGDBChartPoint[] = data.map((snapshot) => ({
-    timestamp: snapshot.timestamp,
-    value: snapshot.iwmTradingOverview.globalDailyBreadthPercentileRank,
-  }));
+  const qqeSeries: IntradayGDBChartPoint[] = data.data.find(line => line.symbol === "QQQE")?.series.map(point => ({
+    timestamp: point.timestamp,
+    value: point.value,
+  })) || [];
+
+
+  const iwmSeries: IntradayGDBChartPoint[] = data.data.find(line => line.symbol === "IWM")?.series.map(point => ({
+    timestamp: point.timestamp,
+    value: point.value,
+  })) || [];
 
   /*const generateSectorColors = () => [
     "#FF6B6B", // Coral Red

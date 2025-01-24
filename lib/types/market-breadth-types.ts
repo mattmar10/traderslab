@@ -314,3 +314,22 @@ export type MarketBreadthGDBSnapshot = z.infer<
 export const MarketBreadthSnapshotArraySchema = z.array(
   MarketBreadthGDBSnapshotSchema
 );
+
+
+const IntradayGDBPointSchema = z.object({
+  timestamp: z.number(),
+  value: z.number()
+});
+
+const IntradayGDBLineSchema = z.object({
+  series: z.array(IntradayGDBPointSchema),
+  symbol: z.string()
+});
+
+export const IntradayGDBResponseSchema = z.object({
+  data: z.array(IntradayGDBLineSchema)
+});
+
+export type IntradayGDBPoint = z.infer<typeof IntradayGDBPointSchema>;
+export type IntradayGDBLine = z.infer<typeof IntradayGDBLineSchema>;
+export type IntradayGDBResponse = z.infer<typeof IntradayGDBResponseSchema>;
